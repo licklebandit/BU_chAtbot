@@ -1,36 +1,65 @@
 import express from "express";
-import OpenAI from "openai";
-import { searchSimilar } from "../utils/vectorStore.js";
 import dotenv from "dotenv";
-dotenv.config();
+import OpenAI from "openai";
+import fs from "fs";
 
+dotenv.config();
 const router = express.Router();
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Load Bugema knowledge base (simple JSON file)
+const knowledgePath = "./data/knowledge.json";
+let knowledge = [];
+
+if (fs.existsSync(knowledgePath)) {
+  const fileData = fs.readFileSync(knowledgePath, "utf8");
+  try {
+    knowledge = JSON.parse(fileData);
+  } catch (error) {
+    console.error("⚠️ Error parsing knowledge.json:", error);
+  }
+} else {
+  console.warn("⚠️ knowledge.json not found. The chatbot may have limited answers.");
+}
 
 router.post("/", async (req, res) => {
   const { q } = req.body;
-  if (!q) return res.status(400).json({ error: "Question required" });
 
-  const results = await searchSimilar(q, 4);
-  const context = results.map(r => `Source: ${r.source}\n${r.chunk}`).join("\n\n");
+  if (!q || q.trim() === "") {
+    return res.status(400).json({ answer: "Please ask a valid question." });
+  }
 
-  const prompt = `
-You are Bugema University Assistant. Use the provided context to answer user questions accurately.
-If you don't know the answer, say you don't know.
-Context:\n${context}\n
-Question: ${q}
-Answer:
-  `;
+  // Try to match question with Bugema knowledge base
+  let context = "You are Bugema University’s AI assistant. Be polite, helpful, and accurate.";
+  let found = knowledge.find(item =>
+    q.toLowerCase().includes(item.keyword.toLowerCase())
+  );
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.3,
-  });
+  if (found) {
+    context += `\nRelevant info: ${found.answer}`;
+  }
 
-  const answer = completion.choices[0].message.content;
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini", // or "gpt-3.5-turbo" if cheaper
+      messages: [
+        { role: "system", content: context },
+        { role: "user", content: q },
+      ],
+    });
 
-  res.json({ answer, sources: results.map(r => r.source) });
+    const answer = completion.choices[0].message.content.trim();
+    res.json({ answer });
+  } catch (error) {
+    console.error("❌ Chat route error:", error);
+    res.status(500).json({
+      answer: "Sorry, I couldn’t process your request right now.",
+    });
+  }
 });
 
 export default router;

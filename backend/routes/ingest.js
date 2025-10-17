@@ -1,28 +1,43 @@
 import express from "express";
-import { chunkText } from "../utils/chunker.js";
-import { addDocumentChunks } from "../utils/vectorStore.js";
-import fetch from "node-fetch";
+import fs from "fs";
 
 const router = express.Router();
+const dataPath = "./data/knowledge.json";
 
-router.post("/url", async (req, res) => {
-  const { url } = req.body;
-  if (!url) return res.status(400).json({ error: "URL required" });
+// Ensure data folder exists
+if (!fs.existsSync("./data")) {
+  fs.mkdirSync("./data");
+}
 
-  const response = await fetch(url);
-  const html = await response.text();
-  const text = html.replace(/<[^>]*>/g, " "); // basic HTML strip
-  const chunks = chunkText(text);
-  await addDocumentChunks(chunks, url);
-  res.json({ added: chunks.length });
+// Load existing knowledge base
+let knowledge = [];
+if (fs.existsSync(dataPath)) {
+  knowledge = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+}
+
+// ✅ Add or update a knowledge entry
+router.post("/", (req, res) => {
+  const { keyword, answer } = req.body;
+
+  if (!keyword || !answer) {
+    return res.status(400).json({ message: "Both keyword and answer are required." });
+  }
+
+  const existingIndex = knowledge.findIndex(item => item.keyword === keyword);
+
+  if (existingIndex !== -1) {
+    knowledge[existingIndex].answer = answer;
+  } else {
+    knowledge.push({ keyword, answer });
+  }
+
+  fs.writeFileSync(dataPath, JSON.stringify(knowledge, null, 2));
+  res.json({ message: "Knowledge base updated successfully!" });
 });
 
-router.post("/text", async (req, res) => {
-  const { text, source } = req.body;
-  if (!text) return res.status(400).json({ error: "Text required" });
-  const chunks = chunkText(text);
-  await addDocumentChunks(chunks, source || "manual");
-  res.json({ added: chunks.length });
+// ✅ View all knowledge entries
+router.get("/", (req, res) => {
+  res.json(knowledge);
 });
 
 export default router;
