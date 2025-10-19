@@ -4,8 +4,21 @@ import path from "path";
 
 const router = express.Router();
 
-// Define path to the knowledge file
-const dataFile = path.resolve("data", "knowledge.json");
+// ✅ Use a writable directory on Render
+const tempDir = "/tmp";
+const tempFile = path.join(tempDir, "knowledge.json");
+
+// ✅ Fallback: local file for development
+const localFile = path.resolve("data", "knowledge.json");
+
+// Decide file path based on environment
+const dataFile = process.env.RENDER ? tempFile : localFile;
+
+// Ensure data file exists
+if (!fs.existsSync(dataFile)) {
+  const initialData = [];
+  fs.writeFileSync(dataFile, JSON.stringify(initialData, null, 2));
+}
 
 // 🧾 GET all knowledge items
 router.get("/", (req, res) => {
@@ -15,6 +28,7 @@ router.get("/", (req, res) => {
       : [];
     res.json(data);
   } catch (err) {
+    console.error("❌ Error reading knowledge:", err);
     res.status(500).json({ error: "Failed to read knowledge file" });
   }
 });
@@ -23,7 +37,9 @@ router.get("/", (req, res) => {
 router.post("/", (req, res) => {
   const { question, answer } = req.body;
   if (!question || !answer)
-    return res.status(400).json({ error: "Both question and answer are required" });
+    return res
+      .status(400)
+      .json({ error: "Both question and answer are required" });
 
   try {
     const data = fs.existsSync(dataFile)
@@ -35,7 +51,7 @@ router.post("/", (req, res) => {
     );
 
     if (existingIndex >= 0) {
-      data[existingIndex].answer = answer; // Update existing
+      data[existingIndex].answer = answer;
     } else {
       data.push({ question, answer });
     }
@@ -43,7 +59,8 @@ router.post("/", (req, res) => {
     fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
     res.json({ success: true, data });
   } catch (err) {
-    res.status(500).json({ error: "Failed to write knowledge file" });
+    console.error("❌ Error saving knowledge:", err);
+    res.status(500).json({ error: "Failed to save knowledge file" });
   }
 });
 
