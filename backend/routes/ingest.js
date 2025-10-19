@@ -1,43 +1,50 @@
 import express from "express";
 import fs from "fs";
+import path from "path";
 
 const router = express.Router();
-const dataPath = "./data/knowledge.json";
 
-// Ensure data folder exists
-if (!fs.existsSync("./data")) {
-  fs.mkdirSync("./data");
-}
+// Define path to the knowledge file
+const dataFile = path.resolve("data", "knowledge.json");
 
-// Load existing knowledge base
-let knowledge = [];
-if (fs.existsSync(dataPath)) {
-  knowledge = JSON.parse(fs.readFileSync(dataPath, "utf8"));
-}
-
-// ✅ Add or update a knowledge entry
-router.post("/", (req, res) => {
-  const { keyword, answer } = req.body;
-
-  if (!keyword || !answer) {
-    return res.status(400).json({ message: "Both keyword and answer are required." });
+// 🧾 GET all knowledge items
+router.get("/", (req, res) => {
+  try {
+    const data = fs.existsSync(dataFile)
+      ? JSON.parse(fs.readFileSync(dataFile))
+      : [];
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to read knowledge file" });
   }
-
-  const existingIndex = knowledge.findIndex(item => item.keyword === keyword);
-
-  if (existingIndex !== -1) {
-    knowledge[existingIndex].answer = answer;
-  } else {
-    knowledge.push({ keyword, answer });
-  }
-
-  fs.writeFileSync(dataPath, JSON.stringify(knowledge, null, 2));
-  res.json({ message: "Knowledge base updated successfully!" });
 });
 
-// ✅ View all knowledge entries
-router.get("/", (req, res) => {
-  res.json(knowledge);
+// 💾 POST: Add or update a knowledge item
+router.post("/", (req, res) => {
+  const { question, answer } = req.body;
+  if (!question || !answer)
+    return res.status(400).json({ error: "Both question and answer are required" });
+
+  try {
+    const data = fs.existsSync(dataFile)
+      ? JSON.parse(fs.readFileSync(dataFile))
+      : [];
+
+    const existingIndex = data.findIndex(
+      (item) => item.question.toLowerCase() === question.toLowerCase()
+    );
+
+    if (existingIndex >= 0) {
+      data[existingIndex].answer = answer; // Update existing
+    } else {
+      data.push({ question, answer });
+    }
+
+    fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to write knowledge file" });
+  }
 });
 
 export default router;
