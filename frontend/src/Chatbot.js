@@ -9,12 +9,28 @@ function Chatbot() {
   const [chats, setChats] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [status, setStatus] = useState("🟢 Online");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Set sidebarOpen to false by default on small screens for better initial view
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 769); 
+  
+
+  // Toggle sidebar on screen size change
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 769);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
     if (token) fetchChats();
+
+    // Initialize chat on load
+    setMessages([
+        { role: "assistant", text: "🎓 Welcome! How can I help you today?" },
+    ]);
   }, []);
 
   const fetchChats = async () => {
@@ -24,17 +40,26 @@ function Chatbot() {
       const res = await axios.get("https://bu-chatbot.onrender.com/chat/history", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setChats(res.data || []);
+      // Limit to 5 recent chats for a clean view, reverse for newest first
+      setChats(res.data ? res.data.slice(-5).reverse() : []);
     } catch (err) {
       console.error("Error fetching chats:", err);
     }
   };
 
+  const loadChat = (chatMessages) => {
+    setMessages(chatMessages);
+    // Close sidebar on mobile after selecting a chat
+    if (window.innerWidth < 769) setSidebarOpen(false);
+  };
+
   const resetChat = () => {
     setMessages([
-      { role: "assistant", text: "🎓 New session started. How can I help you today?" },
+      { role: "assistant", text: "New session started. How can I help you today?" },
     ]);
     setFreeCount(0);
+    // Close sidebar on mobile after starting a new chat
+    if (window.innerWidth < 769) setSidebarOpen(false);
   };
 
   const sendMessage = async () => {
@@ -56,19 +81,19 @@ function Chatbot() {
       const token = localStorage.getItem("token");
       const res = await axios.post(
         "https://bu-chatbot.onrender.com/chat",
-        { q: input },
+        { q: userMsg.text }, // Use the stored userMsg.text
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
 
       const botMsg = { role: "assistant", text: res.data.answer };
       setMessages((prev) => [...prev, botMsg]);
       if (!isLoggedIn) setFreeCount((c) => c + 1);
-      if (isLoggedIn) fetchChats();
+      if (isLoggedIn) fetchChats(); // Refresh chats after sending a message
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: "⚠️ Unable to process your message." },
+        { role: "assistant", text: "⚠️ Unable to process your message. Please try again." },
       ]);
     } finally {
       setLoading(false);
@@ -77,27 +102,38 @@ function Chatbot() {
 
   return (
     <>
-      {/* ✅ Inline Responsive CSS */}
+      {/* 💻 Responsive CSS */}
       <style>{`
+        /* Mobile-first approach: Sidebar hidden by default on small screens */
         @media (max-width: 768px) {
           .sidebar {
             position: fixed;
-            left: -280px;
-            transition: left 0.3s ease;
+            left: -300px; /* Hidden position */
+            transition: left 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: none; /* No shadow when hidden */
           }
           .sidebar.open {
-            left: 0;
+            left: 0; /* Visible position */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* Shadow when open */
           }
           .menu-btn {
-            display: block;
+            display: block; /* Show menu button on mobile */
           }
           .main {
-            margin-left: 0 !important;
+            margin-left: 0 !important; /* Main content takes full width */
+            padding-top: 50px; /* Space for the menu button */
+          }
+          .chat-history {
+            max-height: 180px; /* More space for history on mobile */
           }
         }
+        /* Desktop styles (769px and up) */
         @media (min-width: 769px) {
           .menu-btn {
-            display: none;
+            display: none; /* Hide menu button on desktop */
+          }
+          .main-shift {
+            margin-left: 300px !important; /* Shift main content when sidebar is open */
           }
         }
       `}</style>
@@ -109,7 +145,7 @@ function Chatbot() {
           style={styles.menuButton}
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          ☰
+          {sidebarOpen ? "✖" : "☰"}
         </button>
 
         {/* Sidebar */}
@@ -128,29 +164,32 @@ function Chatbot() {
           </button>
 
           <div style={styles.section}>
-            <h4 style={styles.sectionTitle}>📚 Select Topic</h4>
+            <h4 style={styles.sectionTitle}> Select Topic</h4>
             {["Admissions","Registration","Academics","Financial Aid","Student Life","Campus Tour","Nearby Hostels","Cafeteria"]
               .map((topic) => (
-                <p key={topic} style={styles.link}>{topic}</p>
+                <p 
+                  key={topic} 
+                  style={styles.link}
+                  onClick={() => setInput(topic)} // Pre-fill input with topic
+                >
+                  {topic}
+                </p>
               ))}
           </div>
-
-          <div style={styles.section}>
-            <h4 style={styles.sectionTitle}>🏫 University Resources</h4>
-            {["Student Portal","Academic Calendar","Work Program","Hospital","Emergency Contacts"]
-              .map((r) => (
-                <p key={r} style={styles.link}>{r}</p>
-              ))}
-          </div>
-
+          
+          {/* ✅ Recent Chats Section */}
           {isLoggedIn && chats.length > 0 && (
             <div style={styles.section}>
-              <h4 style={styles.sectionTitle}>💬 Chat History</h4>
-              <div style={styles.chatList}>
+              <h4 style={styles.sectionTitle}>💬 Recent Chats ({chats.length})</h4>
+              <div className='chat-history' style={styles.chatList}>
                 {chats.map((c, i) => (
-                  <div key={i} style={styles.chatItem}>
+                  <div 
+                    key={i} 
+                    style={styles.chatItem}
+                    onClick={() => loadChat(c.messages)} // Load the selected chat
+                  >
                     <p style={styles.chatTitle}>
-                      {c.messages[0]?.text.slice(0, 25) || "Conversation"}
+                      {c.messages.find(m => m.role === 'user')?.text.slice(0, 30) + '...' || "Conversation"}
                     </p>
                     <p style={styles.chatTime}>
                       {new Date(c.updatedAt).toLocaleDateString()}
@@ -161,24 +200,48 @@ function Chatbot() {
             </div>
           )}
 
-          <div style={styles.footer}>
-            <p style={{ fontSize: "12px", color: "#999" }}>📅 Last Updated: Oct 2025</p>
-            <p style={{ fontSize: "12px", color: "#999" }}>🕐 Hours: 24/7 AI Support</p>
+          <div style={styles.section}>
+            <h4 style={styles.sectionTitle}> University Resources</h4>
+            {["Student Portal","Academic Calendar","Work Program","Hospital","Emergency Contacts"]
+              .map((r) => (
+                <p key={r} style={styles.link}>{r}</p>
+              ))}
           </div>
         </div>
 
         {/* Main Chat Area */}
         <div
-          className="main"
+          className={`main ${sidebarOpen && window.innerWidth >= 769 ? "main-shift" : ""}`}
           style={{
             ...styles.main,
-            marginLeft: sidebarOpen ? "300px" : "0",
+            // Inline style for desktop shift is now handled by the 'main-shift' class for responsiveness
           }}
         >
+
+          <div style={styles.topBar}>
+  {!isLoggedIn ? (
+    <div style={styles.authButtons}>
+      <a href="/login" style={styles.loginBtn}>Login</a>
+      <a href="/signup" style={styles.signupBtn}>Sign Up</a>
+    </div>
+  ) : (
+    <div style={styles.authButtons}>
+      <button
+        style={styles.logoutBtn}
+        onClick={() => {
+          localStorage.removeItem("token");
+          setIsLoggedIn(false);
+        }}
+      >
+            Logout
+            </button>
+            </div>
+            )}
+          </div>
           <div style={styles.chatWindow}>
             {messages.length === 0 && (
               <p style={{ color: "#044163ff" }}>
-                 What do you like to know about Bugema university!
+                  What do you like to know about Bugema university!
               </p>
             )}
             {messages.map((msg, i) => (
@@ -186,7 +249,7 @@ function Chatbot() {
                 key={i}
                 style={{
                   textAlign: msg.role === "user" ? "right" : "left",
-                  marginBottom: 5,
+                  marginBottom: 10, // Increased margin for better spacing
                 }}
               >
                 <span
@@ -200,7 +263,9 @@ function Chatbot() {
                 </span>
               </div>
             ))}
-            {loading && <p> Typing...</p>}
+            {loading && <p style={{ textAlign: 'left', margin: '10px 0' }}>Typing...</p>}
+            {/* Scroll to bottom marker (you'd typically implement auto-scroll here with a ref) */}
+            <div style={{ float:"left", clear: "both" }} /> 
           </div>
 
           <div style={styles.inputRow}>
@@ -210,11 +275,19 @@ function Chatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              disabled={loading} // Disable input while loading
             />
-            <button style={styles.button} onClick={sendMessage}>
+            <button 
+              style={styles.button} 
+              onClick={sendMessage}
+              disabled={loading || !input.trim()} // Disable send button when loading or input is empty
+            >
               Send
             </button>
           </div>
+          <p style={{ fontSize: "11px", color: "#777", textAlign: "center", marginTop: "5px" }}>
+              {!isLoggedIn ? `Free questions remaining: ${3 - freeCount}` : "Logged in. Unlimited access."}
+          </p>
         </div>
       </div>
     </>
@@ -228,31 +301,84 @@ const styles = {
     background: "#f4f8ff",
     position: "relative",
     overflow: "hidden",
+    fontFamily: 'Arial, sans-serif',
   },
   menuButton: {
     position: "absolute",
     top: 10,
     left: 10,
-    background: "#0078ff",
+    background: "#0a59b4ff",
     color: "white",
     border: "none",
-    borderRadius: "10px",
-    padding: "8px 12px",
+    borderRadius: "50%", // Made it round
+    width: "40px",
+    height: "40px",
+    lineHeight: "40px",
+    textAlign: "center",
     cursor: "pointer",
     zIndex: 20,
+    fontSize: "20px",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   },
+  topBar: {
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  marginBottom: "10px",
+},
+
+authButtons: {
+  display: "flex",
+  gap: "10px",
+},
+
+loginBtn: {
+  padding: "8px 16px",
+  backgroundColor: "white",
+  color: "#1257a5ff",
+  border: "1px solid #1257a5ff",
+  borderRadius: "20px",
+  textDecoration: "none",
+  fontWeight: "bold",
+  fontSize: "14px",
+  transition: "all 0.2s ease",
+  cursor: "pointer",
+},
+signupBtn: {
+  padding: "8px 16px",
+  backgroundColor: "#1257a5ff",
+  color: "white",
+  border: "none",
+  borderRadius: "20px",
+  textDecoration: "none",
+  fontWeight: "bold",
+  fontSize: "14px",
+  transition: "background-color 0.2s ease",
+  cursor: "pointer",
+},
+logoutBtn: {
+  padding: "8px 16px",
+  backgroundColor: "#d32f2f",
+  color: "white",
+  border: "none",
+  borderRadius: "20px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  fontSize: "14px",
+  transition: "background-color 0.2s ease",
+},
+
   sidebar: {
     position: "fixed",
     top: 0,
-    left: 0,
     width: "280px",
     height: "100%",
     background: "#f8fafaff",
     borderRight: "1px solid #83d7f8ff",
-    padding: "10px",
+    padding: "15px", // Increased padding
     display: "flex",
     flexDirection: "column",
-    overflow: "hidden",
+    overflowY: "auto", // Allow scrolling for long content
     transition: "left 0.3s ease",
     zIndex: 10,
   },
@@ -260,73 +386,110 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    marginBottom: "15px",
+    marginBottom: "20px",
+    paddingBottom: "10px",
+    borderBottom: "1px solid #eee",
   },
-  avatar: { width: "60px", height: "60px", borderRadius: "50%" },
+  avatar: { width: "50px", height: "50px", borderRadius: "50%" },
   newChatBtn: {
     background: "#0a59b4ff",
     color: "white",
     border: "none",
     borderRadius: "10px",
-    padding: "8px 10px",
+    padding: "10px", // Increased padding
     cursor: "pointer",
-    marginBottom: "4px",
+    marginBottom: "15px", // Increased margin
+    fontWeight: "bold",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   },
-  section: { marginBottom: "8px" },
+  section: { marginBottom: "15px" },
   sectionTitle: {
     fontSize: "14px",
     fontWeight: "bold",
-    marginBottom: "5px",
+    marginBottom: "8px",
     color: "#131392ff",
+    borderBottom: "1px solid #f0f0f0",
+    paddingBottom: "4px",
   },
-  link: { fontSize: "13px", color: "#252424ff", margin: "4px 0", cursor: "pointer" },
-  chatList: { maxHeight: "140px", overflowY: "auto" },
-  chatItem: { borderBottom: "1px solid #eee", padding: "4px 0" },
-  chatTitle: { fontSize: "13px", fontWeight: "bold" },
-  chatTime: { fontSize: "11px", color: "#777" },
+  link: { 
+    fontSize: "13px", 
+    color: "#252424ff", 
+    margin: "6px 0", 
+    cursor: "pointer",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    transition: "background-color 0.2s",
+    '&:hover': {
+        backgroundColor: "#eef2ff",
+    }
+  },
+  chatList: { 
+    maxHeight: "180px", // Increased max height
+    overflowY: "auto", 
+    paddingRight: "5px" 
+  },
+  chatItem: { 
+    borderBottom: "1px solid #eee", 
+    padding: "6px 0", 
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+    borderRadius: "4px",
+    paddingLeft: "8px",
+    '&:hover': {
+        backgroundColor: "#eef2ff",
+    }
+  },
+  chatTitle: { fontSize: "13px", fontWeight: "600", margin: 0 },
+  chatTime: { fontSize: "10px", color: "#777", margin: 0, marginTop: "2px" },
   main: {
     flex: 1,
     display: "flex",
     flexDirection: "column",
-    padding: "10px",
-    height: "95vh",
+    padding: "20px", // Increased padding
+    height: "100vh", // Use 100vh for full height
     overflow: "hidden",
     transition: "margin-left 0.3s ease",
+    marginLeft: window.innerWidth >= 769 ? "300px" : "0", // Initial desktop margin
   },
   chatWindow: {
     flex: 1,
     overflowY: "auto",
-    marginBottom: "8px",
-    padding: "10px",
+    marginBottom: "10px",
+    padding: "15px", // Increased padding
     background: "white",
-    borderRadius: "8px",
-    boxShadow: "0 2px 6px hsla(211, 92%, 38%, 0.05)",
+    borderRadius: "12px", // Increased border radius
+    boxShadow: "0 4px 12px rgba(0, 77, 140, 0.1)", // More pronounced shadow
   },
   message: {
     display: "inline-block",
     padding: "10px 14px",
-    borderRadius: "16px",
-    maxWidth: "80%",
+    borderRadius: "20px", // Fully rounded
+    maxWidth: "75%", // Slightly less wide for better readability
+    lineHeight: "1.4",
   },
-  inputRow: { display: "flex", gap: "10px" },
+  inputRow: { display: "flex", gap: "10px", alignItems: "center" },
   input: {
     flex: 1,
-    padding: "10px",
-    borderRadius: "8px",
+    padding: "12px", // Increased padding
+    borderRadius: "25px", // Fully rounded input
     border: "1px solid #1131bdff",
+    fontSize: "16px",
   },
   button: {
     background: "#1257a5ff",
     color: "white",
     border: "none",
-    borderRadius: "8px",
-    padding: "10px 16px",
+    borderRadius: "25px", // Fully rounded button
+    padding: "12px 20px", // Increased padding
     cursor: "pointer",
+    fontWeight: "bold",
+    transition: "background-color 0.2s",
   },
   footer: {
     borderTop: "1px solid #eee",
     paddingTop: "10px",
     marginTop: "auto",
+    textAlign: "center",
   },
 };
 
