@@ -6,7 +6,12 @@ function LandingPage() {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate("/chat");
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/chat"); // logged in user
+    } else {
+      navigate("/chat?guest=true"); // guest mode
+    }
   };
 
   return (
@@ -15,8 +20,8 @@ function LandingPage() {
 
       <div style={styles.content}>
         <img src="/bot.png" alt="Bot" style={styles.image} />
-        <h1 style={styles.title}>BU ChAtBot</h1>
-        <p style={styles.subtitle}>Ask me about Bugema University..</p>
+        <h1 style={styles.title}>BU ChatBot</h1>
+        <p style={styles.subtitle}>Ask me anything about Bugema University.</p>
 
         <button style={styles.button} onClick={handleGetStarted}>
           Get Started
@@ -56,15 +61,15 @@ const styles = {
     height: "180px",
     borderRadius: "50%",
     marginBottom: "20px",
-    boxShadow: "0 0 25px rgba(255,255,255,0.2)",
+    boxShadow: "0 0 25px rgba(255,255,255,0.3)",
   },
   title: {
-    fontSize: "2rem",
+    fontSize: "2.5rem",
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "15px",
   },
   subtitle: {
-    fontSize: "1.2rem",
+    fontSize: "1.3rem",
     marginBottom: "25px",
   },
   button: {

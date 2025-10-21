@@ -1,4 +1,3 @@
-// /backend/routes/chat.js
 import express from "express";
 import dotenv from "dotenv";
 import OpenAI from "openai";
@@ -12,61 +11,44 @@ const router = express.Router();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// 🧩 Load Bugema knowledge base
 const knowledgePath = "./data/knowledge.json";
 let knowledge = [];
 if (fs.existsSync(knowledgePath)) {
+  const fileData = fs.readFileSync(knowledgePath, "utf8");
   try {
-    const fileData = fs.readFileSync(knowledgePath, "utf8");
     knowledge = JSON.parse(fileData);
-  } catch (err) {
-    console.error("⚠️ Error parsing knowledge.json:", err);
+  } catch (error) {
+    console.error("⚠️ Error parsing knowledge.json:", error);
   }
+} else {
+  console.warn("⚠️ knowledge.json not found.");
 }
 
-// ✅ Middleware: verify token (optional)
-function verifyToken(req, res, next) {
+// ✅ Middleware to verify JWT
+const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return next();
+  if (!token) return next(); // guest mode
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-  } catch {
-    console.warn("⚠️ Invalid token");
+    req.user = await User.findById(decoded.id).select("_id name email");
+  } catch (err) {
+    console.error("JWT verification failed:", err.message);
   }
   next();
-}
+};
 
-// 🧠 CHAT ROUTE
-router.post("/", verifyToken, async (req, res) => {
+// ✅ Chat endpoint
+router.post("/", authenticate, async (req, res) => {
   const { q } = req.body;
-  if (!q?.trim()) return res.status(400).json({ answer: "Please ask a valid question." });
-
-  let user = null;
-  if (req.user) user = await User.findById(req.user.id);
-
-  // 🔒 Limit guest users to 3 questions (tracked per IP)
-  if (!user && req.ip) {
-    const guestFile = "./data/guests.json";
-    let guests = {};
-    if (fs.existsSync(guestFile)) {
-      guests = JSON.parse(fs.readFileSync(guestFile, "utf8"));
-    }
-    guests[req.ip] = (guests[req.ip] || 0) + 1;
-    fs.writeFileSync(guestFile, JSON.stringify(guests, null, 2));
-
-    if (guests[req.ip] > 3) {
-      return res.json({
-        answer:
-          "🔒 You’ve reached your free question limit. Please log in or sign up to continue chatting with Bugema University AI.",
-      });
-    }
+  if (!q || q.trim() === "") {
+    return res.status(400).json({ answer: "Please ask a valid question." });
   }
 
-  // 🎯 Search Bugema-specific knowledge base first
-  let context = "You are Bugema University’s official AI assistant. Only answer questions about Bugema University — such as admissions, programs, tuition, history, and campus life. Politely decline anything unrelated.";
-
-  const found = knowledge.find(item => q.toLowerCase().includes(item.keyword.toLowerCase()));
+  let context = "You are Bugema University’s AI assistant. Be polite, helpful, and accurate.";
+  const found = knowledge.find(item =>
+    q.toLowerCase().includes(item.keyword.toLowerCase())
+  );
   if (found) context += `\nRelevant info: ${found.answer}`;
 
   try {
@@ -80,14 +62,13 @@ router.post("/", verifyToken, async (req, res) => {
 
     const answer = completion.choices[0].message.content.trim();
 
-    // 💾 Save chat history for logged-in user
-    if (user) {
-      let chat = await Chat.findOne({ userId: user._id });
-      if (!chat) {
-        chat = new Chat({ userId: user._id, messages: [] });
-      }
-      chat.messages.push({ role: "user", content: q });
-      chat.messages.push({ role: "bot", content: answer });
+    // ✅ Save chat history if user is logged in
+    if (req.user) {
+      let chat = await Chat.findOne({ userId: req.user._id });
+      if (!chat) chat = new Chat({ userId: req.user._id, messages: [] });
+
+      chat.messages.push({ role: "user", text: q });
+      chat.messages.push({ role: "assistant", text: answer });
       await chat.save();
     }
 
@@ -95,8 +76,34 @@ router.post("/", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("❌ Chat route error:", error);
     res.status(500).json({
-      answer: "⚠️ Sorry, I couldn’t process your request at the moment.",
+      answer: "Sorry, I couldn’t process your request right now.",
     });
+  }
+});
+
+// ✅ Get chat history (for logged-in users)
+router.get("/history", authenticate, async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const chat = await Chat.findOne({ userId: req.user._id });
+    res.json(chat ? chat.messages : []);
+  } catch (error) {
+    console.error("Error fetching chat history:", error);
+    res.status(500).json({ message: "Error fetching chat history." });
+  }
+});
+
+// ✅ Clear chat history (for logged-in users)
+router.delete("/clear", authenticate, async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    await Chat.deleteMany({ userId: req.user._id });
+    res.json({ message: "Chat history cleared successfully." });
+  } catch (error) {
+    console.error("Error clearing chat history:", error);
+    res.status(500).json({ message: "Error clearing chat history." });
   }
 });
 
