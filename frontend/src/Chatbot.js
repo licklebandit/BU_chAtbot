@@ -1,28 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./App.css";
 
 function Chatbot() {
   const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      text: "🎓 Hello! I’m Bugema University’s AI Assistant. How can I help you today?",
-    },
+    { role: "assistant", text: "🎓 Hello! I’m Bugema University’s AI Assistant. How can I help you today?" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [freeCount, setFreeCount] = useState(0); // guest questions
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // ✅ Check login state on mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    // ✅ Guest limit: max 3 messages
+    if (!isLoggedIn && freeCount >= 3) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "🔒 You’ve reached your free question limit. Please log in or sign up to continue." },
+      ]);
+      return;
+    }
 
     const userMessage = { role: "user", text: input };
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL || "http://localhost:8000"}/chat`,
-        { q: input }
+        "https://bu-chatbot.onrender.com/chat",
+        { q: input },
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
       );
 
       const botMessage = {
@@ -31,14 +48,13 @@ function Chatbot() {
       };
 
       setMessages((prev) => [...prev, botMessage]);
+
+      if (!isLoggedIn) setFreeCount((count) => count + 1);
     } catch (error) {
       console.error(error);
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          text: "⚠️ Sorry, I couldn’t reach the server.",
-        },
+        { role: "assistant", text: "⚠️ Sorry, I couldn’t reach the server." },
       ]);
     } finally {
       setInput("");
@@ -46,9 +62,33 @@ function Chatbot() {
     }
   };
 
+  const handleLoginRedirect = () => {
+    window.location.href = "/login";
+  };
+
+  const handleSignupRedirect = () => {
+    window.location.href = "/signup";
+  };
+
   return (
     <div style={styles.container}>
       <h2>🎓 Bugema University Chatbot</h2>
+
+      {!isLoggedIn && (
+        <div style={styles.banner}>
+          <p>
+            You are chatting as a <strong>guest</strong>.{" "}
+            {3 - freeCount > 0 ? (
+              <>You have <strong>{3 - freeCount}</strong> free questions left.</>
+            ) : (
+              <>No free questions left.</>
+            )}
+          </p>
+          <button style={styles.loginBtn} onClick={handleLoginRedirect}>Login</button>
+          <button style={styles.signupBtn} onClick={handleSignupRedirect}>Sign Up</button>
+        </div>
+      )}
+
       <div style={styles.chatBox}>
         {messages.map((m, i) => (
           <div
@@ -61,10 +101,8 @@ function Chatbot() {
             <span
               style={{
                 ...styles.message,
-                background: m.role === "user" ? "#0078ff" : "#f1f1f1",
+                background: m.role === "user" ? "#4a4974ff" : "#c6cfcfff",
                 color: m.role === "user" ? "white" : "black",
-                alignSelf:
-                  m.role === "user" ? "flex-end" : "flex-start",
               }}
             >
               {m.text}
@@ -82,11 +120,7 @@ function Chatbot() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
-        <button
-          style={styles.button}
-          onClick={sendMessage}
-          disabled={loading}
-        >
+        <button style={styles.button} onClick={sendMessage} disabled={loading}>
           {loading ? "..." : "Send"}
         </button>
       </div>
@@ -103,6 +137,30 @@ const styles = {
     boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     background: "white",
     fontFamily: "Arial, sans-serif",
+  },
+  banner: {
+    padding: "10px",
+    marginBottom: "15px",
+    background: "#f9f9f9",
+    border: "1px solid #ddd",
+    borderRadius: 8,
+  },
+  loginBtn: {
+    background: "#0078ff",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    padding: "6px 12px",
+    marginRight: 8,
+    cursor: "pointer",
+  },
+  signupBtn: {
+    background: "#00b894",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    padding: "6px 12px",
+    cursor: "pointer",
   },
   chatBox: {
     border: "1px solid #ddd",

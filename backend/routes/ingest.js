@@ -1,66 +1,54 @@
 import express from "express";
-import fs from "fs";
-import path from "path";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import Knowledge from "../models/Knowledge.js";
 
+dotenv.config();
 const router = express.Router();
 
-// ✅ Use a writable directory on Render
-const tempDir = "/tmp";
-const tempFile = path.join(tempDir, "knowledge.json");
+// ✅ Middleware: verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Access denied" });
 
-// ✅ Fallback: local file for development
-const localFile = path.resolve("data", "knowledge.json");
-
-// Decide file path based on environment
-const dataFile = process.env.RENDER ? tempFile : localFile;
-
-// Ensure data file exists
-if (!fs.existsSync(dataFile)) {
-  const initialData = [];
-  fs.writeFileSync(dataFile, JSON.stringify(initialData, null, 2));
-}
-
-// 🧾 GET all knowledge items
-router.get("/", (req, res) => {
   try {
-    const data = fs.existsSync(dataFile)
-      ? JSON.parse(fs.readFileSync(dataFile))
-      : [];
-    res.json(data);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
   } catch (err) {
-    console.error("❌ Error reading knowledge:", err);
-    res.status(500).json({ error: "Failed to read knowledge file" });
+    res.status(403).json({ message: "Invalid token" });
+  }
+};
+
+// ✅ Add or update knowledge (admin only)
+router.post("/", verifyToken, async (req, res) => {
+  try {
+    const { keyword, answer } = req.body;
+    if (!keyword || !answer) return res.status(400).json({ message: "Keyword and answer required" });
+
+    const existing = await Knowledge.findOne({ keyword });
+    if (existing) {
+      existing.answer = answer;
+      await existing.save();
+      return res.json({ message: "✅ Knowledge updated successfully" });
+    }
+
+    const newKnowledge = new Knowledge({ keyword, answer });
+    await newKnowledge.save();
+    res.json({ message: "✅ Knowledge added successfully" });
+  } catch (error) {
+    console.error("Ingest error:", error);
+    res.status(500).json({ message: "❌ Failed to save knowledge" });
   }
 });
 
-// 💾 POST: Add or update a knowledge item
-router.post("/", (req, res) => {
-  const { question, answer } = req.body;
-  if (!question || !answer)
-    return res
-      .status(400)
-      .json({ error: "Both question and answer are required" });
-
+// ✅ Get all knowledge (for admin dashboard)
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const data = fs.existsSync(dataFile)
-      ? JSON.parse(fs.readFileSync(dataFile))
-      : [];
-
-    const existingIndex = data.findIndex(
-      (item) => item.question.toLowerCase() === question.toLowerCase()
-    );
-
-    if (existingIndex >= 0) {
-      data[existingIndex].answer = answer;
-    } else {
-      data.push({ question, answer });
-    }
-
-    fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
-    res.json({ success: true, data });
-  } catch (err) {
-    console.error("❌ Error saving knowledge:", err);
-    res.status(500).json({ error: "Failed to save knowledge file" });
+    const allKnowledge = await Knowledge.find();
+    res.json(allKnowledge);
+  } catch (error) {
+    res.status(500).json({ message: "❌ Could not fetch knowledge" });
   }
 });
 
