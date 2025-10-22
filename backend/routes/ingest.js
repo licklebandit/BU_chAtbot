@@ -1,30 +1,18 @@
+// /backend/routes/ingest.js
 import express from "express";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Knowledge from "../models/Knowledge.js";
+import { verifyAdmin } from "../middleware/authMiddleware.js";
 
 dotenv.config();
 const router = express.Router();
 
-// ✅ Middleware: verify JWT token
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access denied" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(403).json({ message: "Invalid token" });
-  }
-};
-
-// ✅ Add or update knowledge (admin only)
-router.post("/", verifyToken, async (req, res) => {
+// ✅ Add or update knowledge (admins only)
+router.post("/", verifyAdmin, async (req, res) => {
   try {
     const { keyword, answer } = req.body;
-    if (!keyword || !answer) return res.status(400).json({ message: "Keyword and answer required" });
+    if (!keyword || !answer)
+      return res.status(400).json({ message: "Keyword and answer required" });
 
     const existing = await Knowledge.findOne({ keyword });
     if (existing) {
@@ -43,7 +31,7 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 // ✅ Get all knowledge (for admin dashboard)
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyAdmin, async (req, res) => {
   try {
     const allKnowledge = await Knowledge.find();
     res.json(allKnowledge);
