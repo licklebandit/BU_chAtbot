@@ -16,10 +16,25 @@ function Login() {
     setMessage("");
 
     try {
-      const res = await axios.post("https://bu-chatbot.onrender.com/auth/login", form);
+      const res = await axios.post(
+        "https://bu-chatbot.onrender.com/auth/login",
+        form
+      );
+
+      // store token and role
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
+
       setMessage("✅ Login successful! Redirecting...");
-      setTimeout(() => (window.location.href = "/"), 1000);
+
+      // ✅ Redirect based on role
+      setTimeout(() => {
+        if (res.data.user.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/chatbot";
+        }
+      }, 1000);
     } catch (err) {
       setMessage("❌ " + (err.response?.data?.message || "Login failed."));
     } finally {
@@ -55,7 +70,10 @@ function Login() {
       </form>
       {message && <p>{message}</p>}
       <p>
-        Don’t have an account? <a href="/signup">Sign up here</a>
+        Don’t have an account?{" "}
+        <a href="/signup" style={{ color: "#0078ff" }}>
+          Sign up here
+        </a>
       </p>
     </div>
   );

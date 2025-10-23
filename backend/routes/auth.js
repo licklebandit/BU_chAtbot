@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password: hashed,
-      role: email === "admin@gmail.com" ? "admin" : "user", // prevent random admin creation
+      role: "user", // prevent random admin creation
     });
 
     await newUser.save();
