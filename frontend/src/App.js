@@ -8,34 +8,35 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import LandingPage from "./LandingPage";
-import Chatbot from "./Chatbot";
-import Admin from "./Admin";
-import Login from "./Login";
-import Signup from "./Signup";
+// FIX: Added .jsx extensions to resolve "Could not resolve" errors
+import LandingPage from "./LandingPage.js"; 
+import Chatbot from "./Chatbot.js";
+import Admin from "./Admin.js";
+import Login from "./Login.js";
+import Signup from "./Signup.js";
 
-// ✅ Route protection components
+// ✅ Admin Route Protection (Still required)
+// Only allows users with role 'admin' to access the component.
 function AdminRoute({ children }) {
   const role = localStorage.getItem("role");
   return role === "admin" ? children : <Navigate to="/" />;
 }
 
-function UserRoute({ children }) {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" />;
-}
+// NOTE: The UserRoute component is correctly removed, 
+// allowing all users to access the Chatbot.
 
 function MainApp() {
   const location = useLocation();
 
-  // Hide navbar on Landing Page and Chat Page
-  const hideNav = location.pathname === "/" || location.pathname === "/chat";
+  // Hide navbar on Landing Page and Chat Page. 
+  // Checks for the consistent path: /chatbot
+  const hideNav = location.pathname === "/" || location.pathname === "/chatbot";
 
   return (
     <div>
       {!hideNav && (
         <div style={{ textAlign: "center", margin: "20px" }}>
-          <Link to="/chat" style={styles.navLink}>
+          <Link to="/chatbot" style={styles.navLink}> 
             💬 Chatbot
           </Link>{" "}
           |{" "}
@@ -55,14 +56,16 @@ function MainApp() {
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        
+        {/* The Chatbot route is correctly UNPROTECTED and functional */}
         <Route
-          path="/chat"
+          path="/chatbot"
           element={
-            <UserRoute>
-              <Chatbot />
-            </UserRoute>
+            <Chatbot />
           }
         />
+        
+        {/* Admin route remains protected */}
         <Route
           path="/admin"
           element={

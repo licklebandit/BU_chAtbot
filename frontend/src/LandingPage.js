@@ -1,4 +1,3 @@
-// /frontend/src/components/LandingPage.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -6,12 +5,8 @@ function LandingPage() {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/chat"); // logged in user
-    } else {
-      navigate("/chat?guest=true"); // guest mode
-    }
+    // This must be set to /chatbot to match the App.jsx route definition
+    navigate("/chatbot"); 
   };
 
   return (
