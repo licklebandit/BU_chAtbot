@@ -1,3 +1,2 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* CORRECT for Tailwind v4 */
+@import "tailwindcss";
