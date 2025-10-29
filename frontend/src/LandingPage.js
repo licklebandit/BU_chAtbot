@@ -57,6 +57,8 @@ const styles = {
     borderRadius: "50%",
     marginBottom: "20px",
     boxShadow: "0 0 25px rgba(255,255,255,0.3)",
+    display: "block",
+    margin: "0 auto 20px auto",
   },
   title: {
     fontSize: "2.5rem",
