@@ -30,6 +30,7 @@ function MainApp() {
     location.pathname === "/" || 
     location.pathname === "/chatbot" || 
     location.pathname === "/login" || 
+    location.pathname === "/admin" || 
     location.pathname === "/signup";
 
   return (

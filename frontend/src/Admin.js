@@ -1,316 +1,662 @@
-import React, { useState, useMemo, useEffect } from 'react';
-
-// === Utility Functions for CSV Parsing and Data Handling ===
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 /**
- * A basic CSV parser that handles simple comma-separated values.
- * It treats the first row as headers.
- * @param {string} text The raw CSV text input.
- * @returns {{data: Array<Object>, columns: Array<string>}}
+ * Admin.jsx
+ * Bugema University Chatbot — Admin Dashboard (Advanced Analytics Hybrid)
+ *
+ * Drop this file in src/ and import it in App routes:
+ * <Route path="/admin" element={<Admin />} />
+ *
+ * Tailwind required.
  */
-const parseCSV = (text) => {
-  if (!text.trim()) {
-    return { data: [], columns: [] };
-  }
 
-  const rows = text.trim().split('\n').map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
-
-  if (rows.length === 0) {
-    return { data: [], columns: [] };
-  }
-
-  const columns = rows[0];
-  const data = rows.slice(1).map(row => {
-    const rowObj = {};
-    columns.forEach((col, index) => {
-      // Map data fields using the header names
-      rowObj[col] = row[index] || '';
-    });
-    return rowObj;
-  });
-
-  return { data, columns };
+/* -------------------------
+   Small inline SVG icons (no external deps)
+   ------------------------- */
+const Icon = {
+  Menu: ({ className = "h-5 w-5" }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  ),
+  Search: ({ className = "h-5 w-5" }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+    </svg>
+  ),
+  Users: ({ className = "h-5 w-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M17 21v-2a4 4 0 00-3-3.87M9 21v-2a4 4 0 013-3.87" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M12 11a4 4 0 100-8 4 4 0 000 8z" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Chat: ({ className = "h-5 w-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Analytics: ({ className = "h-5 w-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M7 13v5M12 8v10M17 4v14" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  Settings: ({ className = "h-5 w-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M12 15.5A3.5 3.5 0 1112 8.5a3.5 3.5 0 010 7z" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82L4.21 4.2A2 2 0 017 1.37l.06.06c.48.48 1.2.58 1.82.33.38-.16.82-.24 1.24-.24.42 0 .86.08 1.24.24a1.65 1.65 0 001.82-.33L15.8 2.8a2 2 0 012.83 2.83l-.06.06c-.48.48-.58 1.2-.33 1.82.16.38.24.82.24 1.24 0 .42-.08.86-.24 1.24z" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  File: ({ className = "h-5 w-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
 };
 
-// =========================================================
+/* -------------------------
+   Mock / demo data (replace with real API calls)
+   ------------------------- */
+const demo = {
+  metrics: {
+    chatsToday: 124,
+    activeUsers: 72,
+    avgResponseMs: 230,
+    accuracyPct: 89
+  },
+  chatsOverTime: [12, 18, 30, 24, 40, 28, 14, 20, 26, 50, 42, 36, 22, 18], // sample points
+  accuracyOverTime: [78, 80, 82, 85, 88, 86, 89, 90, 91, 92, 91, 90, 89, 89],
+  conversations: [
+    { id: "c_001", user: "Alice N.", snippet: "How do I apply for accommodation?", time: "2m ago", unread: true },
+    { id: "c_002", user: "John K.", snippet: "Admission requirements for diploma", time: "10m ago", unread: false },
+    { id: "c_003", user: "Grace M.", snippet: "Library opening hours?", time: "1h ago", unread: false },
+  ],
+  faqs: [
+    { id: "f1", q: "How to apply online?", a: "Visit the admissions page and complete the form." },
+    { id: "f2", q: "Tuition payment options?", a: "Bank, Mobile Money (MTN/Airtel)" },
+  ],
+  users: [
+    { id: "u1", name: "Alice N", role: "student", email: "alice@bugema.ac.ug" },
+    { id: "u2", name: "John K", role: "staff", email: "john@bugema.ac.ug" },
+  ],
+  admins: [
+    { id: "a1", name: "Admin One", email: "admin@bugema.ac.ug" }
+  ]
+};
 
-const App = () => {
-  const [csvText, setCsvText] = useState('');
-  const [data, setData] = useState([]);
-  const [columns, setColumns] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-
-  // Pagination state
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Initial data and column setup effect
-  useEffect(() => {
-    try {
-      const { data, columns } = parseCSV(csvText);
-      setData(data);
-      setColumns(columns);
-      setCurrentPage(1); // Reset page on new data
-    } catch (e) {
-      console.error("Error parsing CSV:", e);
-      setData([]);
-      setColumns([]);
-    }
-  }, [csvText]);
-
-  // Handle file drop/paste
-  const handleTextChange = (event) => {
-    setCsvText(event.target.value);
-  };
-
-  // Logic for filtering, sorting, and pagination
-  const processedData = useMemo(() => {
-    let currentData = [...data];
-
-    // 1. Filtering
-    if (globalFilter) {
-      const filterLower = globalFilter.toLowerCase();
-      currentData = currentData.filter(row =>
-        columns.some(col => {
-          const cellValue = String(row[col] || '').toLowerCase();
-          return cellValue.includes(filterLower);
-        })
-      );
-    }
-
-    // 2. Sorting
-    if (sortConfig.key) {
-      currentData.sort((a, b) => {
-        const aValue = String(a[sortConfig.key] || '').toLowerCase();
-        const bValue = String(b[sortConfig.key] || '').toLowerCase();
-
-        // Simple string comparison logic
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-
-    return currentData;
-  }, [data, columns, globalFilter, sortConfig]);
-
-  // 3. Pagination calculation
-  const totalPages = Math.ceil(processedData.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const currentTableData = processedData.slice(startIndex, startIndex + pageSize);
-
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-        </svg>
-      );
-    }
-    if (sortConfig.direction === 'asc') {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-        </svg>
-      );
-    }
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    );
-  };
-
-  // Pagination handlers
-  const goToPage = (page) => {
-    const newPage = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(newPage);
-  };
-
-  const PaginationControls = () => (
-    <div className="flex justify-between items-center mt-4">
-      {/* Page Size Selector */}
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-600">Rows per page:</span>
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setCurrentPage(1);
-          }}
-          className="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
-        >
-          {[5, 10, 20, 50].map(size => (
-            <option key={size} value={size}>{size}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Page Navigation */}
-      <div className="flex space-x-2 items-center">
-        <span className="text-sm text-gray-700">
-          Showing {processedData.length > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + pageSize, processedData.length)} of {processedData.length} records
-        </span>
-        <button
-          onClick={() => goToPage(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="p-2 bg-gray-200 text-gray-700 rounded-md disabled:opacity-50 hover:bg-gray-300 transition duration-150"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <span className="text-sm font-semibold px-2">
-          Page {totalPages > 0 ? currentPage : 0} of {totalPages}
-        </span>
-        <button
-          onClick={() => goToPage(currentPage + 1)}
-          disabled={currentPage === totalPages || totalPages === 0}
-          className="p-2 bg-gray-200 text-gray-700 rounded-md disabled:opacity-50 hover:bg-gray-300 transition duration-150"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
+/* -------------------------
+   Tiny chart components using pure SVG
+   - LineChart: renders chatsOverTime
+   - BarChart: renders accuracyOverTime
+   ------------------------- */
+function LineChart({ data = [], width = 500, height = 120, stroke = "#0ea5e9" }) {
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data);
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((d - min) / (max - min || 1)) * height;
+    return `${x},${y}`;
+  });
+  const pathD = points.length ? `M${points.join(" L ")}` : "";
+  // small gradient / area fill path
+  const areaD = points.length ? `M${points[0]} L ${points.slice(1).map(p => p).join(" L ")} L ${width},${height} L 0,${height} Z` : "";
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-['Inter']">
-      <script src="https://cdn.tailwindcss.com"></script>
-      <style jsx>{`
-        /* Custom scrollbar for better look */
-        .csv-table-container::-webkit-scrollbar {
-          height: 8px;
-        }
-        .csv-table-container::-webkit-scrollbar-thumb {
-          background-color: #cbd5e1;
-          border-radius: 4px;
-        }
-        .csv-table-container::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-      `}</style>
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-            CSV Data Viewer
-          </h1>
-          <p className="text-gray-500">
-            Paste your raw CSV text below (commas as delimiters, first row as headers).
-          </p>
-        </header>
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-28">
+      <defs>
+        <linearGradient id="lg1" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={stroke} stopOpacity="0.18" />
+          <stop offset="100%" stopColor={stroke} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      {areaD && <path d={areaD} fill="url(#lg1)" />}
+      {pathD && <path d={pathD} fill="none" stroke={stroke} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />}
+      {/* small circles */}
+      {data.map((d, i) => {
+        const x = (i / (data.length - 1)) * width;
+        const y = height - ((d - min) / (max - min || 1)) * height;
+        return <circle key={i} cx={x} cy={y} r="2.2" fill={stroke} />;
+      })}
+    </svg>
+  );
+}
 
-        {/* CSV Input Area */}
-        <div className="mb-6 p-6 bg-white shadow-lg rounded-xl border border-gray-200">
-          <textarea
-            value={csvText}
-            onChange={handleTextChange}
-            rows="6"
-            placeholder="Paste your CSV data here, e.g.:&#10;Name,Age,City&#10;Alice,30,New York&#10;Bob,25,London"
-            className="w-full p-4 text-sm font-mono border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 resize-none"
-          />
+function BarChart({ data = [], width = 500, height = 120, color = "#0284c7" }) {
+  const max = Math.max(...data, 1);
+  const barWidth = data.length ? width / data.length - 6 : 0;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-28">
+      {data.map((d, i) => {
+        const barH = (d / max) * (height - 10);
+        const x = i * (barWidth + 6) + 4;
+        const y = height - barH;
+        return <rect key={i} x={x} y={y} width={barWidth} height={barH} rx="3" fill={color} opacity="0.95" />;
+      })}
+    </svg>
+  );
+}
+
+/* -------------------------
+   Admin component
+   ------------------------- */
+export default function Admin() {
+  const navigate = useNavigate();
+  // navigation state for left menu
+  const [active, setActive] = useState("dashboard"); // options: dashboard, conversations, faqs, users, admins, analytics, settings
+  const [metrics, setMetrics] = useState(demo.metrics);
+  const [chatsOverTime, setChatsOverTime] = useState(demo.chatsOverTime);
+  const [accuracyOverTime, setAccuracyOverTime] = useState(demo.accuracyOverTime);
+  const [conversations, setConversations] = useState(demo.conversations);
+  const [faqs, setFaqs] = useState(demo.faqs);
+  const [users, setUsers] = useState(demo.users);
+  const [admins, setAdmins] = useState(demo.admins);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // local form states
+  const [newFaqQ, setNewFaqQ] = useState("");
+  const [newFaqA, setNewFaqA] = useState("");
+  const [search, setSearch] = useState("");
+
+  // pagination for conversations
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+  const totalPages = Math.ceil(conversations.length / pageSize);
+  const paginatedConvos = useMemo(() => {
+    const s = (page - 1) * pageSize;
+    return conversations.slice(s, s + pageSize);
+  }, [conversations, page]);
+
+  useEffect(() => {
+    // Example: simulate metrics refresh every 45s (in real app call API)
+    const id = setInterval(() => {
+      // small random walk for demo
+      setChatsOverTime(prev => {
+        const next = [...prev.slice(1), Math.max(6, Math.round((prev[prev.length - 1] || 20) * (0.9 + Math.random() * 0.2)))];
+        return next;
+      });
+      setAccuracyOverTime(prev => {
+        const next = [...prev.slice(1), Math.min(100, Math.round((prev[prev.length - 1] || 85) + (Math.random() > 0.6 ? 1 : 0)))];
+        return next;
+      });
+      setMetrics(prev => ({
+        ...prev,
+        chatsToday: Math.max(0, prev.chatsToday + Math.round((Math.random() - 0.4) * 6)),
+        activeUsers: Math.max(0, prev.activeUsers + Math.round((Math.random() - 0.4) * 3)),
+        accuracyPct: Math.round(accuracyOverTime[accuracyOverTime.length - 1] || prev.accuracyPct)
+      }));
+    }, 45000);
+    return () => clearInterval(id);
+  }, [accuracyOverTime]);
+
+  const onLogout = () => {
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
+
+  const addFaq = () => {
+    if (!newFaqQ.trim() || !newFaqA.trim()) return;
+    const id = `f_${Date.now()}`;
+    setFaqs(prev => [{ id, q: newFaqQ.trim(), a: newFaqA.trim() }, ...prev]);
+    setNewFaqQ("");
+    setNewFaqA("");
+  };
+
+  const deleteFaq = (id) => {
+    setFaqs(prev => prev.filter(f => f.id !== id));
+  };
+
+  const markRead = (id) => {
+    setConversations(prev => prev.map(c => c.id === id ? { ...c, unread: false } : c));
+  };
+
+  // filter helpers
+  const filterTable = (items) => {
+    if (!search.trim()) return items;
+    const s = search.toLowerCase();
+    return items.filter(it => Object.values(it).some(v => String(v).toLowerCase().includes(s)));
+  };
+
+  /* Sidebar menu items */
+  const menu = [
+    { key: "dashboard", label: "Dashboard", icon: Icon.Analytics },
+    { key: "conversations", label: "Conversations", icon: Icon.Chat },
+    { key: "faqs", label: "FAQs Management", icon: Icon.File },
+    { key: "users", label: "Users", icon: Icon.Users },
+    { key: "admins", label: "Admins", icon: Icon.Users },
+    { key: "analytics", label: "Analytics", icon: Icon.Analytics },
+    { key: "settings", label: "Settings", icon: Icon.Settings },
+  ];
+
+  /* -------------------------
+     Render functions for each page
+     ------------------------- */
+
+  function DashboardView() {
+    return (
+      <div className="space-y-6">
+        {/* Top row cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-5 rounded-xl shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-500">Chats Today</p>
+                <p className="text-2xl font-semibold text-blue-800">{metrics.chatsToday}</p>
+              </div>
+              <div className="bg-blue-50 text-blue-700 p-2 rounded-full">
+                <Icon.Chat />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">Compared to yesterday: +5%</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-500">Active Users</p>
+                <p className="text-2xl font-semibold text-blue-800">{metrics.activeUsers}</p>
+              </div>
+              <div className="bg-blue-50 text-blue-700 p-2 rounded-full">
+                <Icon.Users />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">Users who interacted in last 24h</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-500">Avg Response (ms)</p>
+                <p className="text-2xl font-semibold text-blue-800">{metrics.avgResponseMs}</p>
+              </div>
+              <div className="bg-blue-50 text-blue-700 p-2 rounded-full">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12h18" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">Lower is better</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-500">Accuracy</p>
+                <p className="text-2xl font-semibold text-blue-800">{metrics.accuracyPct}%</p>
+              </div>
+              <div className="bg-blue-50 text-blue-700 p-2 rounded-full">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">Confidence of correct answers</p>
+          </div>
         </div>
 
-        {/* Data Controls and Table */}
-        {data.length > 0 && (
-          <div className="bg-white shadow-xl rounded-xl overflow-hidden">
-            {/* Controls */}
-            <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800 mb-3 sm:mb-0">
-                Data Table ({processedData.length} entries)
-              </h2>
-              {/* Global Filter */}
-              <div className="relative w-full sm:w-64">
-                <input
-                  type="text"
-                  value={globalFilter}
-                  onChange={(e) => {
-                    setGlobalFilter(e.target.value);
-                    setCurrentPage(1); // Reset page on filter change
-                  }}
-                  placeholder="Search all columns..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500"
-                />
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-5 rounded-xl shadow">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-medium text-gray-800">Chats Over Time</h3>
+              <p className="text-sm text-gray-500">Last 14 intervals</p>
+            </div>
+            <LineChart data={chatsOverTime} stroke="#0369a1" />
+          </div>
+
+          <div className="bg-white p-5 rounded-xl shadow">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-medium text-gray-800">Accuracy Trend</h3>
+              <p className="text-sm text-gray-500">Model accuracy (%)</p>
+            </div>
+            <BarChart data={accuracyOverTime} color="#0369a1" />
+          </div>
+        </div>
+
+        {/* Recent conversations */}
+        <div className="bg-white p-5 rounded-xl shadow">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-800">Recent Conversations</h3>
+            <p className="text-sm text-gray-500">{conversations.length} total</p>
+          </div>
+
+          <div className="divide-y">
+            {conversations.map((c) => (
+              <div key={c.id} className="py-3 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-9 w-9 rounded-full flex items-center justify-center ${c.unread ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
+                      {c.user[0]}
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800">{c.user}</div>
+                      <div className="text-sm text-gray-500">{c.snippet}</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-400">{c.time}</div>
+                  <div className="mt-2 flex gap-2">
+                    <button onClick={() => markRead(c.id)} className="px-3 py-1 text-sm rounded bg-blue-50 text-blue-700">Mark read</button>
+                    <button onClick={() => alert("Open conversation view (not implemented)")} className="px-3 py-1 text-sm rounded border">Open</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  function ConversationsView() {
+    const filtered = filterTable(conversations);
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search conversations..." className="w-full p-2 rounded border" />
+            <div className="absolute right-2 top-2 text-gray-400"><Icon.Search /></div>
+          </div>
+          <div>
+            <button onClick={() => setSearch("")} className="bg-gray-100 px-3 py-2 rounded">Clear</button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow">
+          <div className="divide-y">
+            {filtered.length ? filtered.map(c => (
+              <div key={c.id} className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center ${c.unread ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
+                    {c.user[0]}
+                  </div>
+                  <div>
+                    <div className="font-semibold">{c.user}</div>
+                    <div className="text-sm text-gray-500">{c.snippet}</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => markRead(c.id)} className="px-3 py-1 rounded text-sm bg-blue-50 text-blue-700">Mark read</button>
+                  <button onClick={() => alert("Open conversation")} className="px-3 py-1 rounded border text-sm">Open</button>
+                </div>
+              </div>
+            )) : (
+              <div className="p-6 text-center text-gray-500">No conversations</div>
+            )}
+          </div>
+          {/* pagination */}
+          <div className="p-3 flex justify-between items-center">
+            <div className="text-sm text-gray-500">Showing {filtered.length} results</div>
+            <div className="flex gap-2">
+              <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 rounded bg-gray-100">Prev</button>
+              <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 rounded bg-gray-100">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function FaqsView() {
+    return (
+      <div className="space-y-4">
+        <div className="bg-white p-4 rounded-xl shadow">
+          <h3 className="font-semibold text-gray-800">Add FAQ</h3>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input value={newFaqQ} onChange={(e) => setNewFaqQ(e.target.value)} placeholder="Question" className="col-span-2 p-2 border rounded" />
+            <input value={newFaqA} onChange={(e) => setNewFaqA(e.target.value)} placeholder="Answer" className="p-2 border rounded" />
+            <div className="col-span-3 flex gap-2">
+              <button onClick={addFaq} className="bg-blue-600 text-white px-4 py-2 rounded">Add FAQ</button>
+              <button onClick={() => { setNewFaqQ(""); setNewFaqA(""); }} className="px-4 py-2 rounded border">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow">
+          <h3 className="font-semibold text-gray-800 mb-3">Manage FAQs</h3>
+          <div className="divide-y">
+            {faqs.map(f => (
+              <div key={f.id} className="py-3 flex justify-between items-start">
+                <div>
+                  <div className="font-medium text-gray-800">{f.q}</div>
+                  <div className="text-sm text-gray-500 mt-1">{f.a}</div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => navigator.clipboard?.writeText(`${f.q}\n\n${f.a}`)} className="px-3 py-1 rounded border text-sm">Copy</button>
+                  <button onClick={() => deleteFaq(f.id)} className="px-3 py-1 rounded bg-red-50 text-red-700">Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function UsersView() {
+    const filtered = filterTable(users);
+    return (
+      <div>
+        <div className="bg-white p-4 rounded-xl shadow">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-medium">Users</h3>
+            <div className="flex items-center gap-2">
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search users..." className="p-2 border rounded" />
+              <button onClick={() => setSearch("")} className="px-3 py-2 rounded bg-gray-100">Clear</button>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="text-sm text-gray-500 uppercase">
+                <tr>
+                  <th className="py-2">Name</th>
+                  <th className="py-2">Email</th>
+                  <th className="py-2">Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(u => (
+                  <tr key={u.id} className="border-t">
+                    <td className="py-3">{u.name}</td>
+                    <td className="py-3">{u.email}</td>
+                    <td className="py-3"><span className={`px-2 py-1 rounded text-sm ${u.role === "student" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>{u.role}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function AdminsView() {
+    return (
+      <div>
+        <div className="bg-white p-4 rounded-xl shadow">
+          <h3 className="text-lg font-medium mb-3">Admins</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="text-sm text-gray-500 uppercase">
+                <tr>
+                  <th className="py-2">Name</th>
+                  <th className="py-2">Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map(a => (
+                  <tr key={a.id} className="border-t">
+                    <td className="py-3">{a.name}</td>
+                    <td className="py-3">{a.email}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function AnalyticsView() {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-5 rounded-xl shadow">
+            <h4 className="text-sm text-gray-500">Conversations (14d)</h4>
+            <p className="text-2xl font-semibold text-blue-800">{chatsOverTime.reduce((a,b) => a+b,0)}</p>
+            <div className="mt-3">
+              <LineChart data={chatsOverTime} stroke="#075985" />
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-xl shadow">
+            <h4 className="text-sm text-gray-500">Avg Accuracy</h4>
+            <p className="text-2xl font-semibold text-blue-800">{Math.round(accuracyOverTime.reduce((a,b)=>a+b,0)/accuracyOverTime.length)}%</p>
+            <div className="mt-3">
+              <BarChart data={accuracyOverTime.slice(-14)} color="#075985" />
+            </div>
+          </div>
+          <div className="bg-white p-5 rounded-xl shadow">
+            <h4 className="text-sm text-gray-500">Quick Actions</h4>
+            <div className="mt-4 flex flex-col gap-3">
+              <button onClick={() => alert("Run evaluation (not implemented)")} className="px-4 py-2 rounded bg-blue-600 text-white">Run Model Eval</button>
+              <button onClick={() => alert("Export logs")} className="px-4 py-2 rounded border">Export Logs</button>
+              <button onClick={() => alert("Retrain model (not implemented)")} className="px-4 py-2 rounded bg-gray-100">Start Retrain</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-xl shadow">
+          <h3 className="text-lg font-medium mb-3">Detailed Metrics</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-gray-50 rounded">
+              <div className="text-sm text-gray-500">Avg Latency</div>
+              <div className="text-xl font-semibold text-blue-800">{metrics.avgResponseMs} ms</div>
+            </div>
+            <div className="p-4 bg-gray-50 rounded">
+              <div className="text-sm text-gray-500">Active Users</div>
+              <div className="text-xl font-semibold text-blue-800">{metrics.activeUsers}</div>
+            </div>
+            <div className="p-4 bg-gray-50 rounded">
+              <div className="text-sm text-gray-500">Accuracy</div>
+              <div className="text-xl font-semibold text-blue-800">{metrics.accuracyPct}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function SettingsView() {
+    return (
+      <div className="space-y-4">
+        <div className="bg-white p-4 rounded-xl shadow">
+          <h3 className="text-lg font-medium">Settings</h3>
+          <p className="text-sm text-gray-500 mt-2">Basic application settings for the chatbot admin.</p>
+          <div className="mt-4 grid gap-3">
+            <label className="text-sm">University Theme</label>
+            <select className="p-2 border rounded">
+              <option>Blue (Default)</option>
+              <option>Gold</option>
+              <option>Green</option>
+            </select>
+            <label className="text-sm">Notification email</label>
+            <input placeholder="admin@bugema.ac.ug" className="p-2 border rounded" />
+            <div className="flex gap-2 mt-3">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+              <button className="px-4 py-2 rounded border">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------------
+     Main render
+     ------------------------- */
+  return (
+    <div className="min-h-screen flex bg-slate-50 text-slate-800">
+      {/* Sidebar */}
+      <aside className={`z-30 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0 fixed sm:relative inset-y-0 left-0 w-64 bg-blue-900 text-white transition-transform duration-200 ease-in-out`}>
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-xl font-bold">BU</div>
+            <div>
+              <div className="font-semibold text-lg">Bugema University</div>
+              <div className="text-sm text-blue-200">Chatbot Admin</div>
+            </div>
+          </div>
+
+          <nav className="flex-1 space-y-1">
+            {menu.map(m => {
+              const IconComp = m.icon;
+              const activeClass = active === m.key ? "bg-white/10" : "hover:bg-white/5";
+              return (
+                <button
+                  key={m.key}
+                  onClick={() => { setActive(m.key); setSidebarOpen(false); }}
+                  className={`w-full text-left flex items-center gap-3 px-3 py-2 rounded ${activeClass}`}
+                >
+                  <span className="text-blue-100"><IconComp /></span>
+                  <span className="flex-1 text-sm">{m.label}</span>
+                  {m.key === "conversations" && <span className="text-xs bg-red-600 px-2 py-0.5 rounded text-white">New</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="mt-6">
+            <button onClick={onLogout} className="w-full bg-red-600 hover:bg-red-700 px-3 py-2 rounded font-semibold">Logout</button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Content area */}
+      <div className="flex-1 min-h-screen sm:pl-64">
+        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-slate-200">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setSidebarOpen(s => !s)} className="sm:hidden p-2 rounded-md bg-white border">
+                <Icon.Menu />
+              </button>
+              <div>
+                <div className="text-sm text-slate-600">Welcome back</div>
+                <div className="font-semibold text-lg text-slate-800">Bugema University — Chatbot Admin</div>
               </div>
             </div>
 
-            {/* Table Container - Responsive Scrolling */}
-            <div className="csv-table-container overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    {columns.map((column, index) => (
-                      <th
-                        key={index}
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition duration-150 select-none"
-                        onClick={() => handleSort(column)}
-                      >
-                        <div className="flex items-center">
-                          {column}
-                          {getSortIcon(column)}
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {currentTableData.length > 0 ? (
-                    currentTableData.map((row, rowIndex) => (
-                      <tr key={rowIndex} className="hover:bg-blue-50 transition duration-150">
-                        {columns.map((column, colIndex) => (
-                          <td
-                            key={colIndex}
-                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                          >
-                            {row[column]}
-                          </td>
-                        ))}
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500 text-lg">
-                        {globalFilter ? "No results found for your search term." : "Table data is empty."}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="flex items-center gap-4">
+              <div className="relative hidden sm:block">
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search everything..." className="pl-10 pr-3 py-2 rounded border w-80" />
+                <div className="absolute left-3 top-2 text-gray-400"><Icon.Search /></div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-slate-600">Signed in as <span className="font-medium">admin@bugema.ac.ug</span></div>
+              </div>
             </div>
-
-            {/* Pagination */}
-            {totalPages > 0 && <PaginationControls />}
           </div>
-        )}
+        </header>
 
-        {/* Empty State */}
-        {csvText.trim() === '' && (
-          <div className="p-12 text-center bg-white shadow-lg rounded-xl border-dashed border-2 border-gray-300 text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-xl font-medium">Ready for your data!</p>
-            <p className="text-sm">Paste a CSV file content into the box above to see it formatted as an interactive table.</p>
+        <main className="p-6">
+          {/* Page chooser */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-800 capitalize">{active.replace(/_/g, " ")}</h2>
+            <p className="text-sm text-slate-500 mt-1">Bugema University chatbot administration panel</p>
           </div>
-        )}
+
+          {/* Page content */}
+          <div>
+            {active === "dashboard" && <DashboardView />}
+            {active === "conversations" && <ConversationsView />}
+            {active === "faqs" && <FaqsView />}
+            {active === "users" && <UsersView />}
+            {active === "admins" && <AdminsView />}
+            {active === "analytics" && <AnalyticsView />}
+            {active === "settings" && <SettingsView />}
+          </div>
+        </main>
       </div>
     </div>
   );
-};
-
-export default App;
+}
