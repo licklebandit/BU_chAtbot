@@ -1,19 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-/**
- * Admin.jsx
- * Bugema University Chatbot — Admin Dashboard (Advanced Analytics Hybrid)
- *
- * Drop this file in src/ and import it in App routes:
- * <Route path="/admin" element={<Admin />} />
- *
- * Tailwind required.
- */
+// Define your API base URL
+const API_BASE_URL = "http://localhost:5000/api/admin , https://bu-chatbot.onrender.com/api/admin"; // Update as needed
 
-/* -------------------------
-   Small inline SVG icons (no external deps)
-   ------------------------- */
 const Icon = {
   Menu: ({ className = "h-5 w-5" }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -57,40 +48,8 @@ const Icon = {
 };
 
 /* -------------------------
-   Mock / demo data (replace with real API calls)
-   ------------------------- */
-const demo = {
-  metrics: {
-    chatsToday: 124,
-    activeUsers: 72,
-    avgResponseMs: 230,
-    accuracyPct: 89
-  },
-  chatsOverTime: [12, 18, 30, 24, 40, 28, 14, 20, 26, 50, 42, 36, 22, 18], // sample points
-  accuracyOverTime: [78, 80, 82, 85, 88, 86, 89, 90, 91, 92, 91, 90, 89, 89],
-  conversations: [
-    { id: "c_001", user: "Alice N.", snippet: "How do I apply for accommodation?", time: "2m ago", unread: true },
-    { id: "c_002", user: "John K.", snippet: "Admission requirements for diploma", time: "10m ago", unread: false },
-    { id: "c_003", user: "Grace M.", snippet: "Library opening hours?", time: "1h ago", unread: false },
-  ],
-  faqs: [
-    { id: "f1", q: "How to apply online?", a: "Visit the admissions page and complete the form." },
-    { id: "f2", q: "Tuition payment options?", a: "Bank, Mobile Money (MTN/Airtel)" },
-  ],
-  users: [
-    { id: "u1", name: "Alice N", role: "student", email: "alice@bugema.ac.ug" },
-    { id: "u2", name: "John K", role: "staff", email: "john@bugema.ac.ug" },
-  ],
-  admins: [
-    { id: "a1", name: "Admin One", email: "admin@bugema.ac.ug" }
-  ]
-};
-
-/* -------------------------
-   Tiny chart components using pure SVG
-   - LineChart: renders chatsOverTime
-   - BarChart: renders accuracyOverTime
-   ------------------------- */
+    Tiny chart components using pure SVG (kept as is)
+    ------------------------- */
 function LineChart({ data = [], width = 500, height = 120, stroke = "#0ea5e9" }) {
   const max = Math.max(...data, 1);
   const min = Math.min(...data);
@@ -100,7 +59,6 @@ function LineChart({ data = [], width = 500, height = 120, stroke = "#0ea5e9" })
     return `${x},${y}`;
   });
   const pathD = points.length ? `M${points.join(" L ")}` : "";
-  // small gradient / area fill path
   const areaD = points.length ? `M${points[0]} L ${points.slice(1).map(p => p).join(" L ")} L ${width},${height} L 0,${height} Z` : "";
 
   return (
@@ -113,7 +71,6 @@ function LineChart({ data = [], width = 500, height = 120, stroke = "#0ea5e9" })
       </defs>
       {areaD && <path d={areaD} fill="url(#lg1)" />}
       {pathD && <path d={pathD} fill="none" stroke={stroke} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />}
-      {/* small circles */}
       {data.map((d, i) => {
         const x = (i / (data.length - 1)) * width;
         const y = height - ((d - min) / (max - min || 1)) * height;
@@ -138,40 +95,127 @@ function BarChart({ data = [], width = 500, height = 120, color = "#0284c7" }) {
   );
 }
 
+
 /* -------------------------
-   Admin component
-   ------------------------- */
+    Conversation Modal Component
+    ------------------------- */
+function ConversationModal({ isOpen, onClose, conversation, markRead }) {
+  if (!isOpen || !conversation) return null;
+
+  // Mock transcript data if API only returns snippet on the list view
+  const displayTranscript = conversation.transcript || [
+    { id: 1, role: 'user', text: conversation.snippet, timestamp: conversation.time || 'unknown' },
+    // If the full conversation object fetched in openConversationModal is missing 'transcript'
+    { id: 2, role: 'bot', text: 'This is a mock response, please implement backend logic to fetch the full conversation transcript from the API endpoint.', timestamp: conversation.time || 'unknown' }
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="relative w-full max-w-lg mx-auto bg-white rounded-xl shadow-2xl">
+          {/* Modal Header */}
+          <div className="p-5 border-b flex justify-between items-center">
+            <h3 className="text-xl font-semibold text-gray-800">Conversation with {conversation.user}</h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          
+          {/* Modal Body: Transcript */}
+          <div className="p-5 h-96 overflow-y-auto space-y-4">
+            {displayTranscript.length > 0 ? (
+              displayTranscript.map((msg, index) => (
+                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}>
+                  <div className={`max-w-xs p-3 rounded-lg text-sm ${msg.role === 'user' ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-800'}`}>
+                    <p className="font-medium capitalize mb-1">{msg.role}:</p>
+                    <p>{msg.text}</p>
+                    {msg.timestamp && <span className="block text-xs text-gray-400 mt-1 text-right">{msg.timestamp}</span>}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500">No full transcript available for this conversation.</div>
+            )}
+          </div>
+
+          {/* Modal Footer */}
+          <div className="p-4 border-t flex justify-end gap-3">
+            <button 
+              onClick={() => { markRead(conversation.id); onClose(); }} 
+              className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Resolve & Mark Read
+            </button>
+            <button onClick={onClose} className="px-4 py-2 rounded border">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/* -------------------------
+    Admin component
+    ------------------------- */
 export default function Admin() {
   const navigate = useNavigate();
-  // navigation state for left menu
+
+  // Initial State - Set to default empty values
   const [active, setActive] = useState("dashboard"); // options: dashboard, conversations, faqs, users, admins, analytics, settings
-  const [metrics, setMetrics] = useState(demo.metrics);
-  const [chatsOverTime, setChatsOverTime] = useState(demo.chatsOverTime);
-  const [accuracyOverTime, setAccuracyOverTime] = useState(demo.accuracyOverTime);
-  const [conversations, setConversations] = useState(demo.conversations);
-  const [faqs, setFaqs] = useState(demo.faqs);
-  const [users, setUsers] = useState(demo.users);
-  const [admins, setAdmins] = useState(demo.admins);
+  const [metrics, setMetrics] = useState({ chatsToday: 0, activeUsers: 0, avgResponseMs: 0, accuracyPct: 0 });
+  const [chatsOverTime, setChatsOverTime] = useState([]);
+  const [accuracyOverTime, setAccuracyOverTime] = useState([]);
+  const [conversations, setConversations] = useState([]);
+  const [faqs, setFaqs] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userRole, setUserRole] = useState(localStorage.getItem("role") || "admin"); // Role-based access
+  
+  // Conversation Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState(null);
 
   // local form states
   const [newFaqQ, setNewFaqQ] = useState("");
   const [newFaqA, setNewFaqA] = useState("");
   const [search, setSearch] = useState("");
 
-  // pagination for conversations
-  const [page, setPage] = useState(1);
-  const pageSize = 6;
-  const totalPages = Math.ceil(conversations.length / pageSize);
-  const paginatedConvos = useMemo(() => {
-    const s = (page - 1) * pageSize;
-    return conversations.slice(s, s + pageSize);
-  }, [conversations, page]);
+  /* --- API Fetching --- */
+  const fetchData = async () => {
+    try {
+      // Fetch Dashboard Metrics & Charts
+      const metricsRes = await axios.get(`${API_BASE_URL}/metrics`);
+      setMetrics(metricsRes.data.metrics);
+      setChatsOverTime(metricsRes.data.chatsOverTime);
+      setAccuracyOverTime(metricsRes.data.accuracyOverTime);
+
+      // Fetch Lists
+      const convosRes = await axios.get(`${API_BASE_URL}/conversations`);
+      setConversations(convosRes.data);
+      const faqsRes = await axios.get(`${API_BASE_URL}/faqs`);
+      setFaqs(faqsRes.data);
+      const usersRes = await axios.get(`${API_BASE_URL}/users`);
+      setUsers(usersRes.data);
+      const adminsRes = await axios.get(`${API_BASE_URL}/admins`);
+      setAdmins(adminsRes.data);
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    // Example: simulate metrics refresh every 45s (in real app call API)
+    fetchData(); // Initial data load
+
+    // Existing interval logic (kept for demo chart simulation)
     const id = setInterval(() => {
-      // small random walk for demo
+       // small random walk for demo
+       // NOTE: This should ideally be replaced with a periodic fetchData() call 
+       // or be removed if the charts are fully driven by API calls only.
       setChatsOverTime(prev => {
         const next = [...prev.slice(1), Math.max(6, Math.round((prev[prev.length - 1] || 20) * (0.9 + Math.random() * 0.2)))];
         return next;
@@ -180,63 +224,143 @@ export default function Admin() {
         const next = [...prev.slice(1), Math.min(100, Math.round((prev[prev.length - 1] || 85) + (Math.random() > 0.6 ? 1 : 0)))];
         return next;
       });
-      setMetrics(prev => ({
-        ...prev,
-        chatsToday: Math.max(0, prev.chatsToday + Math.round((Math.random() - 0.4) * 6)),
-        activeUsers: Math.max(0, prev.activeUsers + Math.round((Math.random() - 0.4) * 3)),
-        accuracyPct: Math.round(accuracyOverTime[accuracyOverTime.length - 1] || prev.accuracyPct)
-      }));
+      // The dependency array below is a placeholder from the original code that may cause issues 
+      // if accuracyOverTime is used within the setMetrics call. Removing for simplicity.
+      // setMetrics(prev => ({ ...prev, accuracyPct: Math.round(accuracyOverTime[accuracyOverTime.length - 1] || prev.accuracyPct) }));
     }, 45000);
     return () => clearInterval(id);
-  }, [accuracyOverTime]);
+  }, []); // Removed accuracyOverTime from dependencies
 
+  /* --- Handlers --- */
   const onLogout = () => {
     localStorage.removeItem("role");
     navigate("/login");
   };
 
-  const addFaq = () => {
+  const addFaq = async () => {
     if (!newFaqQ.trim() || !newFaqA.trim()) return;
-    const id = `f_${Date.now()}`;
-    setFaqs(prev => [{ id, q: newFaqQ.trim(), a: newFaqA.trim() }, ...prev]);
-    setNewFaqQ("");
-    setNewFaqA("");
+    try {
+      const response = await axios.post(`${API_BASE_URL}/faqs`, { 
+        q: newFaqQ.trim(), 
+        a: newFaqA.trim() 
+      });
+      // Assuming API returns the newly created FAQ object
+      setFaqs(prev => [response.data, ...prev]);
+      setNewFaqQ("");
+      setNewFaqA("");
+    } catch (error) {
+      console.error("Error adding FAQ:", error);
+    }
   };
 
-  const deleteFaq = (id) => {
-    setFaqs(prev => prev.filter(f => f.id !== id));
+  const deleteFaq = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/faqs/${id}`);
+      setFaqs(prev => prev.filter(f => f.id !== id));
+    } catch (error) {
+      console.error("Error deleting FAQ:", error);
+    }
   };
 
-  const markRead = (id) => {
-    setConversations(prev => prev.map(c => c.id === id ? { ...c, unread: false } : c));
+  const markRead = async (id) => {
+    try {
+      await axios.put(`${API_BASE_URL}/conversations/${id}/read`);
+      setConversations(prev => prev.map(c => c.id === id ? { ...c, unread: false } : c));
+    } catch (error) {
+      console.error("Error marking as read:", error);
+    }
+  };
+  
+  const openConversationModal = async (conversation) => {
+    try {
+      // Fetch full transcript details
+      const fullConvoRes = await axios.get(`${API_BASE_URL}/conversations/${conversation.id}`);
+      setSelectedConversation(fullConvoRes.data); // Should contain full transcript array
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching conversation details:", error);
+      // Fallback: use the snippet if full fetch fails
+      setSelectedConversation({ ...conversation, transcript: [{ role: "user", text: conversation.snippet, timestamp: conversation.time || 'N/A' }] });
+      setIsModalOpen(true);
+    }
+  };
+  
+  const handleCsvUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const csvText = e.target.result;
+      const lines = csvText.split('\n').filter(line => line.trim() !== '');
+      // Assuming CSV format: name,email,role
+      const newUsers = lines.slice(1).map(line => { // skip header
+        const [name, email, role] = line.split(',');
+        return { 
+          id: `u_${Date.now()}_${Math.random()}`, // Mock ID
+          name: name?.trim(), 
+          email: email?.trim(), 
+          role: role?.trim().toLowerCase() || 'student' 
+        };
+      }).filter(user => user.name && user.email);
+
+      if (newUsers.length === 0) {
+        alert("No valid users found in the CSV.");
+        return;
+      }
+
+      try {
+        // Send to backend for bulk creation
+        await axios.post(`${API_BASE_URL}/users/import`, newUsers);
+        alert(`Successfully imported ${newUsers.length} users! Refreshing data...`);
+        fetchData(); // Refresh the user list
+      } catch (error) {
+        console.error("Error importing users:", error);
+        alert("Failed to import users. Check console for details.");
+      }
+    };
+    reader.readAsText(file);
+    // Clear the input value
+    event.target.value = null; 
   };
 
-  // filter helpers
+
+  // pagination for conversations (kept as is)
+  const pageSize = 6;
+  const totalPages = Math.ceil(conversations.length / pageSize);
+  const [page, setPage] = useState(1);
+  
   const filterTable = (items) => {
     if (!search.trim()) return items;
     const s = search.toLowerCase();
     return items.filter(it => Object.values(it).some(v => String(v).toLowerCase().includes(s)));
   };
+  
+  const filteredConvos = useMemo(() => filterTable(conversations), [conversations, search]);
+  const paginatedConvos = useMemo(() => {
+    const s = (page - 1) * pageSize;
+    return filteredConvos.slice(s, s + pageSize);
+  }, [filteredConvos, page]);
 
-  /* Sidebar menu items */
+  /* Sidebar menu items (updated with roles) */
   const menu = [
-    { key: "dashboard", label: "Dashboard", icon: Icon.Analytics },
-    { key: "conversations", label: "Conversations", icon: Icon.Chat },
-    { key: "faqs", label: "FAQs Management", icon: Icon.File },
-    { key: "users", label: "Users", icon: Icon.Users },
-    { key: "admins", label: "Admins", icon: Icon.Users },
-    { key: "analytics", label: "Analytics", icon: Icon.Analytics },
-    { key: "settings", label: "Settings", icon: Icon.Settings },
+    { key: "dashboard", label: "Dashboard", icon: Icon.Analytics, roles: ["admin", "editor", "viewer"] },
+    { key: "conversations", label: "Conversations", icon: Icon.Chat, roles: ["admin", "editor"] },
+    { key: "faqs", label: "FAQs Management", icon: Icon.File, roles: ["admin", "editor"] },
+    { key: "users", label: "Users", icon: Icon.Users, roles: ["admin"] },
+    { key: "admins", label: "Admins", icon: Icon.Users, roles: ["admin"] },
+    { key: "analytics", label: "Analytics", icon: Icon.Analytics, roles: ["admin", "viewer"] },
+    { key: "settings", label: "Settings", icon: Icon.Settings, roles: ["admin"] },
   ];
 
   /* -------------------------
-     Render functions for each page
-     ------------------------- */
+      Render functions for each page (mostly unchanged)
+      ------------------------- */
 
   function DashboardView() {
     return (
       <div className="space-y-6">
-        {/* Top row cards */}
+        {/* Top row cards (unchanged) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white p-5 rounded-xl shadow">
             <div className="flex justify-between items-start">
@@ -291,7 +415,7 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Charts */}
+        {/* Charts (unchanged) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-5 rounded-xl shadow">
             <div className="flex justify-between items-center mb-3">
@@ -310,7 +434,7 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Recent conversations */}
+        {/* Recent conversations (Open button modified) */}
         <div className="bg-white p-5 rounded-xl shadow">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-800">Recent Conversations</h3>
@@ -335,7 +459,7 @@ export default function Admin() {
                   <div className="text-sm text-gray-400">{c.time}</div>
                   <div className="mt-2 flex gap-2">
                     <button onClick={() => markRead(c.id)} className="px-3 py-1 text-sm rounded bg-blue-50 text-blue-700">Mark read</button>
-                    <button onClick={() => alert("Open conversation view (not implemented)")} className="px-3 py-1 text-sm rounded border">Open</button>
+                    <button onClick={() => openConversationModal(c)} className="px-3 py-1 text-sm rounded border">Open</button>
                   </div>
                 </div>
               </div>
@@ -348,7 +472,6 @@ export default function Admin() {
   }
 
   function ConversationsView() {
-    const filtered = filterTable(conversations);
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-3">
@@ -363,7 +486,7 @@ export default function Admin() {
 
         <div className="bg-white rounded-xl shadow">
           <div className="divide-y">
-            {filtered.length ? filtered.map(c => (
+            {paginatedConvos.length ? paginatedConvos.map(c => (
               <div key={c.id} className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center ${c.unread ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
@@ -376,7 +499,7 @@ export default function Admin() {
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => markRead(c.id)} className="px-3 py-1 rounded text-sm bg-blue-50 text-blue-700">Mark read</button>
-                  <button onClick={() => alert("Open conversation")} className="px-3 py-1 rounded border text-sm">Open</button>
+                  <button onClick={() => openConversationModal(c)} className="px-3 py-1 rounded border text-sm">Open</button>
                 </div>
               </div>
             )) : (
@@ -385,7 +508,7 @@ export default function Admin() {
           </div>
           {/* pagination */}
           <div className="p-3 flex justify-between items-center">
-            <div className="text-sm text-gray-500">Showing {filtered.length} results</div>
+            <div className="text-sm text-gray-500">Showing {paginatedConvos.length} of {filteredConvos.length} results</div>
             <div className="flex gap-2">
               <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 rounded bg-gray-100">Prev</button>
               <button disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 rounded bg-gray-100">Next</button>
@@ -440,6 +563,18 @@ export default function Admin() {
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-lg font-medium">Users</h3>
             <div className="flex items-center gap-2">
+                {/* CSV Import */}
+              <label htmlFor="csv-upload" className="px-3 py-2 rounded bg-blue-600 text-white cursor-pointer text-sm">
+                Import CSV
+              </label>
+              <input 
+                id="csv-upload" 
+                type="file" 
+                accept=".csv" 
+                onChange={handleCsvUpload} 
+                className="hidden" 
+              />
+                {/* End CSV Import */}
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search users..." className="p-2 border rounded" />
               <button onClick={() => setSearch("")} className="px-3 py-2 rounded bg-gray-100">Clear</button>
             </div>
@@ -510,7 +645,7 @@ export default function Admin() {
           </div>
           <div className="bg-white p-5 rounded-xl shadow">
             <h4 className="text-sm text-gray-500">Avg Accuracy</h4>
-            <p className="text-2xl font-semibold text-blue-800">{Math.round(accuracyOverTime.reduce((a,b)=>a+b,0)/accuracyOverTime.length)}%</p>
+            <p className="text-2xl font-semibold text-blue-800">{chatsOverTime.length > 0 ? Math.round(accuracyOverTime.reduce((a,b)=>a+b,0)/accuracyOverTime.length) : 0}%</p>
             <div className="mt-3">
               <BarChart data={accuracyOverTime.slice(-14)} color="#075985" />
             </div>
@@ -572,8 +707,8 @@ export default function Admin() {
   }
 
   /* -------------------------
-     Main render
-     ------------------------- */
+      Main render
+      ------------------------- */
   return (
     <div className="min-h-screen flex bg-slate-50 text-slate-800">
       {/* Sidebar */}
@@ -587,8 +722,11 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* Nav filtered by userRole */}
           <nav className="flex-1 space-y-1">
-            {menu.map(m => {
+            {menu
+                .filter(m => m.roles.includes(userRole)) // Role-based filtering
+                .map(m => {
               const IconComp = m.icon;
               const activeClass = active === m.key ? "bg-white/10" : "hover:bg-white/5";
               return (
@@ -599,7 +737,7 @@ export default function Admin() {
                 >
                   <span className="text-blue-100"><IconComp /></span>
                   <span className="flex-1 text-sm">{m.label}</span>
-                  {m.key === "conversations" && <span className="text-xs bg-red-600 px-2 py-0.5 rounded text-white">New</span>}
+                  {m.key === "conversations" && conversations.some(c => c.unread) && <span className="text-xs bg-red-600 px-2 py-0.5 rounded text-white">New</span>}
                 </button>
               );
             })}
@@ -657,6 +795,14 @@ export default function Admin() {
           </div>
         </main>
       </div>
+      
+      {/* Conversation Modal */}
+      <ConversationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        conversation={selectedConversation}
+        markRead={markRead}
+      />
     </div>
   );
 }
