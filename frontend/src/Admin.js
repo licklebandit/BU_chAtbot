@@ -47,9 +47,7 @@ const Icon = {
   )
 };
 
-/* -------------------------
-    Tiny chart components using pure SVG (kept as is)
-    ------------------------- */
+// Simple LineChart and BarChart components using SVG
 function LineChart({ data = [], width = 500, height = 120, stroke = "#0ea5e9" }) {
   const max = Math.max(...data, 1);
   const min = Math.min(...data);

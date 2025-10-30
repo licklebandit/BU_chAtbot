@@ -1,23 +1,42 @@
-// /backend/models/User.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  name: { type: String },
-  email: { type: String, unique: true, required: true },
-  password: { type: String, required: true },
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user", // all new signups are normal users
-  },
-  chats: [
-    {
-      question: String,
-      answer: String,
-      timestamp: { type: Date, default: Date.now },
+    // Core Authentication Fields
+    name: { 
+        type: String, 
+        trim: true 
     },
-  ],
-  freeQuestionsUsed: { type: Number, default: 0 },
+    email: { 
+        type: String, 
+        unique: true, 
+        required: true, 
+        trim: true 
+    },
+    password: { 
+        type: String, 
+        required: true 
+    },
+    
+    // Authorization Field
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user", 
+    },
+    
+    // Fields for Admin Panel Metrics
+    lastLogin: { 
+        type: Date, 
+        default: Date.now // Updates on every login (used for Active User count)
+    },
+    createdAt: { 
+        type: Date, 
+        default: Date.now 
+    },
+    
+    // ⚠️ Removed: The 'chats' array and 'freeQuestionsUsed' 
+    // Chat history is now stored in the separate 'Conversation' collection 
+    // for better scalability and faster user lookups.
 });
 
 export default mongoose.model("User", userSchema);
