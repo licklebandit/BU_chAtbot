@@ -4,6 +4,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import http from 'http';
+import { Server as IOServer } from 'socket.io';
 
 // ✅ Import all routes using ES module syntax
 import chatRoute from "./routes/chat.js";
@@ -14,8 +16,39 @@ import adminRouter from "./routes/adminRouter.js"; // 💡 CHANGE: Use import fo
 // ✅ Load environment variables
 dotenv.config();
 
-// ✅ Initialize app
+// ✅ Initialize app and create HTTP server
 const app = express();
+const server = http.createServer(app);
+
+// ✅ Initialize Socket.IO
+const io = new IOServer(server, {
+    cors: {
+        origin: [
+            "http://localhost:3000",
+            "https://bu-ch-atbot.vercel.app",
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    }
+});
+
+// ✅ Socket.IO connection handling
+io.on('connection', (socket) => {
+    console.log('✅ Client connected:', socket.id);
+
+    // Listen for admin events
+    socket.on('joinAdminRoom', () => {
+        socket.join('adminRoom');
+        console.log(`Admin ${socket.id} joined admin room`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('❌ Client disconnected:', socket.id);
+    });
+});
+
+// Export io instance for use in routes
+export { io };
 
 // --- CONNECTION AND CONFIGURATION ---
 
@@ -56,7 +89,21 @@ app.get("/", (req, res) => {
 // --- SERVER START ---
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+
+// Start server
+server.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+});
+
+// expose io to routes via app.set/get
+app.set('io', io);
+
+io.on('connection', (socket) => {
+    console.log('Socket connected:', socket.id);
+    socket.on('disconnect', () => console.log('Socket disconnected:', socket.id));
+});
+
+httpServer.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
     console.log("🔑 Gemini API Key:", process.env.GEMINI_API_KEY ? "✅ Yes" : "❌ No");
     console.log("🧩 JWT Secret:", process.env.JWT_SECRET ? "✅ Yes" : "❌ No");

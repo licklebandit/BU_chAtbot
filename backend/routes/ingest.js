@@ -40,4 +40,17 @@ router.get("/", verifyAdmin, async (req, res) => {
   }
 });
 
+// DELETE /api/ingest/:id  (admins only)
+router.delete('/:id', verifyAdmin, async (req, res) => {
+  try {
+    const deleted = await Knowledge.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Knowledge not found' });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Delete knowledge error:', error);
+    if (error.name === 'CastError') return res.status(400).json({ message: 'Invalid ID format' });
+    res.status(500).json({ message: 'Failed to delete knowledge' });
+  }
+});
+
 export default router;

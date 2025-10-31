@@ -75,6 +75,27 @@ router.post("/", authenticate, async (req, res) => {
       chat.messages.push({ role: "user", text: q });
       chat.messages.push({ role: "assistant", text: answer });
       await chat.save();
+      // Emit socket.io event to notify admin UI of a new conversation/chat
+      try {
+        const io = req.app.get('io');
+        if (io) {
+          // Emit a lightweight payload — admin can fetch details if needed
+          io.emit('new_conversation', {
+            id: chat._id,
+            user_name: req.user.name || req.user.email || 'Unknown',
+            snippet: q,
+            createdAt: new Date(),
+          });
+
+          // Optionally compute basic metrics and emit
+          const yesterday = new Date(Date.now() - 24*60*60*1000);
+          const chatsToday = await Chat.countDocuments({ 'messages.timestamp': { $gte: yesterday } }).catch(() => 0);
+          const activeUsersToday = await User.countDocuments({ lastLogin: { $gte: yesterday } }).catch(() => 0);
+          io.emit('metrics', { chatsToday, activeUsersToday });
+        }
+      } catch (err) {
+        console.warn('Socket emit error:', err.message || err);
+      }
     }
 
     res.json({ answer });

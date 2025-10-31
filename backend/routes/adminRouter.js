@@ -2,83 +2,163 @@ import express from 'express';
 import FAQ from '../models/FAQ.js';
 import Conversation from '../models/Conversation.js';
 import User from '../models/User.js';
+import { io } from '../server.js';
 
 const router = express.Router();
 
+// Pagination helper
+const getPaginatedResults = async (model, page = 1, limit = 10, query = {}) => {
+    const skip = (page - 1) * limit;
+    const [results, total] = await Promise.all([
+        model.find(query).skip(skip).limit(limit),
+        model.countDocuments(query)
+    ]);
+    return {
+        results,
+        pagination: {
+            total,
+            pages: Math.ceil(total / limit),
+            page,
+            limit
+        }
+    };
+};
+
 // --- Helper function for fetching stats ---
 const getYesterday = () => new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+// Helper to emit admin updates
+const emitAdminUpdate = async () => {
+    try {
+        const yesterday = getYesterday();
+        const [chatsToday, totalUsers, activeUsersToday] = await Promise.all([
+            Conversation.countDocuments({ createdAt: { $gte: yesterday } }),
+            User.countDocuments(),
+            User.countDocuments({ lastLogin: { $gte: yesterday } })
+        ]);
+
+        io.to('adminRoom').emit('adminStatsUpdate', {
+            chatsToday,
+            totalUsers,
+            activeUsersToday,
+            timestamp: new Date()
+        });
+    } catch (error) {
+        console.error('Error emitting admin update:', error);
+    }
+};
 
 // 1. Dashboard Metrics and Charts Fetching
 // GET /api/admin/metrics
 router.get('/metrics', async (req, res) => {
     try {
         const yesterday = getYesterday();
-
-        // Mongoose Queries for Metrics
-        const chatsToday = await Conversation.countDocuments({
-            createdAt: { $gte: yesterday }
-        });
-        
-        const totalUsers = await User.countDocuments();
-
-        const activeUsersToday = await User.countDocuments({
-            lastLogin: { $gte: yesterday }
-        });
-
-        // Mongoose Aggregation for Chart Data (Chats over the last 14 days)
         const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
 
-        const chatsOverTime = await Conversation.aggregate([
-            {
-                $match: {
-                    createdAt: { $gte: twoWeeksAgo }
-                }
-            },
-            {
-                $group: {
-                    // Group by date (YYYY-MM-DD)
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
-                    count: { $sum: 1 }
-                }
-            },
-            { $sort: { _id: 1 } } // Sort by date ascending
+        const [chatsToday, totalUsers, activeUsersToday, chatsOverTime] = await Promise.all([
+            Conversation.countDocuments({ createdAt: { $gte: yesterday } }),
+            User.countDocuments(),
+            User.countDocuments({ lastLogin: { $gte: yesterday } }),
+            Conversation.aggregate([
+                {
+                    $match: { createdAt: { $gte: twoWeeksAgo } }
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                        count: { $sum: 1 }
+                    }
+                },
+                { $sort: { _id: 1 } }
+            ])
         ]);
-        
-        // Mocked non-database metrics (as these usually require external logging)
-        const avgResponseMs = 345; 
-        const accuracyPct = 92;
 
-        res.json({
+        // Calculate real avg response time from recent conversations
+        const recentConversations = await Conversation.find({
+            createdAt: { $gte: yesterday }
+        }).select('responseTimes');
+
+        const avgResponseMs = recentConversations.reduce((acc, conv) => {
+            const times = conv.responseTimes || [];
+            return acc + (times.reduce((sum, time) => sum + time, 0) / (times.length || 1));
+        }, 0) / (recentConversations.length || 1);
+
+        const response = {
             metrics: {
-                chatsToday: chatsToday,
-                totalUsers: totalUsers,
-                activeUsersToday: activeUsersToday,
-                avgResponseMs: avgResponseMs, 
-                accuracyPct: accuracyPct
+                chatsToday,
+                totalUsers,
+                activeUsersToday,
+                avgResponseMs: Math.round(avgResponseMs),
+                accuracyPct: 92 // This would ideally come from user feedback or ML metrics
             },
-            // Format data for the front-end chart
             chatsOverTime: chatsOverTime.map(d => ({ date: d._id, count: d.count })),
-            // Static mock data for example chart requiring two weeks of data
-            accuracyOverTime: [85, 87, 88, 90, 91, 92, 90, 93, 94, 95, 92, 93, 91, 92], 
-        });
+            accuracyOverTime: [85, 87, 88, 90, 91, 92, 90, 93, 94, 95, 92, 93, 91, 92],
+        };
 
+        // Emit real-time update to admin clients
+        io.to('adminRoom').emit('metricsUpdate', response);
+
+        res.json(response);
     } catch (error) {
         console.error('MongoDB Metrics Error:', error);
         res.status(500).json({ error: 'Failed to fetch dashboard metrics' });
     }
 });
 
-
-// 2. Fetch All Conversations (Snippet View)
+// 2. Fetch All Conversations (Snippet View with Pagination)
 // GET /api/admin/conversations
 router.get('/conversations', async (req, res) => {
     try {
-        // Fetch most recent conversations, only selecting necessary fields for the list view
-        const conversations = await Conversation.find()
-            .select('user_name snippet createdAt isUnread') 
-            .sort({ createdAt: -1 }); // Sort by newest first
+        // Extract and validate pagination params
+        const page = Math.max(1, parseInt(req.query.page || '1'));
+        const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '10')));
+        const search = req.query.search || '';
+        const filter = req.query.filter || 'all';
 
-        res.json(conversations);
+        // Build filter query
+        const query = {};
+        if (search) {
+            query.$or = [
+                { user_name: { $regex: search, $options: 'i' } },
+                { snippet: { $regex: search, $options: 'i' } }
+            ];
+        }
+        if (filter === 'unread') query.isUnread = true;
+        if (req.query.from) {
+            const from = new Date(req.query.from);
+            if (!isNaN(from)) query.createdAt = { $gte: from };
+        }
+        if (req.query.to) {
+            const to = new Date(req.query.to);
+            if (!isNaN(to)) {
+                to.setHours(23, 59, 59, 999);
+                query.createdAt = { ...(query.createdAt || {}), $lte: to };
+            }
+        }
+
+        const paginatedResults = await getPaginatedResults(
+            Conversation,
+            page,
+            limit,
+            query
+        );
+
+        // Transform data for frontend
+        const response = {
+            conversations: paginatedResults.results.map(conv => ({
+                id: conv._id,
+                user_name: conv.user_name,
+                snippet: conv.snippet,
+                createdAt: conv.createdAt,
+                isUnread: conv.isUnread
+            })),
+            pagination: paginatedResults.pagination
+        };
+
+        // Emit real-time update to admin clients
+        io.to('adminRoom').emit('conversationsUpdate', response);
+
+        res.json(response);
     } catch (error) {
         console.error('Conversations Query Error:', error);
         res.status(500).json({ error: 'Failed to fetch conversations list' });
@@ -194,6 +274,38 @@ router.get('/users', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch users list' });
     }
 });
+
+
+    // 11. Update a user (name, role)
+    // PUT /api/admin/users/:id
+    router.put('/users/:id', async (req, res) => {
+        const userId = req.params.id;
+        const { name, role } = req.body;
+        try {
+            const updated = await User.findByIdAndUpdate(userId, { name, role }, { new: true }).select('-password -__v');
+            if (!updated) return res.status(404).json({ error: 'User not found' });
+            res.json(updated);
+        } catch (error) {
+            if (error.name === 'CastError') return res.status(400).json({ error: 'Invalid User ID format.' });
+            console.error('Update User Error:', error);
+            res.status(500).json({ error: 'Failed to update user' });
+        }
+    });
+
+    // 12. Delete a user
+    // DELETE /api/admin/users/:id
+    router.delete('/users/:id', async (req, res) => {
+        const userId = req.params.id;
+        try {
+            const deleted = await User.findByIdAndDelete(userId);
+            if (!deleted) return res.status(404).json({ error: 'User not found' });
+            res.status(204).send();
+        } catch (error) {
+            if (error.name === 'CastError') return res.status(400).json({ error: 'Invalid User ID format.' });
+            console.error('Delete User Error:', error);
+            res.status(500).json({ error: 'Failed to delete user' });
+        }
+    });
 
 
 // 9. Fetch All Admins
