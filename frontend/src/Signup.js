@@ -16,7 +16,7 @@ function Signup() {
     setMessage("");
 
     try {
-      const res = await axios.post("https://bu-chatbot.onrender.com/auth/signup", form);
+      await axios.post("https://bu-chatbot.onrender.com/auth/signup", form);
       setMessage("✅ Signup successful! Redirecting to login...");
       setTimeout(() => (window.location.href = "/login"), 1500);
     } catch (err) {

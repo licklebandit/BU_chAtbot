@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ConfirmDialog from "./components/ConfirmDialog";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import io from 'socket.io-client';
-import { useDebounce } from "./utils/useDebounce";
-import Pagination from "./components/Pagination";
+import { useDebounce } from './hooks/useDebounce';
+import KnowledgeForm from './components/KnowledgeForm';
+import KnowledgeList from './components/KnowledgeList';
 
 // API root: set REACT_APP_API_BASE_URL in your .env (e.g. https://bu-chatbot.onrender.com)
 const API_ROOT = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
@@ -172,16 +173,16 @@ export default function Admin() {
   const [conversations, setConversations] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [knowledge, setKnowledge] = useState([]);
-  const [knowledgeKeyword, setKnowledgeKeyword] = useState("");
-  const [knowledgeAnswer, setKnowledgeAnswer] = useState("");
-  const [editingKnowledgeId, setEditingKnowledgeId] = useState(null);
   const [users, setUsers] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userRole, setUserRole] = useState(localStorage.getItem("role") || "admin"); // Role-based access
-  const [search, setSearch] = useState("");
+  const [userRole] = useState(localStorage.getItem("role") || "admin"); // Role-based access
   const [modalOpen, setModalOpen] = useState(false);
   const socketRef = useRef(null);
+  const [search, setSearch] = useState('');
+  
+  // Debounced values
+  const debouncedSearch = useDebounce(search, 300);
   
   // Conversation Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -197,7 +198,7 @@ export default function Admin() {
   const confirmRef = useRef({});
 
   // Conversations pagination and filtering state
-  const [conversationsState, setConversationsState] = useState({
+  const [, setConversationsState] = useState({
     currentPage: 1,
     totalPages: 1,
     pageSize: 10,
@@ -395,70 +396,30 @@ export default function Admin() {
     setConfirmOpen(true);
   };
 
-  // Fetch conversations with pagination
-  const fetchConversations = useCallback(async () => {
-    setConversationsState(prev => ({ ...prev, loading: true }));
-    try {
-      const { currentPage, pageSize, search, filter, dateRange } = conversationsState;
-      const params = new URLSearchParams({
-        page: currentPage,
-        limit: pageSize,
-        ...(search && { search }),
-        ...(filter !== 'all' && { filter }),
-        ...(dateRange.from && { from: dateRange.from }),
-        ...(dateRange.to && { to: dateRange.to })
-      });
+  // Filter conversations based on search and date range
+  const filterConversations = useCallback((items, searchTerm = "", dateFrom = "", dateTo = "") => {
+    let results = items || [];
 
-      const response = await axios.get(`${ADMIN_API}/conversations?${params}`);
-      setConversations(response.data.conversations);
-      setConversationsState(prev => ({
-        ...prev,
-        totalPages: response.data.pagination.pages,
-        loading: false
-      }));
-    } catch (error) {
-      console.error("Error fetching conversations:", error);
-      setConversationsState(prev => ({ ...prev, loading: false }));
+    if (searchTerm.trim()) {
+      const s = searchTerm.toLowerCase();
+      results = results.filter(it => 
+        Object.values(it).some(v => String(v).toLowerCase().includes(s))
+      );
     }
-  }, [conversationsState]);
 
-  // Add pagination handlers
-  const handlePageChange = (newPage) => {
-    setConversationsState(prev => ({ ...prev, currentPage: newPage }));
-  };
+    if (dateFrom) {
+      const from = new Date(dateFrom);
+      results = results.filter(r => r.rawDate && new Date(r.rawDate) >= from);
+    }
 
-  const handlePageSizeChange = (newSize) => {
-    setConversationsState(prev => ({
-      ...prev,
-      pageSize: newSize,
-      currentPage: 1 // Reset to first page when changing page size
-    }));
-  };
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23,59,59,999);
+      results = results.filter(r => r.rawDate && new Date(r.rawDate) <= to);
+    }
 
-  // Add filter handlers
-  const handleSearchChange = (value) => {
-    setConversationsState(prev => ({
-      ...prev,
-      search: value,
-      currentPage: 1 // Reset to first page when search changes
-    }));
-  };
-
-  const handleFilterChange = (value) => {
-    setConversationsState(prev => ({
-      ...prev,
-      filter: value,
-      currentPage: 1 // Reset to first page when filter changes
-    }));
-  };
-
-  const handleDateRangeChange = (from, to) => {
-    setConversationsState(prev => ({
-      ...prev,
-      dateRange: { from, to },
-      currentPage: 1 // Reset to first page when date range changes
-    }));
-  };
+    return results;
+  }, []);
 
   // Export helpers with confirmation
   const _download = (content, filename, type = 'application/octet-stream') => {
@@ -602,8 +563,8 @@ export default function Admin() {
 
   const filterTable = (items) => {
     let results = items || [];
-    if (search.trim()) {
-      const s = search.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const s = debouncedSearch.toLowerCase();
       results = results.filter(it => Object.values(it).some(v => String(v).toLowerCase().includes(s)));
     }
     return results;
@@ -740,6 +701,12 @@ export default function Admin() {
   }
 
   function ConversationsView() {
+    const [searchConversations, setSearchConversations] = useState("");
+    const debouncedSearchConversations = useDebounce(searchConversations, 300);
+    
+    const filteredConversations = filterConversations(conversations, debouncedSearchConversations, filterDateFrom, filterDateTo);
+    const displayConversations = filterUnreadOnly ? filteredConversations.filter(c => c.unread) : filteredConversations;
+    
     return (
       <div className="flex flex-col gap-4 h-full">
         <div className="bg-white p-4 rounded-lg shadow">
@@ -749,12 +716,8 @@ export default function Admin() {
                 <input
                   type="text"
                   placeholder="Search conversations..."
-                  value={search || ''}
-                  onChange={e => {
-                    e.preventDefault();
-                    const value = e.target.value;
-                    setSearch(value);
-                  }}
+                  value={searchConversations}
+                  onChange={e => setSearchConversations(e.target.value)}
                   className="w-full px-4 py-2 border rounded pr-10"
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -766,29 +729,20 @@ export default function Admin() {
               <input
                 type="checkbox"
                 checked={filterUnreadOnly}
-                onChange={e => {
-                  e.preventDefault();
-                  setFilterUnreadOnly(e.target.checked);
-                }}
+                onChange={e => setFilterUnreadOnly(e.target.checked)}
               />
               Unread only
             </label>
             <input
               type="date"
               value={filterDateFrom || ''}
-              onChange={e => {
-                e.preventDefault();
-                setFilterDateFrom(e.target.value);
-              }}
+              onChange={e => setFilterDateFrom(e.target.value)}
               className="px-4 py-2 border rounded"
             />
             <input
               type="date"
               value={filterDateTo || ''}
-              onChange={e => {
-                e.preventDefault();
-                setFilterDateTo(e.target.value);
-              }}
+              onChange={e => setFilterDateTo(e.target.value)}
               className="px-4 py-2 border rounded"
             />
           </div>
@@ -796,7 +750,7 @@ export default function Admin() {
 
         <div className="bg-white rounded-xl shadow flex-grow overflow-hidden flex flex-col">
           <div className="divide-y flex-grow overflow-y-auto">
-            {conversations.length ? conversations.map(c => (
+            {displayConversations.length ? displayConversations.map(c => (
               <div key={c.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center ${c.unread ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
@@ -818,7 +772,7 @@ export default function Admin() {
           </div>
           <div className="p-3 border-t flex justify-between items-center bg-white">
             <div className="text-sm text-gray-500">
-              Showing {conversations.length} conversations
+              Showing {displayConversations.length} of {conversations.length} conversations
             </div>
             <div className="flex gap-2">
               <button onClick={() => handleExport('json')} className="px-3 py-1 rounded bg-green-50 text-green-700 text-sm">Export JSON</button>
@@ -846,24 +800,81 @@ export default function Admin() {
 
 
   function FaqsView() {
+    const [searchFaqs, setSearchFaqs] = useState("");
+
     return (
       <div className="space-y-4">
         <div className="bg-white p-4 rounded-xl shadow">
           <h3 className="font-semibold text-gray-800">Add FAQ</h3>
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input value={newFaqQ} onChange={(e) => setNewFaqQ(e.target.value)} placeholder="Question" className="col-span-2 p-2 border rounded" />
-            <input value={newFaqA} onChange={(e) => setNewFaqA(e.target.value)} placeholder="Answer" className="p-2 border rounded" />
-            <div className="col-span-3 flex gap-2">
-              <button onClick={addFaq} className="bg-blue-600 text-white px-4 py-2 rounded">Add FAQ</button>
-              <button onClick={() => { setNewFaqQ(""); setNewFaqA(""); }} className="px-4 py-2 rounded border">Clear</button>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Question</label>
+              <input 
+                type="text"
+                value={newFaqQ} 
+                onChange={(e) => setNewFaqQ(e.target.value)} 
+                placeholder="Enter your question" 
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Answer</label>
+              <textarea 
+                value={newFaqA} 
+                onChange={(e) => setNewFaqA(e.target.value)} 
+                placeholder="Enter the answer" 
+                rows={4}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              />
+            </div>
+            <div className="col-span-2 flex gap-2">
+              <button 
+                onClick={addFaq} 
+                disabled={!newFaqQ.trim() || !newFaqA.trim()}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add FAQ
+              </button>
+              <button 
+                onClick={() => { setNewFaqQ(""); setNewFaqA(""); }} 
+                className="px-4 py-2 rounded border hover:bg-gray-50"
+              >
+                Clear
+              </button>
             </div>
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow">
-          <h3 className="font-semibold text-gray-800 mb-3">Manage FAQs</h3>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-semibold text-gray-800">Manage FAQs</h3>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={searchFaqs}
+                onChange={(e) => setSearchFaqs(e.target.value)}
+                placeholder="Search FAQs..."
+                className="p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                onClick={() => setSearchFaqs("")}
+                className="px-3 py-2 rounded bg-gray-100 hover:bg-gray-200"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
           <div className="divide-y">
-            {faqs.map(f => (
+            {faqs
+              .filter(f => {
+                if (!searchFaqs.trim()) return true;
+                const search = searchFaqs.toLowerCase();
+                return (
+                  f.q.toLowerCase().includes(search) ||
+                  f.a.toLowerCase().includes(search)
+                );
+              })
+              .map(f => (
               <div key={f.id} className="py-3 flex justify-between items-start">
                 <div>
                   <div className="font-medium text-gray-800">{f.q}</div>
@@ -882,43 +893,40 @@ export default function Admin() {
   }
 
   function KnowledgeView() {
-    const startEdit = (k) => {
-      setEditingKnowledgeId(k._id || k.id);
-      setKnowledgeKeyword(k.keyword || '');
-      setKnowledgeAnswer(k.answer || '');
-    };
+    const [searchKnowledge, setSearchKnowledge] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    const clearForm = () => {
-      setEditingKnowledgeId(null);
-      setKnowledgeKeyword('');
-      setKnowledgeAnswer('');
-    };
-
-    const submitKnowledge = async () => {
-      if (!knowledgeKeyword.trim() || !knowledgeAnswer.trim()) return alert('Please fill both fields');
+    const handleSubmit = async (formData) => {
       try {
+        setIsLoading(true);
         // POST will create or update (ingest.js handles existing keywords)
-        await axios.post(`${INGEST_API}`, { keyword: knowledgeKeyword.trim(), answer: knowledgeAnswer.trim() });
+        await axios.post(`${INGEST_API}`, { 
+          keyword: formData.keyword.trim(), 
+          answer: formData.answer.trim() 
+        });
         await fetchData();
-        clearForm();
       } catch (err) {
         console.error('Failed to save knowledge:', err);
         alert('Failed to save knowledge. See console for details.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    const removeKnowledge = async (id) => {
+    const handleDelete = async (id) => {
       confirmRef.current = {
         title: 'Delete knowledge',
         message: 'Delete this knowledge entry?',
         onConfirm: async () => {
           try {
+            setIsLoading(true);
             await axios.delete(`${INGEST_API}/${id}`);
             setKnowledge(prev => prev.filter(k => (k._id || k.id) !== id));
           } catch (err) {
             console.error('Failed to delete knowledge:', err);
             alert('Failed to delete knowledge. See console for details.');
           } finally {
+            setIsLoading(false);
             setConfirmOpen(false);
           }
         },
@@ -927,37 +935,29 @@ export default function Admin() {
       setConfirmOpen(true);
     };
 
+    const handleEdit = (item) => {
+      handleSubmit({
+        keyword: item.keyword,
+        answer: item.answer
+      });
+    };
+
     return (
       <div className="space-y-4">
-        <div className="bg-white p-4 rounded-xl shadow">
-          <h3 className="font-semibold text-gray-800">Add / Update Knowledge</h3>
-          <div className="mt-3 grid grid-cols-1 gap-3">
-            <input value={knowledgeKeyword} onChange={e => setKnowledgeKeyword(e.target.value)} placeholder="Keyword" className="p-2 border rounded" />
-            <textarea value={knowledgeAnswer} onChange={e => setKnowledgeAnswer(e.target.value)} placeholder="Answer" className="p-2 border rounded" rows={4} />
-            <div className="flex gap-2">
-              <button onClick={submitKnowledge} className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-              <button onClick={clearForm} className="px-4 py-2 rounded border">Clear</button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl shadow">
-          <h3 className="font-semibold text-gray-800 mb-3">Knowledge Items</h3>
-          <div className="divide-y">
-            {(knowledge || []).map(k => (
-              <div key={k._id || k.id} className="py-3 flex justify-between items-start">
-                <div>
-                  <div className="font-medium text-gray-800">{k.keyword}</div>
-                  <div className="text-sm text-gray-500 mt-1">{k.answer}</div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => startEdit(k)} className="px-3 py-1 rounded border text-sm">Edit</button>
-                  <button onClick={() => removeKnowledge(k._id || k.id)} className="px-3 py-1 rounded bg-red-50 text-red-700">Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <KnowledgeForm
+          onSubmit={handleSubmit}
+          initialData={null}
+          isEditing={false}
+        />
+        
+        <KnowledgeList
+          items={knowledge}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          searchQuery={searchKnowledge}
+          onSearchChange={setSearchKnowledge}
+          isLoading={isLoading}
+        />
       </div>
     );
   }
