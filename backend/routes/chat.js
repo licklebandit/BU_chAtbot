@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-// ✅ UPDATED: Use the correct Google GenAI SDK package
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import Chat from "../models/Chat.js";
@@ -9,16 +8,13 @@ import User from "../models/User.js";
 
 dotenv.config();
 const router = express.Router();
-
-// ✅ UPDATED: Initialize the GenAI client. It automatically picks up GEMINI_API_KEY from the environment.
 const ai = new GoogleGenAI({});
 
 const knowledgePath = "./data/knowledge.json";
 let knowledge = [];
 if (fs.existsSync(knowledgePath)) {
-  const fileData = fs.readFileSync(knowledgePath, "utf8");
   try {
-    knowledge = JSON.parse(fileData);
+    knowledge = JSON.parse(fs.readFileSync(knowledgePath, "utf8"));
   } catch (error) {
     console.error("⚠️ Error parsing knowledge.json:", error);
   }
@@ -26,10 +22,10 @@ if (fs.existsSync(knowledgePath)) {
   console.warn("⚠️ knowledge.json not found.");
 }
 
-// ✅ Middleware to verify JWT
+// ✅ Middleware
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return next(); // guest mode
+  if (!token) return next();
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -40,34 +36,18 @@ const authenticate = async (req, res, next) => {
   next();
 };
 
-// ✅ Chat endpoint
+// ✅ Main chat route
 router.post("/", authenticate, async (req, res) => {
   const { q } = req.body;
   if (!q || q.trim() === "") {
     return res.status(400).json({ answer: "Please ask a valid question." });
   }
 
-  let context = "You are Bugema University’s AI assistant. Be polite, helpful, and accurate.";
-  const found = knowledge.find(item =>
-    q.toLowerCase().includes(item.keyword.toLowerCase())
-  );
-  if (found) context += `\nRelevant info: ${found.answer}`;
-
   try {
-    // ✅ UPDATED: Switched from OpenAI completion to Gemini generateContent
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash", // Switched from gpt-4o-mini to Gemini's fast model
-      contents: [{ role: "user", parts: [{ text: q }] }], // Only the user query here
-      config: {
-          // Use systemInstruction for the persona and context
-          systemInstruction: context, 
-      },
-    });
-
-    // ✅ UPDATED: Simplified response parsing for Gemini SDK
+    const context = await searchKnowledge(q, knowledge);
+    const response = await getChatResponse(q, context);
     const answer = response.text.trim();
 
-    // ✅ Save chat history if user is logged in
     if (req.user) {
       let chat = await Chat.findOne({ userId: req.user._id });
       if (!chat) chat = new Chat({ userId: req.user._id, messages: [] });
@@ -75,42 +55,37 @@ router.post("/", authenticate, async (req, res) => {
       chat.messages.push({ role: "user", text: q });
       chat.messages.push({ role: "assistant", text: answer });
       await chat.save();
-      // Emit socket.io event to notify admin UI of a new conversation/chat
-      try {
-        const io = req.app.get('io');
-        if (io) {
-          // Emit a lightweight payload — admin can fetch details if needed
-          io.emit('new_conversation', {
-            id: chat._id,
-            user_name: req.user.name || req.user.email || 'Unknown',
-            snippet: q,
-            createdAt: new Date(),
-          });
 
-          // Optionally compute basic metrics and emit
-          const yesterday = new Date(Date.now() - 24*60*60*1000);
-          const chatsToday = await Chat.countDocuments({ 'messages.timestamp': { $gte: yesterday } }).catch(() => 0);
-          const activeUsersToday = await User.countDocuments({ lastLogin: { $gte: yesterday } }).catch(() => 0);
-          io.emit('metrics', { chatsToday, activeUsersToday });
-        }
-      } catch (err) {
-        console.warn('Socket emit error:', err.message || err);
+      const io = req.app.get("io");
+      if (io) {
+        io.emit("new_conversation", {
+          id: chat._id,
+          user_name: req.user.name || req.user.email || "Unknown",
+          snippet: q,
+          createdAt: new Date(),
+        });
+
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const chatsToday = await Chat.countDocuments({
+          "messages.timestamp": { $gte: yesterday },
+        }).catch(() => 0);
+        const activeUsersToday = await User.countDocuments({
+          lastLogin: { $gte: yesterday },
+        }).catch(() => 0);
+        io.emit("metrics", { chatsToday, activeUsersToday });
       }
     }
 
     res.json({ answer });
   } catch (error) {
     console.error("❌ Chat route error:", error);
-    res.status(500).json({
-      answer: "Sorry, I couldn’t process your request right now.",
-    });
+    res.status(500).json({ answer: "Sorry, I couldn’t process your request right now." });
   }
 });
 
-// ✅ Get chat history (for logged-in users)
+// ✅ Chat history routes
 router.get("/history", authenticate, async (req, res) => {
   if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-
   try {
     const chat = await Chat.findOne({ userId: req.user._id });
     res.json(chat ? chat.messages : []);
@@ -120,10 +95,8 @@ router.get("/history", authenticate, async (req, res) => {
   }
 });
 
-// ✅ Clear chat history (for logged-in users)
 router.delete("/clear", authenticate, async (req, res) => {
   if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-
   try {
     await Chat.deleteMany({ userId: req.user._id });
     res.json({ message: "Chat history cleared successfully." });

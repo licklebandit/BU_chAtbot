@@ -7,12 +7,14 @@ import { useDebounce } from './hooks/useDebounce';
 import StableKnowledgeForm from './components/StableKnowledgeForm';
 import KnowledgeList from './components/KnowledgeList';
 import StableFaqForm from './components/StableFaqForm';
+import ConversationStats from './components/ConversationStats';
 
 // API root: set REACT_APP_API_BASE_URL in your .env (e.g. https://bu-chatbot.onrender.com)
 const API_ROOT = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 const ADMIN_API = `${API_ROOT.replace(/\/$/, '')}/api/admin`;
 // Note: backend mounts ingest route at /ingest
 const INGEST_API = `${API_ROOT.replace(/\/$/, '')}/ingest`;
+const CONVERSATIONS_API = `${API_ROOT.replace(/\/$/, '')}/api/conversations`;
 
 const Icon = {
   Menu: ({ className = "h-5 w-5" }) => (
@@ -259,13 +261,20 @@ export default function Admin() {
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
 
+  const [conversationStats, setConversationStats] = useState(null);
+
   /* --- API Fetching --- */
   const fetchData = async () => {
     if (fetchBlockedRef.current) return;
     try {
-      // Fetch Dashboard Metrics & Charts
-      const metricsRes = await axios.get(`${ADMIN_API}/metrics`);
+      // Fetch Dashboard Metrics, Charts & Conversation Stats
+      const [metricsRes, statsRes] = await Promise.all([
+        axios.get(`${ADMIN_API}/metrics`),
+        axios.get(`${CONVERSATIONS_API}/stats`)
+      ]);
+      
       setMetrics(metricsRes.data.metrics);
+      setConversationStats(statsRes.data);
       // Normalize charts: backend returns array of {date,count}
       setChatsOverTime((metricsRes.data.chatsOverTime || []).map(d => d.count || 0));
       setAccuracyOverTime(metricsRes.data.accuracyOverTime || []);
@@ -351,6 +360,10 @@ export default function Admin() {
         socket.on('metrics', (m) => {
           // update metrics if provided
           if (m) setMetrics(prev => ({ ...prev, ...m }));
+        });
+
+        socket.on('conversation_stats', (stats) => {
+          if (stats) setConversationStats(prev => ({ ...prev, ...stats }));
         });
 
       } catch (err) {
@@ -678,7 +691,14 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Charts (unchanged) */}
+        {/* Conversation Statistics */}
+        {conversationStats && (
+          <div className="mb-6">
+            <ConversationStats stats={conversationStats} />
+          </div>
+        )}
+
+        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm">
             <div className="flex justify-between items-center mb-3">

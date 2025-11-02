@@ -4,108 +4,90 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import http from 'http';
-import { Server as IOServer } from 'socket.io';
+import http from "http";
+import { Server as IOServer } from "socket.io";
 
-// ✅ Import all routes using ES module syntax
+// ✅ Import all routes
 import chatRoute from "./routes/chat.js";
 import ingestRoute from "./routes/ingest.js";
 import authRoute from "./routes/auth.js";
-import adminRouter from "./routes/adminRouter.js"; // 💡 CHANGE: Use import for adminRouter
+import adminRouter from "./routes/adminRouter.js";
+import conversationRouter from "./routes/conversations.js";
 
-// ✅ Load environment variables
 dotenv.config();
 
-// ✅ Initialize app and create HTTP server
+// --- APP SETUP ---
 const app = express();
-const server = http.createServer(app);
+const server = http.createServer(app); // ✅ the only server instance
 
 // ✅ Initialize Socket.IO
 const io = new IOServer(server, {
-    cors: {
-        origin: [
-            "http://localhost:3000",
-            "https://bu-ch-atbot.vercel.app",
-        ],
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    }
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://bu-ch-atbot.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
 });
 
-// ✅ Socket.IO connection handling
-io.on('connection', (socket) => {
-    console.log('✅ Client connected:', socket.id);
+// ✅ Socket.IO Events
+io.on("connection", (socket) => {
+  console.log("✅ Client connected:", socket.id);
 
-    // Listen for admin events
-    socket.on('joinAdminRoom', () => {
-        socket.join('adminRoom');
-        console.log(`Admin ${socket.id} joined admin room`);
-    });
+  socket.on("joinAdminRoom", () => {
+    socket.join("adminRoom");
+    console.log(`Admin ${socket.id} joined admin room`);
+  });
 
-    socket.on('disconnect', () => {
-        console.log('❌ Client disconnected:', socket.id);
-    });
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected:", socket.id);
+  });
 });
 
-// Export io instance for use in routes
+// ✅ Make io available to routes
+app.set("io", io);
 export { io };
 
-// --- CONNECTION AND CONFIGURATION ---
-
-// ✅ CORS Configuration
+// --- MIDDLEWARES ---
 app.use(
-    cors({
-        origin: [
-            "http://localhost:3000", // for local dev
-            "https://bu-ch-atbot.vercel.app", // your actual deployed frontend
-        ],
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    })
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://bu-ch-atbot.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
 );
 
-// ✅ Body parser
 app.use(express.json({ limit: "10mb" }));
 
-// ✅ MongoDB Atlas Connection
-// Note: useNewUrlParser and useUnifiedTopology are no longer needed/supported in modern Mongoose
+// --- DATABASE ---
 mongoose
-    .connect(process.env.MONGO_URI) 
-    .then(() => console.log("✅ MongoDB connected successfully"))
-    .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// --- API Routes ---
-
+// --- ROUTES ---
 app.use("/chat", chatRoute);
 app.use("/ingest", ingestRoute);
 app.use("/auth", authRoute);
-app.use('/api/admin', adminRouter); // ✅ Your new Admin API base path
+app.use("/api/admin", adminRouter);
+app.use("/api/conversations", conversationRouter);
 
-// ✅ Health Check Route
+// --- HEALTH CHECK ---
 app.get("/", (req, res) => {
-    res.send("🎓 Bugema University AI Chatbot backend running successfully...");
+  res.send("🎓 Bugema University AI Chatbot backend running successfully...");
 });
 
 // --- SERVER START ---
-
 const PORT = process.env.PORT || 8000;
 
-// Start server
 server.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
-});
-
-// expose io to routes via app.set/get
-app.set('io', io);
-
-io.on('connection', (socket) => {
-    console.log('Socket connected:', socket.id);
-    socket.on('disconnect', () => console.log('Socket disconnected:', socket.id));
-});
-
-httpServer.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
-    console.log("🔑 Gemini API Key:", process.env.GEMINI_API_KEY ? "✅ Yes" : "❌ No");
-    console.log("🧩 JWT Secret:", process.env.JWT_SECRET ? "✅ Yes" : "❌ No");
-    console.log("🌍 Environment:", process.env.NODE_ENV || "development");
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log("🔑 Gemini API Key:", process.env.GEMINI_API_KEY ? "✅ Yes" : "❌ No");
+  console.log("🧩 JWT Secret:", process.env.JWT_SECRET ? "✅ Yes" : "❌ No");
+  console.log("🌍 Environment:", process.env.NODE_ENV || "development");
 });
