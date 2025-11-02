@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ConfirmDialog from "./components/ConfirmDialog";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import io from 'socket.io-client';
 import { useDebounce } from './hooks/useDebounce';
-import KnowledgeForm from './components/KnowledgeForm';
+import StableKnowledgeForm from './components/StableKnowledgeForm';
 import KnowledgeList from './components/KnowledgeList';
+import StableFaqForm from './components/StableFaqForm';
 
 // API root: set REACT_APP_API_BASE_URL in your .env (e.g. https://bu-chatbot.onrender.com)
 const API_ROOT = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 const ADMIN_API = `${API_ROOT.replace(/\/$/, '')}/api/admin`;
-// Note: backend mounts ingest route at /ingest (not /api/ingest)
+// Note: backend mounts ingest route at /ingest
 const INGEST_API = `${API_ROOT.replace(/\/$/, '')}/ingest`;
 
 const Icon = {
@@ -179,6 +180,7 @@ export default function Admin() {
   const [userRole] = useState(localStorage.getItem("role") || "admin"); // Role-based access
   const [modalOpen, setModalOpen] = useState(false);
   const socketRef = useRef(null);
+  const fetchBlockedRef = useRef(false);
   const [search, setSearch] = useState('');
   
   // Debounced values
@@ -215,6 +217,32 @@ export default function Admin() {
     setAccuracyOverTime(data.accuracyOverTime);
   }, []);
 
+  // Set Authorization header from token (if present) and centralize 401 handling
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common['Authorization'];
+    }
+
+    const handleUnauthorized = (error) => {
+      const status = error?.response?.status;
+      if (status === 401) {
+        // Block further automatic fetches to avoid retry storms
+        fetchBlockedRef.current = true;
+        console.warn('Received 401 from API; blocking further automatic fetches until reload or login.');
+        // Remove token and force re-login
+        localStorage.removeItem('token');
+        try { navigate('/login'); } catch (e) { /* ignore if navigation not available */ }
+      }
+      return Promise.reject(error);
+    };
+
+    const id = axios.interceptors.response.use(r => r, handleUnauthorized);
+    return () => axios.interceptors.response.eject(id);
+  }, [navigate]);
+
       const handleConversationsUpdate = useCallback((data) => {
         if (!data) return;
         setConversations(data.conversations || []);
@@ -222,22 +250,7 @@ export default function Admin() {
           ...prev,
           totalPages: data.pagination?.pages || 1
         }));
-      }, []);  useEffect(() => {
-    // Setup socket.io connection
-    const socket = io(API_ROOT, { transports: ['websocket'] });
-    socketRef.current = socket;
-
-    socket.on('connect', () => {
-      console.log('Socket connected', socket.id);
-    });
-
-    socket.on('metrics_update', handleMetricsUpdate);
-    socket.on('conversations_update', handleConversationsUpdate);
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [handleMetricsUpdate, handleConversationsUpdate]);
+  }, []);
 
   // local form states
   const [newFaqQ, setNewFaqQ] = useState("");
@@ -248,6 +261,7 @@ export default function Admin() {
 
   /* --- API Fetching --- */
   const fetchData = async () => {
+    if (fetchBlockedRef.current) return;
     try {
       // Fetch Dashboard Metrics & Charts
       const metricsRes = await axios.get(`${ADMIN_API}/metrics`);
@@ -283,27 +297,47 @@ export default function Admin() {
 
     } catch (error) {
       console.error("Error fetching data:", error);
+      // If unauthorized, block further automatic fetch attempts to avoid rapid retries
+      if (error?.response?.status === 401) {
+        console.warn('Received 401 from API; blocking further automatic fetches until reload or login.');
+        fetchBlockedRef.current = true;
+      }
     }
   };
 
-  useEffect(() => {
-    fetchData(); // Initial data load
+  // Memoize fetchData to prevent unnecessary re-renders
+  const memoizedFetchData = useCallback(fetchData, []);
 
-    // Existing interval logic (kept for demo chart simulation)
-    // Periodically refresh data from the backend to keep dashboard real-time
+  useEffect(() => {
+    memoizedFetchData(); // Initial data load
+
+    // Refresh data less frequently and only when tab is visible
     const id = setInterval(() => {
-      fetchData();
-    }, 30000); // refresh every 30s
+      if (document.visibilityState === 'visible') {
+        memoizedFetchData();
+      }
+    }, 60000); // refresh every 60s
 
     // Initialize socket.io client for push updates
     (async () => {
       try {
         const { io } = await import('socket.io-client');
-        const socket = io(API_ROOT, { transports: ['websocket'] });
+        const socket = io(API_ROOT, { 
+          transports: ['websocket', 'polling'],
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+          timeout: 10000
+        });
         socketRef.current = socket;
 
         socket.on('connect', () => {
           console.log('Socket connected', socket.id);
+        });
+
+        // If connection fails, log once and avoid noisy repeated reconnect logs
+        socket.on('connect_error', (err) => {
+          console.warn('Socket connect_error:', err && err.message ? err.message : err);
         });
 
         socket.on('new_conversation', (payload) => {
@@ -804,46 +838,25 @@ export default function Admin() {
 
     return (
       <div className="space-y-4">
-        <div className="bg-white p-4 rounded-xl shadow">
-          <h3 className="font-semibold text-gray-800">Add FAQ</h3>
-          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Question</label>
-              <input 
-                type="text"
-                value={newFaqQ} 
-                onChange={(e) => setNewFaqQ(e.target.value)} 
-                placeholder="Enter your question" 
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Answer</label>
-              <textarea 
-                value={newFaqA} 
-                onChange={(e) => setNewFaqA(e.target.value)} 
-                placeholder="Enter the answer" 
-                rows={4}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-              />
-            </div>
-            <div className="col-span-2 flex gap-2">
-              <button 
-                onClick={addFaq} 
-                disabled={!newFaqQ.trim() || !newFaqA.trim()}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add FAQ
-              </button>
-              <button 
-                onClick={() => { setNewFaqQ(""); setNewFaqA(""); }} 
-                className="px-4 py-2 rounded border hover:bg-gray-50"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-        </div>
+        <StableFaqForm 
+          onSubmit={async ({ question, answer }) => {
+            try {
+              const response = await axios.post(`${ADMIN_API}/faqs`, { 
+                question: question.trim(), 
+                answer: answer.trim() 
+              });
+              // Normalize returned FAQ and prepend
+              const created = { 
+                id: response.data._id || response.data.id, 
+                q: response.data.question || response.data.q, 
+                a: response.data.answer || response.data.a 
+              };
+              setFaqs(prev => [created, ...prev]);
+            } catch (error) {
+              console.error("Error adding FAQ:", error);
+            }
+          }} 
+        />
 
         <div className="bg-white p-4 rounded-xl shadow">
           <div className="flex justify-between items-center mb-3">
@@ -895,33 +908,99 @@ export default function Admin() {
   function KnowledgeView() {
     const [searchKnowledge, setSearchKnowledge] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
+    const typingTimeoutRef = useRef(null);
 
-    const handleSubmit = async (formData) => {
+    // Prevent fetchData from running while typing
+    useEffect(() => {
+      const originalFetchBlocked = fetchBlockedRef.current;
+      if (isTyping) {
+        fetchBlockedRef.current = true;
+      }
+      return () => {
+        fetchBlockedRef.current = originalFetchBlocked;
+      };
+    }, [isTyping]);
+
+    const handleSubmit = useCallback(async (formData) => {
+      if (!formData.keyword?.trim() || !formData.answer?.trim()) return;
+      
       try {
         setIsLoading(true);
         // POST will create or update (ingest.js handles existing keywords)
-        await axios.post(`${INGEST_API}`, { 
+        const response = await axios.post(`${INGEST_API}`, { 
           keyword: formData.keyword.trim(), 
           answer: formData.answer.trim() 
         });
-        await fetchData();
+        // If backend returned an id for the saved item, merge it into state.
+        // Otherwise refresh the knowledge list from the server so we have canonical ids.
+        const key = formData.keyword.trim();
+        const returnedId = response?.data?._id || response?.data?.id;
+        if (returnedId) {
+          setKnowledge(prev => {
+            const existingIndex = prev.findIndex(k => (k.keyword === key) || (k._id === returnedId) || (k.id === returnedId));
+            if (existingIndex !== -1) {
+              return prev.map((k, i) => i === existingIndex ? { ...k, answer: formData.answer.trim(), _id: returnedId, id: returnedId } : k);
+            }
+            const newItem = {
+              id: returnedId,
+              _id: returnedId,
+              keyword: key,
+              answer: formData.answer.trim()
+            };
+            return [newItem, ...prev];
+          });
+        } else {
+          // Backend didn't include the created document; refresh whole knowledge list
+          try {
+            const fresh = await axios.get(`${INGEST_API}`);
+            setKnowledge(fresh.data || []);
+          } catch (err) {
+            console.warn('Failed to refresh knowledge after save:', err);
+          }
+        }
       } catch (err) {
         console.error('Failed to save knowledge:', err);
         alert('Failed to save knowledge. See console for details.');
       } finally {
         setIsLoading(false);
       }
-    };
+    }, []);
 
-    const handleDelete = async (id) => {
+  const [editingKnowledge, setEditingKnowledge] = useState(null);
+
+  const handleDelete = useCallback(async (id) => {
       confirmRef.current = {
         title: 'Delete knowledge',
         message: 'Delete this knowledge entry?',
         onConfirm: async () => {
           try {
             setIsLoading(true);
-            await axios.delete(`${INGEST_API}/${id}`);
-            setKnowledge(prev => prev.filter(k => (k._id || k.id) !== id));
+            // If this is a client-only temporary item (created without server id), just remove locally
+            if (String(id).startsWith('tmp-')) {
+              setKnowledge(prev => prev.filter(k => String(k._id || k.id) !== String(id)));
+            } else {
+              try {
+                console.log('Attempting to delete knowledge with ID:', id);
+                const token = localStorage.getItem('token');
+                const response = await axios.delete(`${INGEST_API}/${id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                });
+                console.log('Delete response:', response);
+                setKnowledge(prev => prev.filter(k => String(k._id || k.id) !== String(id)));
+              } catch (err) {
+                console.error('Delete error:', err.response || err);
+                const status = err?.response?.status;
+                if (status === 404) {
+                  console.warn('Delete returned 404 — item not found on server. Removing locally.');
+                  setKnowledge(prev => prev.filter(k => String(k._id || k.id) !== String(id)));
+                } else {
+                  throw err; // let outer catch handle other errors
+                }
+              }
+            }
           } catch (err) {
             console.error('Failed to delete knowledge:', err);
             alert('Failed to delete knowledge. See console for details.');
@@ -933,21 +1012,26 @@ export default function Admin() {
         onCancel: () => setConfirmOpen(false),
       };
       setConfirmOpen(true);
-    };
+    }, []);
 
-    const handleEdit = (item) => {
-      handleSubmit({
-        keyword: item.keyword,
-        answer: item.answer
-      });
-    };
+    const handleEdit = useCallback((item) => {
+      // enter edit mode - populate the form with the selected item
+      setEditingKnowledge(item);
+    }, []);
+
+    const memoizedHandleSubmit = useCallback(async (formData) => {
+      await handleSubmit(formData);
+      // after successful save, exit edit mode (if any)
+      setEditingKnowledge(null);
+    }, [handleSubmit]);
 
     return (
       <div className="space-y-4">
-        <KnowledgeForm
-          onSubmit={handleSubmit}
-          initialData={null}
-          isEditing={false}
+        <StableKnowledgeForm
+          onSubmit={memoizedHandleSubmit}
+          initialData={editingKnowledge}
+          isEditing={!!editingKnowledge}
+          onCancel={() => setEditingKnowledge(null)}
         />
         
         <KnowledgeList
@@ -963,7 +1047,19 @@ export default function Admin() {
   }
 
   function UsersView() {
-    const filtered = filterTable(users);
+    const [userSearch, setUserSearch] = useState('');
+    const debouncedUserSearch = useDebounce(userSearch, 300);
+    
+    const filtered = useMemo(() => {
+      if (!debouncedUserSearch) return users;
+      const searchTerm = debouncedUserSearch.toLowerCase();
+      return users.filter(user => 
+        Object.values(user).some(val => 
+          String(val).toLowerCase().includes(searchTerm)
+        )
+      );
+    }, [users, debouncedUserSearch]);
+
     return (
       <div>
         <div className="bg-white p-4 rounded-xl shadow">
@@ -983,19 +1079,13 @@ export default function Admin() {
               />
                 {/* End CSV Import */}
               <input 
-                value={search || ''} 
-                onChange={(e) => {
-                  e.preventDefault();
-                  setSearch(e.target.value);
-                }} 
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
                 placeholder="Search users..." 
-                className="p-2 border rounded" 
+                className="p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
               />
               <button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSearch("");
-                }} 
+                onClick={() => setUserSearch('')} 
                 className="px-3 py-2 rounded bg-gray-100"
               >
                 Clear
@@ -1013,7 +1103,7 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(u => (
+                {filtered.length > 0 ? filtered.map(u => (
                   <tr key={u.id} className="border-t">
                     <td className="py-3">{u.name}</td>
                     <td className="py-3">{u.email}</td>
@@ -1025,7 +1115,13 @@ export default function Admin() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan="4" className="py-4 text-center text-gray-500">
+                      {userSearch ? 'No users found matching your search' : 'No users available'}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -1147,8 +1243,7 @@ export default function Admin() {
           <div className="flex items-center gap-3 mb-6">
             <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-xl font-bold">BU</div>
             <div>
-              <div className="font-semibold text-lg">Bugema University</div>
-              <div className="text-sm text-blue-200">Chatbot Admin</div>
+              <div className="font-semibold text-lg">Chatbot Admin</div>
             </div>
           </div>
 
@@ -1189,7 +1284,7 @@ export default function Admin() {
               </button>
               <div>
                 <div className="text-sm text-slate-600">Welcome back</div>
-                <div className="font-semibold text-lg text-slate-800">Bugema University — Chatbot Admin</div>
+                <div className="font-semibold text-lg text-slate-800">My Admin</div>
               </div>
             </div>
 
@@ -1197,10 +1292,6 @@ export default function Admin() {
               <div className="relative hidden sm:block">
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search everything..." className="pl-10 pr-3 py-2 rounded border w-80" />
                 <div className="absolute left-3 top-2 text-gray-400"><Icon.Search /></div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="text-sm text-slate-600">Signed in as <span className="font-medium">admin@bugema.ac.ug</span></div>
               </div>
             </div>
           </div>
@@ -1210,7 +1301,7 @@ export default function Admin() {
           {/* Page chooser */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-800 capitalize">{active.replace(/_/g, " ")}</h2>
-            <p className="text-sm text-slate-500 mt-1">Bugema University chatbot administration panel</p>
+            <p className="text-sm text-slate-500 mt-1">Bugema University chatbot insights</p>
           </div>
 
           {/* Page content */}
@@ -1246,6 +1337,7 @@ export default function Admin() {
 
       {/* User Edit Modal */}
       <UserEditModal
+        key={editingUser?.id || editingUser?._id || 'user-modal-default'}
         isOpen={isUserModalOpen}
         onClose={() => setIsUserModalOpen(false)}
         user={editingUser}

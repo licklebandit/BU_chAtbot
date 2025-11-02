@@ -114,4 +114,4 @@ KnowledgeList.propTypes = {
   isLoading: PropTypes.bool
 };
 
-export default KnowledgeList;
+export default React.memo(KnowledgeList);
