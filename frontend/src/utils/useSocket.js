@@ -1,57 +1,64 @@
-import { useEffect, useRef } from 'react';
-import io from 'socket.io-client';
+// frontend/src/utils/useSockets.js
+import { useEffect, useRef } from "react";
+import { io } from "socket.io-client";
 
-const API_ROOT = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+// Automatically pick correct backend URL
+const API_ROOT =
+  process.env.NODE_ENV === "production"
+    ? "https://bu-chatbot.onrender.com" // 🔥 your Render backend URL
+    : "http://localhost:5000";          // local dev
 
+// Hook for a single socket connection
 export const useSocket = () => {
-    const socketRef = useRef(null);
+  const socketRef = useRef(null);
 
-    useEffect(() => {
-        // Create socket connection
-        socketRef.current = io(API_ROOT, {
-            withCredentials: true
-        });
+  useEffect(() => {
+    // Initialize socket connection
+    socketRef.current = io(API_ROOT, {
+      transports: ["websocket"], // force WebSocket transport
+      withCredentials: true,
+    });
 
-        // Connect to admin room
-        socketRef.current.emit('joinAdminRoom');
+    // Handle connection errors
+    socketRef.current.on("connect_error", (err) => {
+      console.error("⚠️ Socket connect_error:", err.message);
+    });
 
-        // Cleanup on unmount
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
-        };
-    }, []);
+    // Join admin room when connected
+    socketRef.current.on("connect", () => {
+      console.log("✅ Connected to server:", socketRef.current.id);
+      socketRef.current.emit("joinAdminRoom");
+    });
 
-    return socketRef.current;
+    // Cleanup on unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        console.log("🔌 Socket disconnected");
+      }
+    };
+  }, []);
+
+  return socketRef.current;
 };
 
-// Custom hook for admin dashboard real-time updates
+// Hook for admin dashboard real-time updates
 export const useAdminSocket = (onMetricsUpdate, onConversationsUpdate) => {
-    const socket = useSocket();
+  const socket = useSocket();
 
-    useEffect(() => {
-        if (!socket) return;
+  useEffect(() => {
+    if (!socket) return;
 
-        // Listen for metrics updates
-        if (onMetricsUpdate) {
-            socket.on('metricsUpdate', onMetricsUpdate);
-        }
+    if (onMetricsUpdate) socket.on("metricsUpdate", onMetricsUpdate);
+    if (onConversationsUpdate)
+      socket.on("conversationsUpdate", onConversationsUpdate);
 
-        // Listen for conversation updates
-        if (onConversationsUpdate) {
-            socket.on('conversationsUpdate', onConversationsUpdate);
-        }
+    return () => {
+      if (onMetricsUpdate) socket.off("metricsUpdate", onMetricsUpdate);
+      if (onConversationsUpdate)
+        socket.off("conversationsUpdate", onConversationsUpdate);
+    };
+  }, [socket, onMetricsUpdate, onConversationsUpdate]);
 
-        return () => {
-            if (onMetricsUpdate) {
-                socket.off('metricsUpdate', onMetricsUpdate);
-            }
-            if (onConversationsUpdate) {
-                socket.off('conversationsUpdate', onConversationsUpdate);
-            }
-        };
-    }, [socket, onMetricsUpdate, onConversationsUpdate]);
-
-    return socket;
+  return socket;
 };

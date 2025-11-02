@@ -289,17 +289,21 @@ export default function Admin() {
       ]);
 
       // Normalize conversations to expected shape used in UI
-      const convos = (convosRes.data || []).map(c => ({
+      const convos = Array.isArray(convosRes.data) ? convosRes.data.map(c => ({
         id: c._id || c.id,
         user: c.user_name || c.user || 'Unknown',
         snippet: c.snippet || c.summary || '',
         time: c.createdAt ? new Date(c.createdAt).toLocaleString() : (c.time || ''),
         rawDate: c.createdAt || null,
         unread: typeof c.isUnread !== 'undefined' ? c.isUnread : !!c.unread
-      }));
+      })) : [];
 
       setConversations(convos);
-  setFaqs((faqsRes.data || []).map(f => ({ id: f._id || f.id, q: f.question || f.q, a: f.answer || f.a })));
+      setFaqs((faqsRes.data || []).map(f => ({
+        id: f._id || f.id,
+        q: f.question || f.q,
+        a: f.answer || f.a
+      })));
       setUsers(usersRes.data || []);
       setAdmins(adminsRes.data || []);
       setKnowledge(knowledgeRes.data || []);
@@ -555,17 +559,13 @@ export default function Admin() {
   
   const openConversationModal = async (conversation) => {
     try {
-      // Fetch full transcript details
       const fullConvoRes = await axios.get(`${ADMIN_API}/conversations/${conversation.id}`);
-      // Normalize to expected UI shape
       const conv = fullConvoRes.data;
       setSelectedConversation({ id: conv._id || conv.id, user: conv.user_name || conv.user, transcript: conv.transcript || [] });
       setIsModalOpen(true);
     } catch (error) {
       console.error("Error fetching conversation details:", error);
-      // Fallback: use the snippet if full fetch fails
       setSelectedConversation({ ...conversation, transcript: [{ role: "user", text: conversation.snippet, timestamp: conversation.time || 'N/A' }] });
-      setIsModalOpen(true);
     }
   };
   
