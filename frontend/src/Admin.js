@@ -8,156 +8,130 @@ import StableKnowledgeForm from './components/StableKnowledgeForm';
 import KnowledgeList from './components/KnowledgeList';
 import StableFaqForm from './components/StableFaqForm';
 import ConversationStats from './components/ConversationStats';
-
-// API root: set REACT_APP_API_BASE_URL in your .env (e.g. https://bu-chatbot.onrender.com)
-const API_ROOT = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
-const ADMIN_API = `${API_ROOT.replace(/\/$/, '')}/api/admin`;
-// Note: backend mounts ingest route at /ingest
-const INGEST_API = `${API_ROOT.replace(/\/$/, '')}/ingest`;
-const CONVERSATIONS_API = `${API_ROOT.replace(/\/$/, '')}/api/conversations`;
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import { Users, Download, Search, Settings } from "lucide-react";
 
 const Icon = {
   Menu: ({ className = "h-5 w-5" }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  ),
-  Search: ({ className = "h-5 w-5" }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-    </svg>
-  ),
-  Users: ({ className = "h-5 w-5" }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M17 21v-2a4 4 0 00-3-3.87M9 21v-2a4 4 0 013-3.87" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M12 11a4 4 0 100-8 4 4 0 000 8z" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round"/></svg>
   ),
   Chat: ({ className = "h-5 w-5" }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round"/></svg>
   ),
   Analytics: ({ className = "h-5 w-5" }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M7 13v5M12 8v10M17 4v14" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round"/><path d="M7 14v4M12 10v8M17 6v12" strokeLinecap="round" strokeLinejoin="round"/></svg>
   ),
-  Settings: ({ className = "h-5 w-5" }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M12 15.5A3.5 3.5 0 1112 8.5a3.5 3.5 0 010 7z" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82L4.21 4.2A2 2 0 017 1.37l.06.06c.48.48 1.2.58 1.82.33.38-.16.82-.24 1.24-.24.42 0 .86.08 1.24.24a1.65 1.65 0 001.82-.33L15.8 2.8a2 2 0 012.83 2.83l-.06.06c-.48.48-.58 1.2-.33 1.82.16.38.24.82.24 1.24 0 .42-.08.86-.24 1.24z" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  ),
-  File: ({ className = "h-5 w-5" }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M14 2v6h6" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )
+  File: ({ className = "h-5 w-5" }) => <Download className={className} />, 
+  Users: ({ className = "h-5 w-5" }) => <Users className={className} />,
+  Search: ({ className = "h-5 w-5" }) => <Search className={className} />,
+  Settings: ({ className = "h-5 w-5" }) => <Settings className={className} />
 };
 
-// Simple LineChart and BarChart components using SVG
-function LineChart({ data = [], width = 500, height = 120, stroke = "#0ea5e9" }) {
-  const max = Math.max(...data, 1);
-  const min = Math.min(...data);
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * width;
-    const y = height - ((d - min) / (max - min || 1)) * height;
-    return `${x},${y}`;
-  });
-  const pathD = points.length ? `M${points.join(" L ")}` : "";
-  const areaD = points.length ? `M${points[0]} L ${points.slice(1).map(p => p).join(" L ")} L ${width},${height} L 0,${height} Z` : "";
+//API ROOTS
+const API_ROOT = process.env.REACT_APP_API_ROOT || "https://bu-chatbot.onrender.com";
+const ADMIN_API = `${API_ROOT}/api/admin`;
+const INGEST_API = `${API_ROOT}/api/ingest`;
+const CONVERSATIONS_API = `${API_ROOT}/api/conversations`;
 
+// Chart Components
+function MiniLineChart({ data, stroke = "#0369a1" }) {
+  if (!data || data.length === 0) {
+    return <div className="h-32 flex items-center justify-center text-gray-400">No data</div>;
+  }
+  
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-28">
-      <defs>
-        <linearGradient id="lg1" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={stroke} stopOpacity="0.18" />
-          <stop offset="100%" stopColor={stroke} stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      {areaD && <path d={areaD} fill="url(#lg1)" />}
-      {pathD && <path d={pathD} fill="none" stroke={stroke} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />}
-      {data.map((d, i) => {
-        const x = (i / (data.length - 1)) * width;
-        const y = height - ((d - min) / (max - min || 1)) * height;
-        return <circle key={i} cx={x} cy={y} r="2.2" fill={stroke} />;
-      })}
-    </svg>
+    <ResponsiveContainer width="100%" height={120}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+        <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+        <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
+        <Tooltip />
+        <Line type="monotone" dataKey="count" stroke={stroke} strokeWidth={2} dot={false} />
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
 
-function BarChart({ data = [], width = 500, height = 120, color = "#0284c7" }) {
-  const max = Math.max(...data, 1);
-  const barWidth = data.length ? width / data.length - 6 : 0;
+function BarChart({ data, color = "#0369a1" }) {
+  if (!data || data.length === 0) {
+    return <div className="h-32 flex items-center justify-center text-gray-400">No data</div>;
+  }
+  
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-28">
-      {data.map((d, i) => {
-        const barH = (d / max) * (height - 10);
-        const x = i * (barWidth + 6) + 4;
-        const y = height - barH;
-        return <rect key={i} x={x} y={y} width={barWidth} height={barH} rx="3" fill={color} opacity="0.95" />;
-      })}
-    </svg>
+    <ResponsiveContainer width="100%" height={120}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+        <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+        <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
+        <Tooltip />
+        <Line type="monotone" dataKey="accuracy" stroke={color} strokeWidth={2} />
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
 
-
-/* -------------------------
-    Conversation Modal Component
-    ------------------------- */
+// Conversation Modal Component
 function ConversationModal({ isOpen, onClose, conversation, markRead, onExport }) {
   if (!isOpen || !conversation) return null;
 
-  // Use transcript returned by backend if available. Do not inject mock messages.
-  const displayTranscript = conversation.transcript || [];
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="relative w-full max-w-lg mx-auto bg-white rounded-xl shadow-2xl">
-          {/* Modal Header */}
-          <div className="p-5 border-b flex justify-between items-center">
-            <h3 className="text-xl font-semibold text-gray-800">Conversation with {conversation.user}</h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
+        <div className="relative w-full max-w-3xl mx-auto bg-white rounded-xl shadow-2xl">
+          <div className="p-4 border-b flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-medium">Conversation with {conversation.user}</h3>
+              <p className="text-sm text-gray-500">ID: {conversation.id}</p>
+            </div>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
           </div>
           
-          {/* Modal Body: Transcript */}
-          <div className="p-5 h-96 overflow-y-auto space-y-4">
-            {displayTranscript.length > 0 ? (
-              displayTranscript.map((msg, index) => (
-                <div key={index} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}>
-                  <div className={`max-w-xs p-3 rounded-lg text-sm ${msg.role === 'user' ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-800'}`}>
-                    <p className="font-medium capitalize mb-1">{msg.role}:</p>
-                    <p>{msg.text}</p>
-                    {msg.timestamp && <span className="block text-xs text-gray-400 mt-1 text-right">{msg.timestamp}</span>}
+          <div className="p-4 max-h-96 overflow-y-auto">
+            {conversation.transcript && conversation.transcript.length > 0 ? (
+              <div className="space-y-4">
+                {conversation.transcript.map((msg, idx) => (
+                  <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[70%] p-3 rounded-lg ${
+                      msg.role === 'user' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      <div className="text-xs opacity-75 mb-1">{msg.role}</div>
+                      <div className="text-sm">{msg.text}</div>
+                      {msg.timestamp && (
+                        <div className="text-xs opacity-75 mt-1">{msg.timestamp}</div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
-              <div className="text-center text-gray-500">No full transcript available for this conversation.</div>
+              <div className="text-center text-gray-500 py-8">No messages in this conversation</div>
             )}
           </div>
-
-          {/* Modal Footer */}
-          <div className="p-4 border-t flex justify-end gap-3">
-            <div className="flex items-center gap-2 mr-auto">
-              <button onClick={() => onExport && onExport(conversation, 'json')} className="px-3 py-1 rounded border text-sm">Export JSON</button>
-              <button onClick={() => onExport && onExport(conversation, 'csv')} className="px-3 py-1 rounded border text-sm">Export CSV</button>
-            </div>
-            <button 
-              onClick={() => { markRead(conversation.id); onClose(); }} 
-              className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+          
+          <div className="p-4 border-t flex justify-between items-center">
+            <button
+              onClick={() => markRead(conversation.id)}
+              className="px-4 py-2 rounded bg-blue-50 text-blue-700 text-sm"
             >
-              Resolve & Mark Read
+              Mark as Read
             </button>
-            <button onClick={onClose} className="px-4 py-2 rounded border">
-              Close
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => onExport(conversation, 'json')}
+                className="px-4 py-2 rounded bg-green-50 text-green-700 text-sm"
+              >
+                Export JSON
+              </button>
+              <button
+                onClick={() => onExport(conversation, 'csv')}
+                className="px-4 py-2 rounded border text-sm"
+              >
+                Export CSV
+              </button>
+              <button onClick={onClose} className="px-4 py-2 rounded border text-sm">Close</button>
+            </div>
           </div>
         </div>
       </div>
@@ -165,12 +139,15 @@ function ConversationModal({ isOpen, onClose, conversation, markRead, onExport }
   );
 }
 
-export default function Admin() {
+function Admin() {
   const navigate = useNavigate();
+   const socketRef = useRef(null);
+   const fetchBlockedRef = useRef(false);
 
   // Initial State - Set to default empty values
-  const [active, setActive] = useState("dashboard"); // options: dashboard, conversations, faqs, users, admins, analytics, settings
-  const [metrics, setMetrics] = useState({ chatsToday: 0, activeUsers: 0, avgResponseMs: 0, accuracyPct: 0 });
+  const [active, setActive] = useState("dashboard");
+  const [metrics, setMetrics] = useState({});
+  const [conversationStats, setConversationStats] = useState(null);
   const [chatsOverTime, setChatsOverTime] = useState([]);
   const [accuracyOverTime, setAccuracyOverTime] = useState([]);
   const [conversations, setConversations] = useState([]);
@@ -178,214 +155,275 @@ export default function Admin() {
   const [knowledge, setKnowledge] = useState([]);
   const [users, setUsers] = useState([]);
   const [admins, setAdmins] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userRole] = useState(localStorage.getItem("role") || "admin"); // Role-based access
-  const [modalOpen, setModalOpen] = useState(false);
-  const socketRef = useRef(null);
-  const fetchBlockedRef = useRef(false);
-  const [search, setSearch] = useState('');
-  
-  // Debounced values
-  const debouncedSearch = useDebounce(search, 300);
-  
-  // Conversation Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [newFaqQ, setNewFaqQ] = useState('');
+  const [newFaqA, setNewFaqA] = useState('');
+  // Charts + Pagination state
+  const [chartsData, setChartsData] = useState({ chats: [], accuracy: [] });
+  const [pagination, setPagination] = useState({ page: 1, total: 0 });
 
-  // User edit modal state
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  // UI state / refs
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
+  const [userRole, setUserRole] = useState(localStorage.getItem('role') || 'admin');
+
+  const confirmRef = useRef({});
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const [editingUser, setEditingUser] = useState(null);
   const [editName, setEditName] = useState("");
   const [editRole, setEditRole] = useState("");
-  // Confirm dialog state
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const confirmRef = useRef({});
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
-  // Conversations pagination and filtering state
-  const [, setConversationsState] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    pageSize: 10,
-    loading: false,
-    search: "",
-    dateRange: { from: "", to: "" },
-    filter: "all"
-  });
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  // backward-compatible aliases used in the file
+  const isModalOpen = modalOpen;
+  const setIsModalOpen = setModalOpen;
 
-  // Socket integration
-  const handleMetricsUpdate = useCallback((data) => {
-    setMetrics(data.metrics);
-    setChatsOverTime(data.chatsOverTime);
-    setAccuracyOverTime(data.accuracyOverTime);
-  }, []);
-
-  // Set Authorization header from token (if present) and centralize 401 handling
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
-
-    const handleUnauthorized = (error) => {
-      const status = error?.response?.status;
-      if (status === 401) {
-        // Block further automatic fetches to avoid retry storms
-        fetchBlockedRef.current = true;
-        console.warn('Received 401 from API; blocking further automatic fetches until reload or login.');
-        // Remove token and force re-login
-        localStorage.removeItem('token');
-        try { navigate('/login'); } catch (e) { /* ignore if navigation not available */ }
-      }
-      return Promise.reject(error);
-    };
-
-    const id = axios.interceptors.response.use(r => r, handleUnauthorized);
-    return () => axios.interceptors.response.eject(id);
-  }, [navigate]);
-
-      const handleConversationsUpdate = useCallback((data) => {
-        if (!data) return;
-        setConversations(data.conversations || []);
-        setConversationsState(prev => ({
-          ...prev,
-          totalPages: data.pagination?.pages || 1
-        }));
-  }, []);
-
-  // local form states
-  const [newFaqQ, setNewFaqQ] = useState("");
-  const [newFaqA, setNewFaqA] = useState("");
   const [filterUnreadOnly, setFilterUnreadOnly] = useState(false);
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
 
-  const [conversationStats, setConversationStats] = useState(null);
+ // --- Handle Unauthorized Responses ---
+  useEffect(() => {
+    const handleUnauthorized = (error) => {
+      const status = error?.response?.status;
+      if (status === 401) {
+        fetchBlockedRef.current = true;
+        console.warn("401 from API; blocking further automatic fetches.");
+        localStorage.removeItem("token");
+        try {
+          navigate("/login");
+        } catch (e) {}
+      }
+      return Promise.reject(error);
+    };
 
-  /* --- API Fetching --- */
-  const fetchData = async () => {
+    const id = axios.interceptors.response.use((r) => r, handleUnauthorized);
+    return () => axios.interceptors.response.eject(id);
+  }, [navigate]);
+
+  // --- Fetch Data ---
+  const fetchData = useCallback(async () => {
     if (fetchBlockedRef.current) return;
+
     try {
-      // Fetch Dashboard Metrics, Charts & Conversation Stats
+      const token = localStorage.getItem("token"); // 🔑 your JWT or auth token
+      if (!token) {
+        console.warn("No token found — please log in first.");
+        fetchBlockedRef.current = true;
+      return;
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch Dashboard Metrics & Conversation Stats
       const [metricsRes, statsRes] = await Promise.all([
-        axios.get(`${ADMIN_API}/metrics`),
-        axios.get(`${CONVERSATIONS_API}/stats`)
-      ]);
-      
-      setMetrics(metricsRes.data.metrics);
-      setConversationStats(statsRes.data);
-      // Normalize charts: backend returns array of {date,count}
-      setChatsOverTime((metricsRes.data.chatsOverTime || []).map(d => d.count || 0));
-      setAccuracyOverTime(metricsRes.data.accuracyOverTime || []);
-
-      // Fetch Lists (conversations, faqs, users, admins)
-      const [convosRes, faqsRes, usersRes, adminsRes, knowledgeRes] = await Promise.all([
-        axios.get(`${ADMIN_API}/conversations`),
-        axios.get(`${ADMIN_API}/faqs`),
-        axios.get(`${ADMIN_API}/users`),
-        axios.get(`${ADMIN_API}/admins`),
-        axios.get(`${INGEST_API}`)
+        axios.get(`${ADMIN_API}/metrics`, { headers }),
+        axios.get(`${CONVERSATIONS_API}/stats`, { headers }),
       ]);
 
-      // Normalize conversations to expected shape used in UI
-      const convos = Array.isArray(convosRes.data) ? convosRes.data.map(c => ({
-        id: c._id || c.id,
-        user: c.user_name || c.user || 'Unknown',
-        snippet: c.snippet || c.summary || '',
-        time: c.createdAt ? new Date(c.createdAt).toLocaleString() : (c.time || ''),
-        rawDate: c.createdAt || null,
-        unread: typeof c.isUnread !== 'undefined' ? c.isUnread : !!c.unread
-      })) : [];
+      setMetrics(metricsRes.data.metrics || {});
+      setConversationStats(statsRes.data || {});
+
+      // Normalize charts
+      setChatsOverTime(
+        (statsRes.data.dailyCounts || []).map((d) => ({
+          date: d.date,
+          count: d.count || 0
+        }))
+      );
+
+      setAccuracyOverTime(
+        (metricsRes.data.accuracyOverTime || []).map((d) => ({
+          date: d.date,
+          accuracy: d.accuracy
+        }))
+      );
+
+      // Fetch lists (conversations, faqs, users, admins, knowledge)
+      const [convosRes, faqsRes, usersRes, adminsRes, knowledgeRes] =
+        await Promise.all([
+          axios.get(`${ADMIN_API}/conversations`, { headers }),
+          axios.get(`${ADMIN_API}/faqs`, { headers }),
+          axios.get(`${ADMIN_API}/users`, { headers }),
+          axios.get(`${ADMIN_API}/admins`, { headers }),
+          axios.get(`${INGEST_API}`, { headers }),
+        ]);
+
+      const convos = Array.isArray(convosRes.data)
+        ? convosRes.data.map((c) => ({
+            id: c._id || c.id,
+            user: c.user_name || c.user || "Unknown",
+            snippet: c.snippet || c.summary || "",
+            time: c.createdAt
+              ? new Date(c.createdAt).toLocaleString()
+              : c.time || "",
+            rawDate: c.createdAt || null,
+            unread:
+              typeof c.isUnread !== "undefined" ? c.isUnread : !!c.unread
+          }))
+        : [];
 
       setConversations(convos);
-      setFaqs((faqsRes.data || []).map(f => ({
-        id: f._id || f.id,
-        q: f.question || f.q,
-        a: f.answer || f.a
-      })));
+      setFaqs(
+        (faqsRes.data || []).map((f) => ({
+          id: f._id || f.id,
+          q: f.question || f.q,
+          a: f.answer || f.a
+        }))
+      );
       setUsers(usersRes.data || []);
       setAdmins(adminsRes.data || []);
       setKnowledge(knowledgeRes.data || []);
-
     } catch (error) {
-      console.error("Error fetching data:", error);
-      // If unauthorized, block further automatic fetch attempts to avoid rapid retries
-      if (error?.response?.status === 401) {
-        console.warn('Received 401 from API; blocking further automatic fetches until reload or login.');
-        fetchBlockedRef.current = true;
-      }
+     console.error("Error fetching data:", error);
+     if (error?.response?.status === 401) {
+      console.warn("401 from API; blocking further automatic fetches.");
+      fetchBlockedRef.current = true;
+      localStorage.removeItem("token");
+      navigate("/login"); // redirect to login
+    }
+  }
+}, [navigate]);
+
+  // --- Load Data + Socket ---
+useEffect(() => {
+  let intervalId;
+
+  const initSocket = async () => {
+    try {
+      const { io } = await import("socket.io-client");
+      const socket = io(API_ROOT, {
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 10000,
+      });
+      socketRef.current = socket;
+
+      /* 🟢 Connection Status */
+      socket.on("connect", () => {
+        console.log("✅ Admin socket connected:", socket.id);
+        socket.emit("joinRoom", "adminRoom"); // join admin updates channel
+      });
+
+      socket.on("disconnect", () => {
+        console.warn("⚠️ Admin socket disconnected");
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("❌ Socket connect_error:", err.message);
+      });
+
+      /* 🟢 Metrics Updates */
+      socket.on("metricsUpdate", (payload) => {
+        if (!payload) return;
+        setMetrics(payload.metrics || {});
+        setChartsData({
+          chatsOverTime: payload.chatsOverTime || [],
+          accuracyOverTime: payload.accuracyOverTime || [],
+        });
+      });
+
+      /* 🟢 Real-time Stats (fast updates) */
+      socket.on("adminStatsUpdate", (stats) => {
+        if (stats)
+          setMetrics((prev) => ({
+            ...prev,
+            chatsToday: stats.chatsToday ?? prev.chatsToday,
+            totalUsers: stats.totalUsers ?? prev.totalUsers,
+            activeUsersToday: stats.activeUsersToday ?? prev.activeUsersToday,
+            lastUpdated: new Date(stats.timestamp).toLocaleString(),
+          }));
+      });
+
+      /* 🟢 Conversations (new + updates) */
+      socket.on("conversationsUpdate", (data) => {
+        if (!data?.conversations) return;
+        setConversations(data.conversations);
+        setPagination(data.pagination || {});
+      });
+
+      // When new conversation is created in real time
+      socket.on("new_conversation", (payload) => {
+        if (!payload) return;
+        setConversations((prev) => {
+          const next = [
+            {
+              id: payload.id,
+              user_name: payload.user_name || "Unknown",
+              snippet: payload.snippet || "",
+              createdAt: payload.createdAt,
+              isUnread: true,
+            },
+            ...prev,
+          ];
+          return next.slice(0, 100);
+        });
+      });
+
+      /* 🟢 FAQs (added/deleted live updates) */
+      socket.on("faqAdded", (faq) => {
+        if (faq) setFaqs((prev) => [faq, ...prev]);
+      });
+      socket.on("faqDeleted", (id) => {
+        setFaqs((prev) => prev.filter((f) => f._id !== id));
+      });
+
+      /* 🟢 Users (updated/deleted/imported) */
+      socket.on("userUpdated", (user) => {
+        if (user)
+          setUsers((prev) =>
+            prev.map((u) => (u._id === user._id ? user : u))
+          );
+      });
+
+      socket.on("userDeleted", (id) => {
+        if (id) setUsers((prev) => prev.filter((u) => u._id !== id));
+      });
+
+      socket.on("usersImported", (count) => {
+        console.log(`✅ ${count} users imported`);
+        fetchData(); // refresh user list
+      });
+
+      /* 🟢 Cleanup on Unmount */
+      return socket;
+    } catch (err) {
+      console.error("Socket initialization error:", err);
+      return null;
     }
   };
 
-  // Memoize fetchData to prevent unnecessary re-renders
-  const memoizedFetchData = useCallback(fetchData, []);
+  // --- Load initial data ---
+  fetchData();
 
-  useEffect(() => {
-    memoizedFetchData(); // Initial data load
+  // --- Refresh every 60s when tab is visible ---
+  intervalId = setInterval(() => {
+    if (document.visibilityState === "visible") fetchData();
+  }, 60000);
 
-    // Refresh data less frequently and only when tab is visible
-    const id = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        memoizedFetchData();
-      }
-    }, 60000); // refresh every 60s
+  // --- Initialize Socket ---
+  let socketInstance;
+  initSocket().then((sock) => (socketInstance = sock));
 
-    // Initialize socket.io client for push updates
-    (async () => {
-      try {
-        const { io } = await import('socket.io-client');
-        const socket = io(API_ROOT, { 
-          transports: ['websocket', 'polling'],
-          reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 1000,
-          timeout: 10000
-        });
-        socketRef.current = socket;
-
-        socket.on('connect', () => {
-          console.log('Socket connected', socket.id);
-        });
-
-        // If connection fails, log once and avoid noisy repeated reconnect logs
-        socket.on('connect_error', (err) => {
-          console.warn('Socket connect_error:', err && err.message ? err.message : err);
-        });
-
-        socket.on('new_conversation', (payload) => {
-          // prepend to conversations list if viewing dashboard or conversations
-          setConversations(prev => {
-            const next = [{ id: payload.id, user: payload.user_name || payload.user || 'Unknown', snippet: payload.snippet || '', time: payload.createdAt ? new Date(payload.createdAt).toLocaleString() : '' , rawDate: payload.createdAt, unread: true }, ...prev];
-            return next.slice(0, 100); // cap client list
-          });
-        });
-
-        socket.on('metrics', (m) => {
-          // update metrics if provided
-          if (m) setMetrics(prev => ({ ...prev, ...m }));
-        });
-
-        socket.on('conversation_stats', (stats) => {
-          if (stats) setConversationStats(prev => ({ ...prev, ...stats }));
-        });
-
-      } catch (err) {
-        console.warn('Socket.io client failed to load or connect:', err.message || err);
-      }
-    })();
-
-    return () => {
-      clearInterval(id);
-      try { socketRef.current?.disconnect(); } catch(e) {}
-    };
-  }, []);
-
-  /* --- Handlers --- */
-  const onLogout = () => {
-    localStorage.removeItem("role");
-    navigate("/login");
+  // --- Cleanup ---
+  return () => {
+    clearInterval(intervalId);
+    if (socketInstance) {
+      socketInstance.disconnect();
+      console.log("🧹 Socket disconnected cleanly");
+    }
   };
+}, [fetchData]);
+
+    /* --- Handlers --- */
+    const onLogout = () => { localStorage.removeItem("role"); 
+    navigate("/login"); };
+
 
   const addFaq = async () => {
     if (!newFaqQ.trim() || !newFaqA.trim()) return;
@@ -705,7 +743,7 @@ export default function Admin() {
               <h3 className="text-lg font-medium text-gray-800">Chats Over Time</h3>
               <p className="text-sm text-gray-500">Last 14 intervals</p>
             </div>
-            <LineChart data={chatsOverTime} stroke="#0369a1" />
+            <MiniLineChart data={chatsOverTime} stroke="#0369a1" />
           </div>
 
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm">
@@ -1186,7 +1224,7 @@ export default function Admin() {
             <h4 className="text-sm text-gray-500">Conversations (14d)</h4>
             <p className="text-2xl font-semibold text-blue-800">{chatsOverTime.reduce((a,b) => a+b,0)}</p>
             <div className="mt-3">
-              <LineChart data={chatsOverTime} stroke="#075985" />
+              <MiniLineChart data={chatsOverTime} stroke="#075985" />
             </div>
           </div>
           <div className="bg-white p-5 rounded-xl shadow">
@@ -1406,3 +1444,5 @@ function UserEditModal({ isOpen, onClose, user, name, role, setName, setRole, on
     </div>
   );
 }
+
+export default Admin;

@@ -72,7 +72,7 @@ mongoose
 
 // --- ROUTES ---
 app.use("/chat", chatRoute);
-app.use("/ingest", ingestRoute);
+app.use("/api/ingest", ingestRoute);
 app.use("/auth", authRoute);
 app.use("/api/admin", adminRouter);
 app.use("/api/conversations", conversationRouter);
