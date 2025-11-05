@@ -3,81 +3,57 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
+  // Link, // Removed since the Navbar is removed
   useLocation,
   Navigate,
 } from "react-router-dom";
 
-// 🛠 FIX: Reverting imports to simple file paths without extensions 
-// to resolve persistent "Could not resolve" errors.
-import LandingPage from "./LandingPage"; 
+// Pages
+import LandingPage from "./LandingPage";
 import Chatbot from "./Chatbot";
-import Admin from "./Admin";
 import Login from "./Login";
 import Signup from "./Signup";
+import AdminRoutes from "./pages/AdminRoutes"; 
 
-// ✅ Admin Route Protection (Still required)
+// ✅ Admin Route Protection Component
 function AdminRoute({ children }) {
   const role = localStorage.getItem("role");
-  return role === "admin" ? children : <Navigate to="/" />;
+  return role === "admin" ? children : <Navigate to="/" replace />;
 }
 
+// Main component using React hooks like useLocation
 function MainApp() {
-  const location = useLocation();
-
-  // The logic to hide the navbar on the specified paths remains correct.
-  const hideNav = 
-    location.pathname === "/" || 
-    location.pathname === "/chatbot" || 
-    location.pathname === "/login" || 
-    location.pathname === "/admin" || 
-    location.pathname === "/signup";
+  // useLocation is still needed by MainApp if you want to use it for other logic,
+  // but it's no longer needed for hiding the nav bar.
+  // const location = useLocation(); 
+  
+  // The logic for 'hideNav' and the entire <nav> block are removed.
 
   return (
     <div>
-      {/* Navbar is hidden if hideNav is true */}
-      {!hideNav && (
-        <div style={{ textAlign: "center", margin: "20px" }}>
-          <Link to="/chatbot" style={styles.navLink}> 
-            💬 Chatbot
-          </Link>{" "}
-          |{" "}
-          <Link to="/admin" style={styles.navLink}>
-            🛠 Admin
-          </Link>{" "}
-          |{" "}
-          <Link to="/login" style={styles.navLink}>
-            🔐 Login
-          </Link>{" "}
-          |{" "}
-          <Link to="/signup" style={styles.navLink}>
-            📝 Signup
-          </Link>
-        </div>
-      )}
+      {/* The Navbar block was here, but has been entirely removed 
+      to hide it from all pages, as requested.
+      */}
 
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
-        
-        {/* Unprotected Chatbot route */}
+        <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected admin routes */}
         <Route
-          path="/chatbot"
-          element={
-            <Chatbot />
-          }
-        />
-        
-        {/* Protected Admin route */}
-        <Route
-          path="/admin"
+          path="/admin/*"
           element={
             <AdminRoute>
-              <Admin />
+              <AdminRoutes />
             </AdminRoute>
           }
         />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        
+        {/* Fallback for unknown routes */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>
   );
@@ -91,7 +67,15 @@ function App() {
   );
 }
 
+// The styles object is no longer needed since it only styled the removed navbar.
+/*
 const styles = {
+  navContainer: {
+    textAlign: "center",
+    margin: "20px 0",
+    padding: "10px 0",
+    borderBottom: "1px solid #ccc",
+  },
   navLink: {
     textDecoration: "none",
     color: "#0078ff",
@@ -99,5 +83,6 @@ const styles = {
     margin: "0 10px",
   },
 };
+*/
 
 export default App;

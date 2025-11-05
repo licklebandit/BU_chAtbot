@@ -1,8 +1,13 @@
+// models/Knowledge.js
 import mongoose from "mongoose";
 
-const KnowledgeSchema = new mongoose.Schema({
-  keyword: { type: String, required: true, unique: true },
-  answer: { type: String, required: true },
-});
+const knowledgeSchema = new mongoose.Schema(
+  {
+    question: String,
+    answer: String,
+    tags: [String],
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model("Knowledge", KnowledgeSchema);
+export default mongoose.model("Knowledge", knowledgeSchema);
