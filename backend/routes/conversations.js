@@ -14,7 +14,7 @@ router.get('/', verifyAdmin, async (req, res) => {
         const conversations = await Conversation.find()
             .sort({ createdAt: -1 })
             .limit(100)
-            .select('userId user_name snippet transcript createdAt isUnread');
+            .select('userId user_name snippet transcript createdAt isUnread messages');
         res.json(conversations); // always return an array
     } catch (error) {
         console.error('Error getting conversations:', error);

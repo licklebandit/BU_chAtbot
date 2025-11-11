@@ -1,8 +1,12 @@
-import React, { useEffect, useState, useMemo } from "react";
+// src/views/Admin/ConversationsView.js (Full, Corrected Code)
+
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import { Button } from "../../components/ui/Button";
 import ConversationModal from "../../components/ConversationModal";
-import { Search, Calendar, Loader, ChevronLeft, ChevronRight, MessageCircle, ListOrdered } from "lucide-react";
+import { Search, Calendar, Loader, ChevronLeft, ChevronRight, MessageCircle, ListOrdered, AlertTriangle } from "lucide-react";
+// 💡 IMPORTANT: Import the centralized API URL
+import { API_BASE_URL } from "../../config/api"; 
 
 const ITEMS_PER_PAGE = 10;
 
@@ -31,41 +35,54 @@ export default function ConversationsView() {
 
   const token = localStorage.getItem("token");
 
-  // Fetch data on component mount
-  useEffect(() => {
-    const fetchConversations = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await axios.get("https://bu-chatbot.onrender.com/api/admin/conversations", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        // Enhance data for display (simulating missing fields if not provided by API)
-        const data = Array.isArray(res.data) 
-          ? res.data.map(c => ({
+  const fetchConversations = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // ✅ FIX 1: Use dynamic API_BASE_URL
+      // The endpoint is /api/conversations (due to backend router.get('/'))
+      const res = await axios.get(`${API_BASE_URL}/conversations`, { 
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // ✅ FIX 2: Correctly enhance data using the now-available 'messages' array
+      const data = Array.isArray(res.data) 
+        ? res.data.map(c => {
+          const messageCount = c.messages ? c.messages.length : 0;
+          const lastMessage = messageCount > 0 ? c.messages[messageCount - 1].content : "No messages yet";
+          
+          return {
             ...c,
-            // Assuming the API provides a timestamp field like 'createdAt' or 'timestamp'
-            createdAt: c.createdAt || new Date().toISOString(), 
-            // Simulating message count if API only returns lastMessage
-            messageCount: c.messages ? c.messages.length : Math.floor(Math.random() * 20) + 5,
-            status: c.status || (Math.random() > 0.8 ? 'Closed' : 'Open'),
-          }))
-          : [];
+            // Assign computed values
+            lastMessage: lastMessage,
+            messageCount: messageCount,
+            user: c.user_name || c.userId || "Anonymous User", // Prioritize user_name
+            // Simulate status based on unread status or message count
+            status: c.isUnread ? 'New' : (messageCount > 1 ? 'Open' : 'Closed'), 
+          };
+        })
+        : [];
 
-        setConversations(data);
-      } catch (err) {
-        console.error("Failed to fetch conversations:", err);
-        setError("Failed to load conversations. Check the API endpoint.");
-        setConversations([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchConversations();
+      setConversations(data);
+    } catch (err) {
+      console.error("Failed to fetch conversations:", err);
+      // Improved error message
+      const errorMessage = err.code === "ERR_NETWORK" 
+        ? "Network Error: Could not connect to the backend server (local or deployed). Check if the server is running on port 8000."
+        : "Failed to load conversations. Ensure your token is valid and the backend route is correct.";
+      setError(errorMessage);
+      setConversations([]);
+    } finally {
+      setLoading(false);
+    }
   }, [token]);
 
-  // Client-side filtering and pagination logic
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
+  // Client-side filtering and pagination logic (UNMODIFIED)
   const filteredConversations = useMemo(() => {
     if (!searchQuery) return conversations;
     const query = searchQuery.toLowerCase();
@@ -85,10 +102,9 @@ export default function ConversationsView() {
     setModalOpen(true);
   };
   
-  // Navigation handlers
+  // Navigation handlers (UNMODIFIED)
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const goToPrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-  // const goToPage = (page) => setCurrentPage(Math.max(1, Math.min(page, totalPages))); // Removed unused function
 
   return (
     <div className="space-y-6">
@@ -110,28 +126,30 @@ export default function ConversationsView() {
           />
         </div>
         <Button 
-          onClick={() => { /* Re-run fetchConversations if needed, or link to a refresh function */ }}
+          onClick={fetchConversations} // Use the correct fetch function
           className="bg-blue-600 hover:bg-blue-700 transition"
         >
-          {/* <RefreshCw className="w-4 h-4 mr-2" /> */}
           Export Data
         </Button>
       </div>
 
-      {/* Content Area: Loading, Error, or Table */}
+      {/* Content Area: Loading, Error, or Table (UNMODIFIED) */}
       {loading ? (
         <div className="text-center p-20 flex items-center justify-center text-blue-600">
           <Loader className="w-8 h-8 mr-2 animate-spin" /> Loading Conversations...
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">{error}</div>
+        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center flex items-center justify-center">
+            <AlertTriangle className="w-5 h-5 mr-2" />
+            {error}
+        </div>
       ) : currentConversations.length === 0 && searchQuery ? (
         <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg text-center">No conversations match your search query.</div>
       ) : conversations.length === 0 ? (
         <div className="p-4 bg-gray-100 text-gray-500 rounded-lg text-center">No conversation data found.</div>
       ) : (
         <>
-          {/* Table for Conversations */}
+          {/* Table for Conversations (UNMODIFIED) */}
           <div className="overflow-x-auto bg-white shadow-md rounded-lg">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-blue-50">
@@ -158,7 +176,7 @@ export default function ConversationsView() {
                 {currentConversations.map(c => (
                   <tr key={c._id} className="hover:bg-blue-50 transition duration-150">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 truncate max-w-xs">
-                      {c.user || "Anonymous User"}
+                      {c.user}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 max-w-sm truncate">
                       {c.lastMessage.substring(0, 70)}{c.lastMessage.length > 70 ? '...' : ''}
@@ -171,7 +189,7 @@ export default function ConversationsView() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm hidden md:table-cell">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        c.status === 'Open' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        c.status === 'Open' ? 'bg-green-100 text-green-800' : (c.status === 'New' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800')
                       }`}>
                         {c.status}
                       </span>
@@ -187,7 +205,7 @@ export default function ConversationsView() {
             </table>
           </div>
 
-          {/* Pagination Controls */}
+          {/* Pagination Controls (UNMODIFIED) */}
           <div className="flex justify-between items-center mt-4 p-4 bg-white rounded-lg shadow-md">
             <div className="text-sm text-gray-600">
               Showing {Math.min(endIndex, filteredConversations.length)} of {filteredConversations.length} conversations

@@ -1,6 +1,7 @@
 // src/views/Admin/AdminsView.js
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { ADMIN_API_URL } from "../../config/api";
 import { Button } from "../../components/ui/Button";
 import AdminModal from "../../components/AdminModal"; 
 import { Edit, Trash2, Loader2, CheckCircle, AlertTriangle, UserCog } from 'lucide-react';
@@ -41,6 +42,7 @@ const Toast = ({ message, type, onClose }) => {
 export default function AdminsView() {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(null); 
 
@@ -58,13 +60,16 @@ export default function AdminsView() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get("https://bu-chatbot.onrender.com/api/admin/admins", {
+      const res = await axios.get(`${ADMIN_API_URL}/admins`,{
         headers: { Authorization: `Bearer ${token}` }
       });
       setAdmins(res.data || []);
     } catch (err) {
       console.error("Fetch error:", err);
-      setError("Failed to retrieve admins. Ensure you have the correct permissions.");
+      const errorMessage = err.code === "ERR_NETWORK"
+      ? "Network Error: Cannot reach the server. Ensure the backend is running on port 8000 locally or is deployed."
+      : "Failed to retrieve admins. Ensure you have the correct permissions."
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -96,7 +101,7 @@ export default function AdminsView() {
 
     setIsDeleting(id);
     try {
-      await axios.delete(`https://bu-chatbot.onrender.com/api/admin/admins/${id}`, {
+      await axios.delete(`${ADMIN_API_URL}/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

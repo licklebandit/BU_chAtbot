@@ -2,15 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { X, Save } from 'lucide-react';
+// ✅ FIX: Added Loader2 to the import list
+import { X, Save, Loader2 } from 'lucide-react'; 
+import { ADMIN_API_URL } from "../config/api"; // Assumed to be /api/admin
 
 /**
  * FaqModal Component (Handles Add/Edit form logic)
- * Props:
- * - isOpen: Boolean → controls modal visibility
- * - faq: Object|null → current FAQ being edited (null for Add)
- * - onClose: Function → closes modal
- * - onSave: Function → refreshes parent FAQ list after successful save
  */
 export default function FaqModal({ isOpen, faq, onClose, onSave }) {
   const [question, setQuestion] = useState('');
@@ -23,14 +20,12 @@ export default function FaqModal({ isOpen, faq, onClose, onSave }) {
 
   useEffect(() => {
     if (isOpen) {
-      // Set form values based on whether we are editing (faq exists) or adding (faq is null)
       setQuestion(faq ? faq.question : '');
       setAnswer(faq ? faq.answer : '');
       setError(null);
     }
   }, [isOpen, faq]);
 
-  // Don't render anything if the modal is not open
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -45,8 +40,10 @@ export default function FaqModal({ isOpen, faq, onClose, onSave }) {
     setError(null);
 
     const payload = { question, answer };
-    const url = `https://bu-chatbot.onrender.com/api/admin/faqs${isEdit ? '/' + faq._id : ''}`;
-    const method = isEdit ? 'put' : 'post'; // Use PUT for edit, POST for add
+    
+    // CORRECT PATH: Uses /faqs for POST and /faqs/:id for PUT
+    const url = `${ADMIN_API_URL}/faqs${isEdit ? '/' + faq._id : ''}`;
+    const method = isEdit ? 'put' : 'post'; 
 
     try {
       await axios({
@@ -56,8 +53,8 @@ export default function FaqModal({ isOpen, faq, onClose, onSave }) {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      onSave(); // Trigger the parent component (FaqsView) to refresh its list
-      onClose(); // Close the modal
+      onSave(); // Trigger refresh in parent
+      onClose(); // Close modal
     } catch (err) {
       console.error("Failed to save FAQ:", err);
       setError(`Failed to ${isEdit ? 'update' : 'create'} FAQ. Please try again.`);
@@ -67,7 +64,6 @@ export default function FaqModal({ isOpen, faq, onClose, onSave }) {
   };
 
   const handleOverlayClick = (e) => {
-    // Closes the modal only when clicking the background overlay
     if (e.target.id === 'modal-overlay') onClose();
   };
 
@@ -79,7 +75,7 @@ export default function FaqModal({ isOpen, faq, onClose, onSave }) {
     >
       <div
         className="bg-white w-full max-w-xl rounded-xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()} // Prevent clicks inside the modal from closing it
+        onClick={(e) => e.stopPropagation()} 
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">
@@ -144,7 +140,9 @@ export default function FaqModal({ isOpen, faq, onClose, onSave }) {
               }`}
             >
               {loading ? (
-                <>Saving...</>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                </>
               ) : (
                 <>
                   <Save className="w-4 h-4" /> {isEdit ? 'Update FAQ' : 'Save FAQ'}

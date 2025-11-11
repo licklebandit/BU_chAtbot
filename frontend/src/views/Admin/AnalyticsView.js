@@ -1,6 +1,7 @@
 // src/views/Admin/AnalyticsView.js
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { ADMIN_API_URL } from "../../config/api";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, BarChart, Bar,
@@ -62,10 +63,10 @@ export default function AnalyticsView() {
     try {
       const [summaryRes, chartRes] = await Promise.all([
         // 🚨 Using the dynamic API_BASE_URL here
-        axios.get(`${API_BASE_URL}/analytics/summary`, { 
+        axios.get(`${ADMIN_API_URL}/analytics/summary`, { 
             headers: { Authorization: `Bearer ${token}` } 
         }),
-        axios.get(`${API_BASE_URL}/analytics/charts`, { 
+        axios.get(`${ADMIN_API_URL}/analytics/charts`, { 
             headers: { Authorization: `Bearer ${token}` } 
         })
       ]);
@@ -76,10 +77,9 @@ export default function AnalyticsView() {
     } catch (err) {
       console.error("Analytics fetch error:", err);
       // Re-check the error type for better user feedback
-      let errorMessage = "Failed to load analytics data. Check console for details.";
-      if (err.code === "ERR_NETWORK") {
-          errorMessage = "Could not reach the server. Ensure the backend is running (locally or on Render).";
-      }
+      const errorMessage = err.code === "ERR_NETWORK" 
+        ? "Network Error: Cannot reach the server. Ensure the backend is running on port 8000 locally or is deployed."
+        : "Failed to load analytics data. Ensure you are logged in.";
       setError(errorMessage);
     } finally {
       setLoading(false);
