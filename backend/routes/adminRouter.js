@@ -236,7 +236,7 @@ router.delete("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
 
 
 /* ---------------------------
-    ANALYTICS ENDPOINTS
+    ANALYTICS ENDPOINTS (UPDATED)
 --------------------------- */
 
 // GET /api/admin/stats - Fetch general statistics 
@@ -244,18 +244,40 @@ router.get("/stats", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
         const totalConversations = await Conversation.countDocuments();
-        const totalKnowledgeArticles = await Knowledge.countDocuments();
+        
+        // Assuming FAQS and Knowledge Articles are both stored in the Knowledge model
+        // We will need to split them if you differentiate them.
+        const totalKnowledgeArticles = await Knowledge.countDocuments(); 
+        
+        // TEMPORARY MAPPING: For simplicity, we'll map all knowledge articles 
+        // to the 'knowledge' key and set 'faqs' to 0 until filtering logic is added.
+        
+        const summaryData = { 
+            users: totalUsers, // Renamed from totalUsers for frontend compatibility
+            conversations: totalConversations, // Renamed from totalConversations
+            faqs: totalKnowledgeArticles, // Using total count for both faqs and knowledge articles for now
+            knowledge: totalKnowledgeArticles // Using total count for both faqs and knowledge articles for now
+        };
 
-        res.json({ 
-            totalUsers, 
-            totalConversations,
-            totalKnowledgeArticles
-        });
+        // Placeholder chart data structure (Frontend expects this to be an array)
+        // You will need to implement actual date aggregation logic later.
+        const chartData = [
+            { date: "Jan", users: 5, conversations: 10, faqs: 1, knowledge: 2 },
+            { date: "Feb", users: 15, conversations: 25, faqs: 3, knowledge: 5 },
+            { date: "Mar", users: 30, conversations: 50, faqs: 6, knowledge: 10 },
+            // Add more historical data points here
+        ];
+
+        // Send both summary and chart data in one combined response for efficiency
+        res.json({
+            summary: summaryData,
+            charts: chartData
+        });
+        
     } catch (err) {
         console.error("Error fetching stats:", err);
-        res.status(500).json({ message: "Server error fetching stats" });
+        res.status(500).json({ message: "Server error fetching analytics data" });
     }
 });
-
 
 export default router;
