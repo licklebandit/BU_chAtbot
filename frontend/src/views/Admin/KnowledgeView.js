@@ -7,7 +7,7 @@ import KnowledgeModal from "../../components/KnowledgeModal";
 import KnowledgeList from "../../components/KnowledgeList"; 
 import { Loader2, CheckCircle, AlertTriangle, BookOpen } from 'lucide-react'; 
 
-// --- Simple Toast/Alert Component ---
+// --- Simple Toast/Alert Component (UNMODIFIED) ---
 const Toast = ({ message, type, onClose }) => {
   const baseClasses = "fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white flex items-center gap-2 z-[60] transition-opacity duration-300";
   let colorClasses = "";
@@ -41,6 +41,7 @@ const Toast = ({ message, type, onClose }) => {
 
 
 export default function KnowledgeView() {
+  // Renamed 'articles' to 'knowledgeItems' for clarity, maintaining original variable name `articles` for minimum change
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,11 +89,13 @@ export default function KnowledgeView() {
   };
 
   const handleEditArticle = (item) => {
-    // Map the keyword/answer fields from the list component back to title/content for the modal
+    // UPDATED: Use the 'keyword' and 'answer' fields provided by KnowledgeList 
+    // and map them back to 'title' and 'content' for the KnowledgeModal's state.
     const articleForModal = {
       _id: item._id,
-      title: item.keyword || item.title, 
-      content: item.answer || item.content, 
+      // The item passed here already has 'keyword' (which is question) and 'answer'
+      title: item.keyword, // Maps keyword back to title for the modal form
+      content: item.answer, // Maps answer back to content for the modal form
       lastUpdated: item.lastUpdated,
     };
     setSelectedArticle(articleForModal);
@@ -124,27 +127,29 @@ export default function KnowledgeView() {
     }
   };
 
-  // Map the articles (title/content) to the format KnowledgeList expects (keyword/answer)
+  // UPDATED: Map the incoming API response fields (question/answer)
+  // to the display fields KnowledgeList expects (keyword/answer).
   const mappedArticles = articles.map(article => ({
     _id: article._id,
-    // If your backend is sending title/content, map them to keyword/answer
-    keyword: article.title || article.question, 
-    answer: article.content || article.answer,
+    // Map the model's 'question' field to the list's 'keyword' field
+    keyword: article.question, 
+    // Use the model's 'answer' field directly
+    answer: article.answer,
     lastUpdated: article.updatedAt, 
   }));
 
-  // --- Render Logic ---
+  // --- Render Logic (UNMODIFIED) ---
   const renderContent = () => {
     if (error) {
       return (
         <div className="text-center p-10 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-xl text-red-600 font-semibold mb-2">API Error</p>
           <p className="text-red-500">{error}</p>
-          <p className="text-red-500 mt-2 text-sm">Please check your backend logs and CORS configuration.</p>
+          <p className="text-red-500 mt-2 text-sm">Please check your backend logs and CORS configuration.</p>
         </div>
       );
     }
-    
+    
     return (
       <KnowledgeList
         items={mappedArticles}

@@ -10,15 +10,15 @@ import { verifyUser as isAuthenticated, verifyAdmin as isAdmin } from "../middle
 const router = express.Router();
 
 /* ---------------------------
-    USER/ADMIN MANAGEMENT
+    USER/ADMIN MANAGEMENT (UPDATED)
     Routes are relative to /api/admin
 --------------------------- */
 
-// GET /api/admin/users - Fetch all users
+// GET /api/admin/users - Fetch ALL users (AdminsView will filter for role: 'admin')
 router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // Fetches users, excluding the password field
-        const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
+        // FIX: Fetch ALL users, excluding the password field, allowing the frontend to filter by role
+        const users = await User.find().select('-password');
         res.json(users);
     } catch (err) {
         console.error("Error fetching users:", err);
@@ -26,45 +26,77 @@ router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-// POST /api/admin/user - Create a new user (Placeholder: Add actual password hashing)
-router.post("/user", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-        // Example logic: You will need to hash the password here
-        const { username, email, password, role } = req.body;
-        const hashedPassword = await hash(password, 10); 
+// POST /api/admin/user - Create a new user/admin
+router.post("/users", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        // Note: Your frontend AdminModal enforces role: 'admin'
+        const { username, email, password, role } = req.body;
+        
+        if (!password) {
+            return res.status(400).json({ message: "Password is required for new user creation." });
+        }
         
-        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user' });
-        await newUser.save();
+        const hashedPassword = await hash(password, 10); 
+        
+        // Assuming 'username' in your model is where you put 'name' from the frontend modal
+        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user' });
+        await newUser.save();
 
-        res.status(201).json({ message: "User created successfully" });
+        res.status(201).json({ message: "User created successfully" });
+    } catch (err) {
+        console.error("Error creating user:", err);
+        res.status(500).json({ message: "Server error creating user" });
+    }
+});
+
+// PUT /api/admin/users/:id - Update an existing user/admin (NEW ROUTE ADDED)
+router.put("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { username, email, password, role } = req.body;
+        const updateFields = { username, email, role };
+
+        if (password) {
+            // Only hash and update password if provided
+            updateFields.password = await hash(password, 10);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            updateFields,
+            { new: true, runValidators: true }
+        ).select('-password'); // Exclude password from the response
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        res.json(updatedUser);
     } catch (err) {
-        console.error("Error creating user:", err);
-        res.status(500).json({ message: "Server error creating user" });
+        console.error("Error updating user:", err);
+        res.status(500).json({ message: "Server error updating user" });
     }
 });
 
 // DELETE /api/admin/users/:id - Delete a user
 router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-        const deletedUser = await User.findByIdAndDelete(req.params.id);
-        if (!deletedUser) return res.status(404).json({ message: "User not found." });
-        res.json({ message: "User deleted successfully" });
-    } catch (err) {
-        console.error("Error deleting user:", err);
-        res.status(500).json({ message: "Server error deleting user" });
-    }
+    try {
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+        if (!deletedUser) return res.status(404).json({ message: "User not found." });
+        res.json({ message: "User deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting user:", err);
+        res.status(500).json({ message: "Server error deleting user" });
+    }
 });
 
 /* ---------------------------------
-    KNOWLEDGE MANAGEMENT
-    Routes are relative to /api/admin/knowledge
-    Mapped to Knowledge.js model fields (question/answer).
+    KNOWLEDGE BASE MANAGEMENT - DUAL ROUTES (UNMODIFIED)
+// ... (rest of the /knowledge, /faqs, and /stats routes) ...
 --------------------------------- */
 
 // GET /api/admin/knowledge - Fetch all Knowledge articles
 router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // Fetches articles; the frontend (KnowledgeView) is responsible for mapping
         const articles = await Knowledge.find().sort({ createdAt: -1 });
         res.json(articles);
     } catch (err) {
@@ -76,7 +108,6 @@ router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
 // POST /api/admin/knowledge - Create a new Knowledge article
 router.post("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // Frontend sends 'title' (mapped to question) and 'content' (mapped to answer)
         const { title, content } = req.body; 
         
         if (!title || !content) {
@@ -132,26 +163,98 @@ router.delete("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
+// --- 2. /api/admin/faqs Routes (Directly using question/answer) ---
+
+// GET /api/admin/faqs - Fetch all FAQs (Restored to fix FaqsView 404)
+router.get("/faqs", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        // FaqsView expects 'question' and 'answer' fields (which the model already uses)
+        const faqs = await Knowledge.find().sort({ createdAt: -1 });
+        res.json(faqs);
+    } catch (err) {
+        console.error("Error fetching FAQs:", err);
+        res.status(500).json({ message: "Server error fetching FAQs" });
+    }
+});
+
+// POST /api/admin/faqs - Create a new FAQ
+router.post("/faqs", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        // FaqsView sends 'question' and 'answer'
+        const { question, answer } = req.body; 
+        
+        if (!question || !answer) {
+            return res.status(400).json({ message: "Missing required fields: question and answer." });
+        }
+
+        const newFaq = new Knowledge({ question, answer, source: 'Admin Panel' });
+        const savedFaq = await newFaq.save();
+        res.status(201).json(savedFaq);
+    } catch (err) {
+        console.error("Error creating FAQ:", err);
+        res.status(500).json({ message: "Server error creating FAQ" });
+    }
+});
+
+// PUT /api/admin/faqs/:id - Update an existing FAQ
+router.put("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { question, answer } = req.body;
+        
+        const updatedFaq = await Knowledge.findByIdAndUpdate(
+            req.params.id,
+            { question, answer }, 
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedFaq) {
+            return res.status(404).json({ message: "FAQ not found." });
+        }
+
+        res.json(updatedFaq);
+    } catch (err) {
+        console.error("Error updating FAQ:", err);
+        res.status(500).json({ message: "Server error updating FAQ" });
+    }
+});
+
+// DELETE /api/admin/faqs/:id - Delete an FAQ
+router.delete("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const deletedFaq = await Knowledge.findByIdAndDelete(req.params.id);
+
+        if (!deletedFaq) {
+            return res.status(404).json({ message: "FAQ not found." });
+        }
+
+        res.json({ message: "FAQ deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting FAQ:", err);
+        res.status(500).json({ message: "Server error deleting FAQ" });
+    }
+});
+
+
 /* ---------------------------
     ANALYTICS ENDPOINTS
 --------------------------- */
 
 // GET /api/admin/stats - Fetch general statistics 
 router.get("/stats", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-        const totalUsers = await User.countDocuments();
-        const totalConversations = await Conversation.countDocuments();
-        const totalKnowledgeArticles = await Knowledge.countDocuments();
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalConversations = await Conversation.countDocuments();
+        const totalKnowledgeArticles = await Knowledge.countDocuments();
 
-        res.json({ 
-            totalUsers, 
-            totalConversations,
-            totalKnowledgeArticles
-        });
-    } catch (err) {
-        console.error("Error fetching stats:", err);
-        res.status(500).json({ message: "Server error fetching stats" });
-    }
+        res.json({ 
+            totalUsers, 
+            totalConversations,
+            totalKnowledgeArticles
+        });
+    } catch (err) {
+        console.error("Error fetching stats:", err);
+        res.status(500).json({ message: "Server error fetching stats" });
+    }
 });
 
 
