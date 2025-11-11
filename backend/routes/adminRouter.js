@@ -10,10 +10,10 @@ import { verifyUser as isAuthenticated, verifyAdmin as isAdmin } from "../middle
 const router = express.Router();
 
 /* ---------------------------
-    USER/ADMIN MANAGEMENT (Placeholder)
+    USER/ADMIN MANAGEMENT (Placeholders from previous steps)
 --------------------------- */
 
-// GET /api/admin/users - Fetch all users 
+// GET /api/admin/users
 router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
@@ -24,7 +24,7 @@ router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-// POST /api/admin/user - Create a new user (Placeholder)
+// POST /api/admin/user
 router.post("/user", isAuthenticated, isAdmin, async (req, res) => {
     try {
         // TODO: Implement user creation logic
@@ -35,7 +35,7 @@ router.post("/user", isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-// DELETE /api/admin/users/:id - Delete a user (Placeholder)
+// DELETE /api/admin/users/:id
 router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
@@ -48,81 +48,82 @@ router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /* ---------------------------------
-    FAQ/KNOWLEDGE MANAGEMENT (Corrected to use /faqs routes)
-    Routes are relative to /api/admin/faqs
+    KNOWLEDGE MANAGEMENT (Corrected to use /knowledge routes)
+    Routes are relative to /api/admin/knowledge
 --------------------------------- */
 
-// GET /api/admin/faqs - Fetch all FAQs (Matches FaqsView.js)
-router.get("/faqs", isAuthenticated, isAdmin, async (req, res) => {
+// GET /api/admin/knowledge - Fetch all Knowledge articles
+router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // Assuming the Knowledge model has fields 'question' and 'answer'
-        const faqs = await Knowledge.find().sort({ createdAt: -1 });
-        res.json(faqs);
+        // Fetches articles using fields expected by KnowledgeView (title/content)
+        const articles = await Knowledge.find().sort({ createdAt: -1 });
+        res.json(articles);
     } catch (err) {
-        console.error("Error fetching FAQs:", err);
-        res.status(500).json({ message: "Server error fetching FAQs" });
+        console.error("Error fetching knowledge articles:", err);
+        res.status(500).json({ message: "Server error fetching knowledge articles" });
     }
 });
 
-// POST /api/admin/faqs - Create a new FAQ (Matches FaqsView.js)
-router.post("/faqs", isAuthenticated, isAdmin, async (req, res) => {
+// POST /api/admin/knowledge - Create a new Knowledge article
+router.post("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // FaqModal is expected to send 'question' and 'answer'
-        const { question, answer } = req.body; 
+        // KnowledgeModal sends 'title' and 'content'
+        const { title, content } = req.body; 
         
-        if (!question || !answer) {
-            return res.status(400).json({ message: "Missing required fields: question and answer." });
+        if (!title || !content) {
+            return res.status(400).json({ message: "Missing required fields: title and content." });
         }
 
-        const newFaq = new Knowledge({ question, answer, source: 'Admin Panel' });
-        const savedFaq = await newFaq.save();
-        res.status(201).json(savedFaq);
+        // Assuming your Knowledge model supports 'title' and 'content' fields
+        const newArticle = new Knowledge({ title, content, source: 'Admin Panel' });
+        const savedArticle = await newArticle.save();
+        res.status(201).json(savedArticle);
     } catch (err) {
-        console.error("Error creating FAQ:", err);
-        res.status(500).json({ message: "Server error creating FAQ" });
+        console.error("Error creating article:", err);
+        res.status(500).json({ message: "Server error creating article" });
     }
 });
 
-// PUT /api/admin/faqs/:id - Update an existing FAQ (Matches FaqsView.js)
-router.put("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
+// PUT /api/admin/knowledge/:id - Update an existing Knowledge article
+router.put("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        const { question, answer } = req.body;
+        const { title, content } = req.body;
         
-        const updatedFaq = await Knowledge.findByIdAndUpdate(
+        const updatedArticle = await Knowledge.findByIdAndUpdate(
             req.params.id,
-            { question, answer }, 
+            { title, content }, 
             { new: true, runValidators: true }
         );
 
-        if (!updatedFaq) {
-            return res.status(404).json({ message: "FAQ not found." });
+        if (!updatedArticle) {
+            return res.status(404).json({ message: "Article not found." });
         }
 
-        res.json(updatedFaq);
+        res.json(updatedArticle);
     } catch (err) {
-        console.error("Error updating FAQ:", err);
-        res.status(500).json({ message: "Server error updating FAQ" });
+        console.error("Error updating article:", err);
+        res.status(500).json({ message: "Server error updating article" });
     }
 });
 
-// DELETE /api/admin/faqs/:id - Delete an FAQ (Matches FaqsView.js)
-router.delete("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
+// DELETE /api/admin/knowledge/:id - Delete an article
+router.delete("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        const deletedFaq = await Knowledge.findByIdAndDelete(req.params.id);
+        const deletedArticle = await Knowledge.findByIdAndDelete(req.params.id);
 
-        if (!deletedFaq) {
-            return res.status(404).json({ message: "FAQ not found." });
+        if (!deletedArticle) {
+            return res.status(404).json({ message: "Article not found." });
         }
 
-        res.json({ message: "FAQ deleted successfully" });
+        res.json({ message: "Article deleted successfully" });
     } catch (err) {
-        console.error("Error deleting FAQ:", err);
-        res.status(500).json({ message: "Server error deleting FAQ" });
+        console.error("Error deleting article:", err);
+        res.status(500).json({ message: "Server error deleting article" });
     }
 });
 
 /* ---------------------------
-    ANALYTICS ENDPOINTS (Placeholder)
+    ANALYTICS ENDPOINTS (Placeholder from previous steps)
 --------------------------- */
 
 // GET /api/admin/stats - Fetch general statistics 
@@ -130,12 +131,12 @@ router.get("/stats", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
         const totalConversations = await Conversation.countDocuments();
-        const totalFaqs = await Knowledge.countDocuments();
+        const totalKnowledgeArticles = await Knowledge.countDocuments();
 
         res.json({ 
             totalUsers, 
             totalConversations,
-            totalFaqs
+            totalKnowledgeArticles
         });
     } catch (err) {
         console.error("Error fetching stats:", err);
