@@ -3,19 +3,21 @@
 import express from "express";
 import User from "../models/User.js"; 
 import Conversation from "../models/Conversation.js"; 
-import Knowledge from "../models/Knowledge.js"; // Assumes this handles your FAQ/KB items
+import Knowledge from "../models/Knowledge.js"; 
 import { hash } from 'bcrypt'; 
 import { verifyUser as isAuthenticated, verifyAdmin as isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 /* ---------------------------
-    USER/ADMIN MANAGEMENT (Placeholders from previous steps)
+    USER/ADMIN MANAGEMENT
+    Routes are relative to /api/admin
 --------------------------- */
 
-// GET /api/admin/users
+// GET /api/admin/users - Fetch all users
 router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
     try {
+        // Fetches users, excluding the password field
         const users = await User.find({ role: { $ne: 'admin' } }).select('-password');
         res.json(users);
     } catch (err) {
@@ -24,23 +26,29 @@ router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-// POST /api/admin/user
+// POST /api/admin/user - Create a new user (Placeholder: Add actual password hashing)
 router.post("/user", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // TODO: Implement user creation logic
-        res.status(201).json({ message: "User created successfully (Placeholder)" });
+        // Example logic: You will need to hash the password here
+        const { username, email, password, role } = req.body;
+        const hashedPassword = await hash(password, 10); 
+        
+        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user' });
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully" });
     } catch (err) {
         console.error("Error creating user:", err);
         res.status(500).json({ message: "Server error creating user" });
     }
 });
 
-// DELETE /api/admin/users/:id
+// DELETE /api/admin/users/:id - Delete a user
 router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!deletedUser) return res.status(404).json({ message: "User not found." });
-        res.json({ message: "User deleted successfully (Placeholder)" });
+        res.json({ message: "User deleted successfully" });
     } catch (err) {
         console.error("Error deleting user:", err);
         res.status(500).json({ message: "Server error deleting user" });
@@ -48,14 +56,15 @@ router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /* ---------------------------------
-    KNOWLEDGE MANAGEMENT (Corrected to use /knowledge routes)
+    KNOWLEDGE MANAGEMENT
     Routes are relative to /api/admin/knowledge
+    Mapped to Knowledge.js model fields (question/answer).
 --------------------------------- */
 
 // GET /api/admin/knowledge - Fetch all Knowledge articles
 router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // Fetches articles using fields expected by KnowledgeView (title/content)
+        // Fetches articles; the frontend (KnowledgeView) is responsible for mapping
         const articles = await Knowledge.find().sort({ createdAt: -1 });
         res.json(articles);
     } catch (err) {
@@ -67,15 +76,15 @@ router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
 // POST /api/admin/knowledge - Create a new Knowledge article
 router.post("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        // KnowledgeModal sends 'title' and 'content'
+        // Frontend sends 'title' (mapped to question) and 'content' (mapped to answer)
         const { title, content } = req.body; 
         
         if (!title || !content) {
             return res.status(400).json({ message: "Missing required fields: title and content." });
         }
 
-        // Assuming your Knowledge model supports 'title' and 'content' fields
-        const newArticle = new Knowledge({ title, content, source: 'Admin Panel' });
+        // Map frontend fields (title/content) to model fields (question/answer)
+        const newArticle = new Knowledge({ question: title, answer: content, source: 'Admin Panel' });
         const savedArticle = await newArticle.save();
         res.status(201).json(savedArticle);
     } catch (err) {
@@ -91,7 +100,8 @@ router.put("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
         
         const updatedArticle = await Knowledge.findByIdAndUpdate(
             req.params.id,
-            { title, content }, 
+            // Map frontend fields (title/content) to model fields (question/answer)
+            { question: title, answer: content }, 
             { new: true, runValidators: true }
         );
 
@@ -123,7 +133,7 @@ router.delete("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /* ---------------------------
-    ANALYTICS ENDPOINTS (Placeholder from previous steps)
+    ANALYTICS ENDPOINTS
 --------------------------- */
 
 // GET /api/admin/stats - Fetch general statistics 
