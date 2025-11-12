@@ -3,7 +3,9 @@ import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 dotenv.config();
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// FIX: Initialize the SDK without arguments. 
+// It will automatically use the GEMINI_API_KEY from the environment.
+const ai = new GoogleGenAI({}); 
 
 /**
  * Get AI response using Google Gemini with context
@@ -13,7 +15,9 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
  */
 export async function getChatResponse(userQuestion, context = "") {
   try {
-    const model = ai.getGenerativeModel({ model: "gemini-pro" });
+    // You should use the recommended "gemini-2.5-flash" or "gemini-1.5-flash" 
+    // for chat and RAG tasks as it's faster and cheaper.
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" }); 
 
     const prompt = `
 You are Bugema University's AI assistant. Answer politely and accurately.
@@ -27,12 +31,17 @@ Question: ${userQuestion}
 Answer:
 `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
+    const result = await model.generateContent({
+        contents: prompt,
+    });
+    
+    // Check if response text exists before returning
+    const responseText = result.text || "I am not sure about that.";
 
-    return { text: response.text() || "I am not sure about that." };
+    return { text: responseText };
   } catch (error) {
     console.error("Google GenAI error:", error);
-    return { text: "Sorry, I couldn’t process your request right now." };
+    // The previous error message was generic; this one is specific to the backend
+    return { text: "Sorry, I couldn’t process your request due to an AI service error." };
   }
 }
