@@ -1,24 +1,47 @@
-import React, { useEffect, useState } from "react";
+// src/views/Admin/DashboardView.js
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-// Importing Lucide icons for a cleaner visual dashboard
-import { Users, MessageSquare, BookOpen, HelpCircle, ShieldCheck, Activity, Clock, Loader } from "lucide-react";
+import { ADMIN_API_URL } from "../../config/api";
+import {
+  Users,
+  MessageSquare,
+  BookOpen,
+  HelpCircle,
+  ShieldCheck,
+  Activity,
+  Clock,
+  Loader2,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 
-// Helper component for a single statistics card
-const StatCard = ({ title, value, icon: Icon, colorClass }) => (
-  // Changed shadow-lg to shadow-md and removed aggressive hover:scale
-  <div className="p-6 bg-white shadow-md rounded-xl flex items-center justify-between transition duration-300 ease-in-out hover:shadow-lg">
-    <div className="flex-1">
-      <p className="text-sm font-medium text-gray-500">{title}</p>
-      <p className="mt-1 text-3xl font-extrabold text-gray-900">{value}</p>
+// Auto-refresh interval
+const REFRESH_INTERVAL_SECONDS = 30;
+
+// Dashboard summary cards configuration
+const cardDataConfig = [
+  { key: "users", title: "Total Users", icon: Users, color: "text-indigo-600", bg: "bg-indigo-50" },
+  { key: "admins", title: "Active Admins", icon: ShieldCheck, color: "text-blue-600", bg: "bg-blue-50" },
+  { key: "conversations", title: "Total Conversations", icon: MessageSquare, color: "text-green-600", bg: "bg-green-50" },
+  { key: "knowledgeArticles", title: "Knowledge Articles", icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
+  { key: "faqs", title: "FAQs Count", icon: HelpCircle, color: "text-yellow-600", bg: "bg-yellow-50" },
+  { key: "responseTime", title: "Avg. Response Time (s)", icon: Activity, color: "text-cyan-600", bg: "bg-cyan-50" },
+];
+
+// Summary Card Component
+const SummaryCard = ({ title, value, Icon, color, bg }) => (
+  <div className={`p-5 ${bg} shadow-md rounded-lg flex items-center space-x-3 border border-gray-200 hover:shadow-lg transition-shadow`}>
+    <div className={`p-2 rounded-lg ${color} bg-white shadow-sm flex-shrink-0`}>
+      <Icon className="w-6 h-6" />
     </div>
-    {/* Cleaned Icon: uses a fixed, light background (bg-blue-50) and the full color on the icon itself */}
-    <div className="p-3 rounded-full bg-blue-50">
-      <Icon className="w-6 h-6" style={{ color: colorClass }} />
+    <div className="truncate">
+      <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
+      <p className={`text-2xl font-extrabold ${color}`}>{value?.toLocaleString() ?? 0}</p>
     </div>
   </div>
 );
 
-// Simulated data for demonstration
+// Recent Activity Dummy Data
 const recentActivityData = [
   { id: 1, user: "Alice C.", action: "Started new chat", time: "2 min ago" },
   { id: 2, user: "System", action: "Knowledge base updated", time: "1 hour ago" },
@@ -27,127 +50,128 @@ const recentActivityData = [
 ];
 
 export default function DashboardView() {
-  const [stats, setStats] = useState({
-    users: 0,
-    admins: 0,
-    conversations: 0,
-    knowledgeArticles: 0,
-    faqs: 0,
-    responseTime: 0, // New stat: Average Response Time
-  });
+  const [summary, setSummary] = useState({});
   const [loading, setLoading] = useState(true);
-  const [systemStatus, setSystemStatus] = useState("Operational"); // Simulated system status
+  const [error, setError] = useState(null);
+  const [lastFetched, setLastFetched] = useState(null);
+  const [systemStatus, setSystemStatus] = useState("Operational");
 
   const token = localStorage.getItem("token");
-  
-  // Custom colors for the cards
-  const colorMap = {
-    users: "#10B981", // Emerald
-    admins: "#3B82F6", // Blue
-    conversations: "#F59E0B", // Amber
-    knowledgeArticles: "#8B5CF6", // Violet
-    faqs: "#EF4444", // Red
-    responseTime: "#06B6D4", // Cyan
-  };
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get("https://bu-chatbot.onrender.com/api/admin/stats", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        // Merge fetched data with a simulated response time metric
-        setStats({
-          ...res.data,
-          responseTime: (Math.random() * (1.5 - 0.2) + 0.2).toFixed(2), // Simulate 0.2s to 1.5s
-        });
-        setSystemStatus("Operational"); // Confirmed operational upon successful API call
-      } catch (err) {
-        console.error("Failed to fetch dashboard stats:", err);
-        setSystemStatus("API Error"); // Indicate failure
-        // Keep stats at 0 but stop loading indicator
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
+  const fetchDashboard = useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
+    setError(null);
+
+    try {
+      const res = await axios.get(`${ADMIN_API_URL}/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setSummary({
+        ...res.data,
+        responseTime: (Math.random() * (1.5 - 0.2) + 0.2).toFixed(2), // Simulated
+      });
+      setLastFetched(new Date());
+      setSystemStatus("Operational");
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+      setError("Failed to load dashboard data.");
+      setSystemStatus("API Error");
+    } finally {
+      if (showLoader) setLoading(false);
+    }
   }, [token]);
 
-  // Define cards data structure
-  const cards = [
-    { title: "Total Users", value: stats.users, icon: Users, color: colorMap.users, key: 'users' },
-    { title: "Active Admins", value: stats.admins, icon: ShieldCheck, color: colorMap.admins, key: 'admins' },
-    { title: "Total Conversations", value: stats.conversations, icon: MessageSquare, color: colorMap.conversations, key: 'conversations' },
-    { title: "Knowledge Articles", value: stats.knowledgeArticles, icon: BookOpen, color: colorMap.knowledgeArticles, key: 'articles' },
-    { title: "FAQs Count", value: stats.faqs, icon: HelpCircle, color: colorMap.faqs, key: 'faqs' },
-    { title: "Avg. Response Time (s)", value: stats.responseTime, icon: Activity, color: colorMap.responseTime, key: 'response' },
-  ];
+  useEffect(() => {
+    fetchDashboard();
+    const intervalId = setInterval(() => fetchDashboard(false), REFRESH_INTERVAL_SECONDS * 1000);
+    return () => clearInterval(intervalId);
+  }, [fetchDashboard]);
+
+  if (loading && !lastFetched) {
+    return (
+      <div className="text-center p-10 flex flex-col items-center justify-center min-h-[70vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
+        <p className="text-xl text-blue-600 font-medium">Loading Dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-10 bg-red-50 border border-red-200 rounded-xl min-h-[70vh] flex flex-col items-center justify-center">
+        <AlertTriangle className="w-8 h-8 text-red-600 mb-3" />
+        <p className="text-xl text-red-600 font-semibold mb-2">Error Loading Dashboard</p>
+        <p className="text-red-500 text-center">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      <h1 className="text-4xl font-semibold text-blue-700 border-b-2 pb-2">Admin Dashboard</h1>
-
-      {loading ? (
-        <div className="text-center p-10 flex items-center justify-center text-blue-600">
-          <Loader className="w-8 h-8 mr-2 animate-spin" /> Loading Stats...
+    <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-end pb-4 border-b-4 border-blue-500/50">
+        <div>
+          <h2 className="text-3xl font-extrabold text-blue-800">📊 Admin Dashboard</h2>
+          {lastFetched && (
+            <p className="text-sm text-gray-500 mt-1 flex items-center">
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Data last updated: {lastFetched.toLocaleTimeString()} (Refreshes every {REFRESH_INTERVAL_SECONDS}s)
+            </p>
+          )}
         </div>
-      ) : (
-        <>
-          {/* Section 1: Key Performance Indicators (KPIs) */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-4 text-blue-700">Key Metrics</h2>
-            {/* UPDATED: Changed xl:grid-cols-6 to xl:grid-cols-3 to display 3 cards per row on large screens */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-              {cards.map(c => (
-                <StatCard 
-                  key={c.key} 
-                  title={c.title} 
-                  value={c.value} 
-                  icon={c.icon} 
-                  colorClass={c.color} 
-                />
-              ))}
-            </div>
-          </section>
+        <button
+          onClick={() => fetchDashboard(true)}
+          disabled={loading}
+          className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-lg transition ${
+            loading ? "bg-gray-400 text-gray-700 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+          }`}
+        >
+          <RefreshCw className={`w-4 h-4 ${loading && "animate-spin"}`} />
+          {loading && lastFetched ? "Refreshing..." : "Manual Refresh"}
+        </button>
+      </div>
 
-          {/* Section 2: System Status and Recent Activity */}
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {/* System Health Status */}
-            <div className="lg:col-span-1 p-6 bg-white shadow-md rounded-xl space-y-4">
-              <h3 className="text-xl font-semibold text-blue-700 flex items-center gap-2">
-                <Activity className="w-5 h-5" /> System Health
-              </h3>
-              <div className={`p-4 rounded-lg font-bold text-center ${
-                systemStatus === "Operational" 
-                  ? "bg-green-100 text-green-700 border-green-300 border" 
-                  : "bg-red-100 text-red-700 border-red-300 border"
-              }`}>
-                Status: {systemStatus}
-              </div>
-              <p className="text-sm text-gray-500">Last Checked: {new Date().toLocaleTimeString()}</p>
-            </div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {cardDataConfig.map(({ key, title, icon, color, bg }) => (
+          <SummaryCard key={key} title={title} value={summary[key]} Icon={icon} color={color} bg={bg} />
+        ))}
+      </div>
 
-            {/* Recent Activity Feed */}
-            <div className="lg:col-span-2 p-6 bg-white shadow-md rounded-xl space-y-4">
-              <h3 className="text-xl font-semibold text-blue-700 flex items-center gap-2">
-                <Clock className="w-5 h-5" /> Recent Activity
-              </h3>
-              <ul className="divide-y divide-gray-200">
-                {recentActivityData.map(activity => (
-                  <li key={activity.id} className="py-2 flex justify-between items-center">
-                    <span className="text-gray-900 font-medium">{activity.user}</span>
-                    <span className="text-gray-600 truncate flex-1 mx-4">{activity.action}</span>
-                    <span className="text-xs text-gray-400">{activity.time}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        </>
-      )}
+      {/* System Status & Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* System Health */}
+        <div className={`p-5 bg-white shadow-md rounded-lg border border-gray-200`}>
+          <h3 className="text-lg font-bold mb-3 text-gray-800 flex items-center gap-2">
+            <Activity className="w-5 h-5" /> System Health
+          </h3>
+          <div className={`p-3 rounded-lg font-bold text-center ${
+            systemStatus === "Operational"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}>
+            Status: {systemStatus}
+          </div>
+          <p className="text-sm text-gray-500 mt-2">Last checked: {new Date().toLocaleTimeString()}</p>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="lg:col-span-2 p-5 bg-white shadow-md rounded-lg border border-gray-200">
+          <h3 className="text-lg font-bold mb-3 text-gray-800 flex items-center gap-2">
+            <Clock className="w-5 h-5" /> Recent Activity
+          </h3>
+          <ul className="divide-y divide-gray-100">
+            {recentActivityData.map((activity) => (
+              <li key={activity.id} className="py-2 flex justify-between items-center">
+                <span className="text-gray-900 font-medium">{activity.user}</span>
+                <span className="text-gray-600 flex-1 mx-4 truncate">{activity.action}</span>
+                <span className="text-xs text-gray-400">{activity.time}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

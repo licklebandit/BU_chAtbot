@@ -14,6 +14,8 @@ import ingestRoute from "./routes/ingest.js";
 import authRoute from "./routes/auth.js";
 import adminRouter from "./routes/adminRouter.js";
 import conversationRouter from "./routes/conversations.js";
+import analyticsRouter from "./routes/analytics.js";
+import settingsRouter from "./routes/settings.js";
 
 dotenv.config();
 
@@ -101,6 +103,8 @@ app.use("/api/ingest", ingestRoute);
 app.use("/auth", authRoute);
 app.use("/api/admin", adminRouter);
 app.use("/api/conversations", conversationRouter);
+app.use("/api/admin/analytics", analyticsRouter);
+app.use("/api/admin/settings", settingsRouter);
 
 // --- HEALTH CHECK (Unchanged) ---
 app.get("/", (req, res) => {
