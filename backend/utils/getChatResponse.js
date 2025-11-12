@@ -1,32 +1,38 @@
 // utils/getChatResponse.js
 import { GoogleGenAI } from "@google/genai";
+import dotenv from "dotenv";
+dotenv.config();
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 /**
- * Generates chat response using Google Gemini (Gemini Pro).
- * @param {string} question
+ * Get AI response using Google Gemini with context
+ * @param {string} userQuestion
  * @param {string} context
- * @returns {Promise<string>}
+ * @returns {Promise<{text: string}>}
  */
-export async function getChatResponse(question, context = "") {
+export async function getChatResponse(userQuestion, context = "") {
   try {
     const model = ai.getGenerativeModel({ model: "gemini-pro" });
 
-    const prompt = `You are Bugema University's AI assistant. Be polite, helpful, and accurate. 
+    const prompt = `
+You are Bugema University's AI assistant. Answer politely and accurately.
 If you have relevant information in the context, use it to answer the question.
-If you don't have relevant information, say so and provide a general response.
+If you don't have relevant information, provide a general helpful response.
 
 Context:
 ${context || "No specific context available."}
 
-Question: ${question}`;
+Question: ${userQuestion}
+Answer:
+`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    return response.text();
+
+    return { text: response.text() || "I am not sure about that." };
   } catch (error) {
     console.error("Google GenAI error:", error);
-    return "Sorry, I couldn’t process your request right now.";
+    return { text: "Sorry, I couldn’t process your request right now." };
   }
 }

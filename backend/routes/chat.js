@@ -1,6 +1,9 @@
 // backend/routes/chat.js
 import express from "express";
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
+
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 
@@ -8,6 +11,22 @@ import { searchKnowledge } from "../utils/searchKnowledge.js";
 import { getChatResponse } from "../utils/getChatResponse.js";
 
 const router = express.Router();
+
+// -----------------
+// Load knowledge.json as fallback
+// -----------------
+const knowledgePath = path.resolve("data/knowledge.json");
+let knowledge = [];
+if (fs.existsSync(knowledgePath)) {
+  try {
+    knowledge = JSON.parse(fs.readFileSync(knowledgePath, "utf8"));
+    console.log(`✅ Loaded ${knowledge.length} knowledge items`);
+  } catch (err) {
+    console.error("⚠️ Error parsing knowledge.json:", err);
+  }
+} else {
+  console.warn("⚠️ knowledge.json not found. Fallback search will be limited.");
+}
 
 // -----------------
 // Auth Middleware
@@ -30,13 +49,19 @@ const authenticate = async (req, res, next) => {
 // -----------------
 router.post("/", authenticate, async (req, res) => {
   const { q } = req.body;
-  if (!q || q.trim() === "") return res.status(400).json({ answer: "Please ask a valid question." });
+
+  if (!q || q.trim() === "") {
+    return res.status(400).json({ answer: "Please ask a valid question." });
+  }
 
   try {
-    const context = await searchKnowledge(q);
-    const answer = await getChatResponse(q, context);
+    // 1️⃣ Get context from vector store + fallback knowledge.json
+    const context = await searchKnowledge(q, knowledge);
 
-    // Save chat if user is logged in
+    // 2️⃣ Get AI response from Google Gemini with context
+    const { text: answer } = await getChatResponse(q, context);
+
+    // 3️⃣ Save chat if user is logged in
     if (req.user) {
       let chat = await Chat.findOne({ userId: req.user._id });
       if (!chat) chat = new Chat({ userId: req.user._id, messages: [] });
@@ -45,8 +70,16 @@ router.post("/", authenticate, async (req, res) => {
       chat.messages.push({ role: "assistant", text: answer });
       await chat.save();
 
+      // 4️⃣ Emit real-time update to connected clients
       const io = req.app.get("io");
-      if (io) io.emit("new_conversation", { id: chat._id, user_name: req.user.name || req.user.email, snippet: q, createdAt: new Date() });
+      if (io) {
+        io.emit("new_conversation", {
+          id: chat._id,
+          user_name: req.user.name || req.user.email || "Unknown",
+          snippet: q,
+          createdAt: new Date(),
+        });
+      }
     }
 
     res.json({ answer });
@@ -56,6 +89,32 @@ router.post("/", authenticate, async (req, res) => {
   }
 });
 
-// History & Clear Routes remain the same...
+// -----------------
+// Chat History Route
+// -----------------
+router.get("/history", authenticate, async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+  try {
+    const chat = await Chat.findOne({ userId: req.user._id });
+    res.json(chat ? chat.messages : []);
+  } catch (error) {
+    console.error("Error fetching chat history:", error);
+    res.status(500).json({ message: "Error fetching chat history." });
+  }
+});
+
+// -----------------
+// Clear Chat History Route
+// -----------------
+router.delete("/clear", authenticate, async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+  try {
+    await Chat.deleteMany({ userId: req.user._id });
+    res.json({ message: "Chat history cleared successfully." });
+  } catch (error) {
+    console.error("Error clearing chat history:", error);
+    res.status(500).json({ message: "Error clearing chat history." });
+  }
+});
 
 export default router;
