@@ -48,7 +48,8 @@ Please use the Context above to generate a complete and helpful answer to the us
         let lastErr = null;
         for (const m of candidateModels) {
             try {
-                const model = ai.getGenerativeModel(m); 
+                // 🛑 CRITICAL FIX: Must provide model name inside an object: { model: m }
+                const model = ai.getGenerativeModel({ model: m }); 
                 
                 const response = await model.generateContent({ 
                     contents: [{ role: 'user', parts: [{ text: userPrompt }] }], 
@@ -64,7 +65,7 @@ Please use the Context above to generate a complete and helpful answer to the us
                 }
             } catch (callErr) {
                 lastErr = callErr;
-                console.warn(`GenAI model '${m}' failed:`, callErr); 
+                console.warn(`GenAI model '${m}' failed:`, callErr.message); 
             }
         }
 
@@ -81,7 +82,6 @@ Please use the Context above to generate a complete and helpful answer to the us
         console.error("--- Google GenAI API Call FAILED ---");
         console.error("Error Message:", error.message);
         
-        // Simplified fallback message:
         return { 
             text: "Sorry, I experienced a temporary AI service error. Please try asking your question again in a minute, or ask a more specific question." 
         };

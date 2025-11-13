@@ -7,7 +7,6 @@ import path from "path";
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 
-// Import the correct utility functions
 import { searchKnowledge } from "../utils/searchKnowledge.js";
 import { getChatResponse } from "../utils/getChatResponse.js"; 
 
@@ -56,6 +55,7 @@ router.post("/", authenticate, async (req, res) => {
 
     try {
         // 1️⃣ Search knowledge base for context
+        // NOTE: This now relies on the FIXED embeddings.js
         const context = await searchKnowledge(q, knowledgeBase);
 
         // 2️⃣ Generate AI answer (Destructures the { text: response } object)
