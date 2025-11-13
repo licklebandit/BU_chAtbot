@@ -11,7 +11,12 @@ export async function searchKnowledge(query, knowledge = []) {
     const queryLower = query.toLowerCase();
 
     // 1. First try semantic vector search
-    const topResults = await searchSimilar(query, 3);
+    // This function must return an array of {chunk: string} objects or an empty array
+    const topResults = await searchSimilar(query, 3).catch(err => {
+        console.error("Vector search failed:", err);
+        return []; // Return empty array on failure
+    });
+    
     if (topResults.length > 0) {
         // Combine top results as context
         return topResults.map(r => r.chunk).join("\n\n");
@@ -19,15 +24,11 @@ export async function searchKnowledge(query, knowledge = []) {
 
     // 2. Fallback: naive match in knowledge.json
     if (knowledge.length > 0) {
-        
-        // 🛑 FIX: Check against 'keyword' and 'answer' fields for a match
         const match = knowledge.find(item => 
-            (item.keyword && queryLower.includes(item.keyword.toLowerCase())) ||
-            (item.answer && queryLower.includes(item.answer.toLowerCase()))
+            (item.keyword && queryLower.includes(item.keyword.toLowerCase()))
         );
 
         if (match) {
-            // Only return the SPECIFIC matching answer, not all knowledge
             console.log(`Knowledge fallback: Found match for keyword: ${match.keyword}`);
             return match.answer; 
         }
