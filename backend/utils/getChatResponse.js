@@ -64,13 +64,11 @@ Please use the Context above to generate a complete and helpful answer to the us
                 }
             } catch (callErr) {
                 lastErr = callErr;
-                // Log the full error to help debug API issues
                 console.warn(`GenAI model '${m}' failed:`, callErr); 
             }
         }
 
         if (!result && lastErr) {
-            // If all models failed, throw the last error to be caught by the outer catch block
             throw lastErr;
         }
 
@@ -79,11 +77,11 @@ Please use the Context above to generate a complete and helpful answer to the us
         
         return { text: responseText }; // Returns object { text: string }
     } catch (error) {
-        // --- Error Logging and Fallback (Simplified for stability) ---
+        // --- Error Logging and Fallback (The block currently being triggered) ---
         console.error("--- Google GenAI API Call FAILED ---");
         console.error("Error Message:", error.message);
         
-        // This is the fallback that is currently being triggered.
+        // Simplified fallback message:
         return { 
             text: "Sorry, I experienced a temporary AI service error. Please try asking your question again in a minute, or ask a more specific question." 
         };

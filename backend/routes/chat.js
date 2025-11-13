@@ -23,7 +23,7 @@ if (fs.existsSync(knowledgePath)) {
         knowledgeBase = JSON.parse(fs.readFileSync(knowledgePath, "utf8"));
         console.log(`✅ Loaded ${knowledgeBase.length} knowledge items`);
     } catch (error) {
-        console.error("⚠️ Failed to parse knowledge.json:", error);
+        console.error("⚠️ Error parsing knowledge.json:", error);
     }
 } else {
     console.warn("⚠️ knowledge.json not found. Chat context will be empty.");
