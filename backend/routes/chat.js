@@ -1,35 +1,37 @@
+// backend/routes/chat.js
 import express from "express";
-import jwt from "jsonwebtoken";
 import fs from "fs";
+import jwt from "jsonwebtoken";
 import path from "path";
 
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 
+// 🛑 Import the correct utility functions
 import { searchKnowledge } from "../utils/searchKnowledge.js";
-import { getChatResponse } from "../utils/getChatResponse.js";
+import { getChatResponse } from "../utils/getChatResponse.js"; 
 
 const router = express.Router();
 
-// -----------------
-// Load knowledge.json
-// -----------------
+// ---------------------------
+// Load knowledge base JSON
+// ---------------------------
 const knowledgePath = path.resolve("data/knowledge.json");
-let knowledge = [];
+let knowledgeBase = [];
 if (fs.existsSync(knowledgePath)) {
     try {
-        knowledge = JSON.parse(fs.readFileSync(knowledgePath, "utf8"));
-        console.log(`✅ Loaded ${knowledge.length} knowledge items`);
-    } catch (err) {
-        console.error("⚠️ Error parsing knowledge.json:", err);
+        knowledgeBase = JSON.parse(fs.readFileSync(knowledgePath, "utf8"));
+        console.log(`✅ Loaded ${knowledgeBase.length} knowledge items`);
+    } catch (error) {
+        console.error("⚠️ Failed to parse knowledge.json:", error);
     }
 } else {
-    console.warn("⚠️ knowledge.json not found. Fallback search will be limited.");
+    console.warn("⚠️ knowledge.json not found. Chat context will be empty.");
 }
 
-// -----------------
-// Auth Middleware (MOVED UP to resolve ReferenceError)
-// -----------------
+// ---------------------------
+// Middleware: Authenticate
+// ---------------------------
 const authenticate = async (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return next();
@@ -43,33 +45,24 @@ const authenticate = async (req, res, next) => {
     next();
 };
 
-// -----------------
-// Chat Route
-// -----------------
+// ---------------------------
+// Main Chat Route
+// ---------------------------
 router.post("/", authenticate, async (req, res) => {
     const { q } = req.body;
-
     if (!q || q.trim() === "") {
         return res.status(400).json({ answer: "Please ask a valid question." });
     }
 
     try {
-        // 1️⃣ Get context from vector store + fallback knowledge.json
-        let context = "";
-        try {
-            // This function should return the most relevant context snippet, or an empty string.
-            context = await searchKnowledge(q, knowledge);
-        } catch (searchErr) {
-            console.error('searchKnowledge failed:', searchErr);
-            context = ""; // Proceed with empty context if search fails
-        }
+        // 1️⃣ Search knowledge base for context
+        const context = await searchKnowledge(q, knowledgeBase);
 
-        // 2️⃣ LLM Synthesis (Always run for conversational answers)
-        // We removed the old 'knowledge-first' logic. The LLM now synthesizes
-        // the answer based on the context (or lack thereof), ensuring a unique reply.
-        const { text: llmAnswer } = await getChatResponse(q, context);
-        let answer = llmAnswer;
-
+        // 2️⃣ Generate AI answer
+        // 🛑 Destructure the returned object { text: aiResponse } from getChatResponse.js
+        const { text: aiResponse } = await getChatResponse(q, context);
+        const answer = aiResponse || "I’m not sure about that. Can you ask differently?";
+        
         // 3️⃣ Save chat if user is logged in
         if (req.user) {
             let chat = await Chat.findOne({ userId: req.user._id });
@@ -78,8 +71,8 @@ router.post("/", authenticate, async (req, res) => {
             chat.messages.push({ role: "user", text: q });
             chat.messages.push({ role: "assistant", text: answer });
             await chat.save();
-            
-            // 4️⃣ Emit real-time update to connected clients
+
+            // 4️⃣ Emit via socket.io
             const io = req.app.get("io");
             if (io) {
                 io.emit("new_conversation", {
@@ -88,23 +81,35 @@ router.post("/", authenticate, async (req, res) => {
                     snippet: q,
                     createdAt: new Date(),
                 });
+
+                // Emit metrics
+                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const chatsToday = await Chat.countDocuments({
+                    "messages.timestamp": { $gte: yesterday },
+                }).catch(() => 0);
+
+                const activeUsersToday = await User.countDocuments({
+                    lastLogin: { $gte: yesterday },
+                }).catch(() => 0);
+
+                io.emit("metrics", { chatsToday, activeUsersToday });
             }
         }
 
         res.json({ answer });
-    } catch (err) {
-        console.error("Chat route error:", err);
-        res.status(500).json({ answer: "Sorry, I couldn’t process your request right now." });
+    } catch (error) {
+        console.error("❌ Chat route error:", error);
+        res.status(500).json({ answer: "Sorry, I couldn’t process your request due to an internal server error." });
     }
 });
 
-// -----------------
+// ---------------------------
 // Chat History Route
-// -----------------
+// ---------------------------
 router.get("/history", authenticate, async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
     try {
-        const chats = await Chat.find({ userId: req.user._id }).sort({ updatedAt: -1 }).limit(5); 
+        const chats = await Chat.find({ userId: req.user._id }).sort({ updatedAt: -1 }).limit(10); 
         res.json(chats);
     } catch (error) {
         console.error("Error fetching chat history:", error);
@@ -112,9 +117,9 @@ router.get("/history", authenticate, async (req, res) => {
     }
 });
 
-// -----------------
-// Clear Chat History Route
-// -----------------
+// ---------------------------
+// Clear Chat History
+// ---------------------------
 router.delete("/clear", authenticate, async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
     try {

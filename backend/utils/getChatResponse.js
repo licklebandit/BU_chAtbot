@@ -1,3 +1,4 @@
+// backend/utils/getChatResponse.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
@@ -22,7 +23,7 @@ export async function getChatResponse(userQuestion, context = "") {
     try {
         // 1. Define the System Instruction (Model Persona and Rules)
         const systemInstruction = `You are Bugema University's AI assistant. Answer the user's question politely, concisely, and accurately. 
-You MUST use the provided Context to answer the Question. If the Context is empty or does not contain the answer, state clearly and politely that you cannot find the relevant information in the provided knowledge base, then offer to help with general knowledge or a different topic.`;
+You MUST use the provided Context to answer the Question. If the Context is empty or does not contain the answer, state clearly and politely that you cannot find the relevant information in the provided knowledge base.`;
 
         // 2. Build the new user prompt (Focus on synthesis)
         const userPrompt = `
@@ -47,13 +48,11 @@ Please use the Context above to generate a complete and helpful answer to the us
         let lastErr = null;
         for (const m of candidateModels) {
             try {
-                // FIX: use model name as a string argument
                 const model = ai.getGenerativeModel(m); 
                 
                 const response = await model.generateContent({ 
                     contents: [{ role: 'user', parts: [{ text: userPrompt }] }], 
                     config: {
-                        // Pass the persona/rules using the dedicated field
                         systemInstruction: systemInstruction 
                     }
                 });
@@ -65,7 +64,7 @@ Please use the Context above to generate a complete and helpful answer to the us
                 }
             } catch (callErr) {
                 lastErr = callErr;
-                console.warn(`GenAI model '${m}' failed:`, callErr && callErr.message ? callErr.message : callErr);
+                console.warn(`GenAI model '${m}' failed:`, callErr); 
             }
         }
 
@@ -76,14 +75,15 @@ Please use the Context above to generate a complete and helpful answer to the us
         let responseText = result.text.trim();
         if (!responseText) responseText = "I am not sure about that.";
         
-        return { text: responseText };
+        return { text: responseText }; // Returns object { text: string }
     } catch (error) {
         console.error("--- Google GenAI API Call FAILED ---");
         console.error("Error Message:", error.message);
         
-        // Fallback to the original context if the AI call failed
+        // Fallback: Use the retrieved context (if any) to provide a minimal answer
         if (context && typeof context === 'string' && context.trim()) {
             console.warn('GenAI failed — falling back to knowledge context as the answer.');
+            // This message is why the user saw the fallback error. The LLM failed.
             return { text: `Sorry, I experienced a service error, but here is the relevant information I found: ${context.trim()}` };
         }
 
