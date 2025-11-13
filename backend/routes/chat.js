@@ -1,4 +1,3 @@
-// backend/routes/chat.js
 import express from "express";
 import jwt from "jsonwebtoken";
 import fs from "fs";
@@ -38,6 +37,7 @@ const authenticate = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Assuming User model is available and working
     req.user = await User.findById(decoded.id).select("_id name email");
   } catch (err) {
     console.error("JWT verification failed:", err.message);
@@ -57,11 +57,35 @@ router.post("/", authenticate, async (req, res) => {
 
   try {
     // 1️⃣ Get context from vector store + fallback knowledge.json
-    // Note: searchKnowledge implementation is assumed correct here.
-    const context = await searchKnowledge(q, knowledge);
+    
+        // Attempt to build context from vector store + fallback knowledge.json
+        let context = "";
+        try {
+            context = await searchKnowledge(q, knowledge);
+            if (!context) {
+                // fallback to naive match in knowledge.json if searchKnowledge returned empty
+                const fallback = knowledge.find(item => q.toLowerCase().includes((item.question || item.keyword || '').toLowerCase()));
+                if (fallback) context = `${fallback.answer || ''}`;
+            }
+        } catch (searchErr) {
+            console.error('searchKnowledge failed:', searchErr);
+            // keep going with empty context so chatbot still responds
+            context = "";
+        }
 
-    // 2️⃣ Get AI response from Google Gemini with context (Using the fixed utility)
-    const { text: answer } = await getChatResponse(q, context);
+        // 2️⃣ Knowledge-first behavior: if we found relevant KB context, return it as the answer
+        // This avoids making an LLM call when an authoritative KB answer exists.
+        let answer = "";
+        if (context && typeof context === 'string' && context.trim()) {
+            // Prefer the KB content directly. You can change this to refine with the LLM
+            // by setting a flag or calling getChatResponse(context, q) instead.
+            answer = `According to our knowledge base:\n\n${context}`;
+            console.log('Responding from knowledge base (knowledge-first).');
+        } else {
+            // No KB context found — fall back to LLM
+            const { text: llmAnswer } = await getChatResponse(q, context);
+            answer = llmAnswer;
+        }
 
     // 3️⃣ Save chat if user is logged in
     if (req.user) {
@@ -98,10 +122,8 @@ router.post("/", authenticate, async (req, res) => {
 router.get("/history", authenticate, async (req, res) => {
   if (!req.user) return res.status(401).json({ message: "Unauthorized" });
   try {
-    // Find the latest 5 chats, if you want full history, change this query.
-    const chats = await Chat.find({ userId: req.user._id }).sort({ updatedAt: -1 }).limit(5); 
-    
     // The frontend expects an array of chat objects, not just the messages array.
+    const chats = await Chat.find({ userId: req.user._id }).sort({ updatedAt: -1 }).limit(5); 
     res.json(chats);
   } catch (error) {
     console.error("Error fetching chat history:", error);
