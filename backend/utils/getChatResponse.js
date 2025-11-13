@@ -8,112 +8,98 @@ if (!process.env.GEMINI_API_KEY) {
 }
 
 // Initialize the client with the API key using the Google Generative AI client (Gemini).
-// This matches how embeddings.js initializes the client and exposes getGenerativeModel().
+// The 'ai' object is an instance of GoogleGenerativeAI.
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || ""); 
 
 /**
  * Get AI response using Google Gemini with context
- * @param {string} userQuestion
- * @param {string} context
+ * @param {string} userQuestion - The question asked by the user.
+ * @param {string} context - The relevant text retrieved from the knowledge base.
  * @returns {Promise<{text: string}>}
  */
 export async function getChatResponse(userQuestion, context = "") {
-  // If the API key was missing on startup, prevent API call
-  if (!process.env.GEMINI_API_KEY) {
-      return { text: "Backend service error: API Key is missing." };
-  }
-
-  try {
-    const prompt = `You are Bugema University's AI assistant. Answer politely and accurately.`;
-
-    // Build the contents payload (defensive shape expected by the SDK)
-    const contents = [{ role: 'user', parts: [{ text: `${prompt}\n\nContext:\n${context || 'No specific context available.'}\n\nQuestion: ${userQuestion}` }] }];
-
-    // Try a list of candidate models until one succeeds. Some accounts or API versions
-    // may not support newer Gemini model names; fallbacks improve resilience.
-    const candidateModels = [
-      "gemini-1.5-flash",
-      "gemini-1.5",
-      "gemini-pro",
-      "chat-bison-001",
-      "text-bison-001",
-    ];
-
-    let result = null;
-    let lastErr = null;
-    for (const m of candidateModels) {
-      try {
-        const model = ai.getGenerativeModel({ model: m });
-        result = await model.generateContent({ contents });
-        // If we got a result, stop trying further models
-        if (result) {
-          console.log(`GenAI: model '${m}' succeeded.`);
-          break;
-        }
-      } catch (callErr) {
-        lastErr = callErr;
-        // Log and continue to next candidate if model not found or unsupported
-        console.warn(`GenAI model '${m}' failed:`, callErr && callErr.message ? callErr.message : callErr);
-        // continue trying next model
-      }
+    // If the API key was missing on startup, prevent API call
+    if (!process.env.GEMINI_API_KEY) {
+        return { text: "Backend service error: API Key is missing." };
     }
 
-    if (!result && lastErr) {
-      // Try to list available models (best-effort) to aid debugging
-      try {
-        if (typeof ai.listModels === 'function') {
-          const available = await ai.listModels();
-          console.warn('GenAI available models:', available);
-        }
-      } catch (listErr) {
-        console.warn('Failed to list GenAI models:', listErr && listErr.message ? listErr.message : listErr);
-      }
-
-      // bubble up last error to outer catch for consistent handling/logging
-      throw lastErr;
-    }
-
-    // Defensive parsing of possible SDK response shapes
-    let responseText = "";
     try {
-      // direct text
-      if (result == null) responseText = "";
-      else if (typeof result.text === 'string' && result.text.trim()) responseText = result.text.trim();
-      else if (result.response && typeof result.response.text === 'string') responseText = result.response.text.trim();
-      else if (result.response && typeof result.response.output_text === 'string') responseText = result.response.output_text.trim();
-      else if (Array.isArray(result.output) && result.output.length && result.output[0].content && result.output[0].content[0]) {
-        responseText = String(result.output[0].content[0].text || result.output[0].content[0].text).trim();
-      } else if (result?.candidates && Array.isArray(result.candidates) && result.candidates[0]) {
-        responseText = String(result.candidates[0].content?.join?.(' ') || result.candidates[0].text || '').trim();
-      }
-    } catch (ex) {
-      console.warn('Failed to normalize GenAI response shape:', ex, 'rawResult:', result);
-    }
+        // 1. Define the System Instruction (Model Persona and Rules)
+        const systemInstruction = `You are Bugema University's AI assistant. Answer the user's question politely, concisely, and accurately. 
+You MUST use the provided Context to answer the Question. If the Context does not contain the answer, state clearly that you cannot find the relevant information in the provided knowledge base, but do not apologize for the lack of information.`;
 
-    if (!responseText) responseText = "I am not sure about that.";
-    return { text: responseText };
-  } catch (error) {
-    // This logs the full API error to your server console for debugging
-    console.error("--- Google GenAI API Call FAILED ---");
-    console.error("Error Message:", error.message);
-    console.error("Error Name:", error.name);
-    
-    // If the error message indicates an API key issue, prompt the user to check it
-    if (error.message.includes("400") || error.message.includes("403")) {
-        console.error("HINT: A 400 or 403 error often means the GEMINI_API_KEY is invalid or unauthorized. Please verify the key.");
-    }
+        // 2. Build the new user prompt (Focus on synthesis)
+        const userPrompt = `
+Context:
+---
+${context.trim() || 'No specific context was found. The knowledge base does not contain any relevant information for this query.'}
+---
 
-    // If we have useful context (from your knowledge base), prefer returning that
-    // instead of an opaque AI-service error so the user still gets helpful info.
-    try {
-      if (context && typeof context === 'string' && context.trim()) {
-        console.warn('GenAI failed — falling back to knowledge context as the answer.');
-        return { text: context };
-      }
-    } catch (ex) {
-      console.warn('Error while preparing fallback context:', ex);
-    }
+Question: ${userQuestion.trim()}
 
-    return { text: "Sorry, I couldn’t process your request due to an AI service error." };
-  }
+Please use the Context above to generate a complete and helpful answer to the user's Question. Do not simply repeat the context; synthesize a direct and conversational response.
+`;
+
+        // 3. Try a list of candidate models until one succeeds.
+        const candidateModels = [
+            "gemini-2.5-flash", 
+            "gemini-1.5-flash",
+            "gemini-pro",
+        ];
+
+        let result = null;
+        let lastErr = null;
+        for (const m of candidateModels) {
+            try {
+                // FIX for "ai.getGenerativeModel is not a function": use string argument
+                const model = ai.getGenerativeModel(m); 
+                
+                const response = await model.generateContent({ 
+                    contents: [{ role: 'user', parts: [{ text: userPrompt }] }], 
+                    config: {
+                        // Pass the persona/rules using the dedicated field
+                        systemInstruction: systemInstruction 
+                    }
+                });
+
+                // The modern SDK response has a .text property
+                if (response && response.text) {
+                    result = response;
+                    console.log(`GenAI: model '${m}' succeeded.`);
+                    break;
+                }
+            } catch (callErr) {
+                lastErr = callErr;
+                console.warn(`GenAI model '${m}' failed:`, callErr && callErr.message ? callErr.message : callErr);
+            }
+        }
+
+        if (!result && lastErr) {
+            // Re-throw the last error if no model succeeded
+            throw lastErr;
+        }
+
+        // Get the response text and ensure it's not empty
+        let responseText = result.text.trim();
+
+        if (!responseText) responseText = "I am not sure about that.";
+        return { text: responseText };
+    } catch (error) {
+        // --- Error Logging and Fallback ---
+        console.error("--- Google GenAI API Call FAILED ---");
+        console.error("Error Message:", error.message);
+        
+        // Fallback to the original context if the AI call failed
+        try {
+            if (context && typeof context === 'string' && context.trim()) {
+                console.warn('GenAI failed — falling back to knowledge context as the answer.');
+                // Return a combined message to inform the user
+                return { text: `Sorry, I experienced a service error, but here is the relevant information I found in our knowledge base: ${context.trim()}` };
+            }
+        } catch (ex) {
+            console.warn('Error while preparing fallback context:', ex);
+        }
+
+        return { text: "Sorry, I couldn’t process your request due to an AI service error." };
+    }
 }
