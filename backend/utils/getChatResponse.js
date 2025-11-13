@@ -64,11 +64,13 @@ Please use the Context above to generate a complete and helpful answer to the us
                 }
             } catch (callErr) {
                 lastErr = callErr;
+                // Log the full error to help debug API issues
                 console.warn(`GenAI model '${m}' failed:`, callErr); 
             }
         }
 
         if (!result && lastErr) {
+            // If all models failed, throw the last error to be caught by the outer catch block
             throw lastErr;
         }
 
@@ -77,16 +79,13 @@ Please use the Context above to generate a complete and helpful answer to the us
         
         return { text: responseText }; // Returns object { text: string }
     } catch (error) {
+        // --- Error Logging and Fallback (Simplified for stability) ---
         console.error("--- Google GenAI API Call FAILED ---");
         console.error("Error Message:", error.message);
         
-        // Fallback: Use the retrieved context (if any) to provide a minimal answer
-        if (context && typeof context === 'string' && context.trim()) {
-            console.warn('GenAI failed — falling back to knowledge context as the answer.');
-            // This message is why the user saw the fallback error. The LLM failed.
-            return { text: `Sorry, I experienced a service error, but here is the relevant information I found: ${context.trim()}` };
-        }
-
-        return { text: "Sorry, I couldn’t process your request due to an AI service error." };
+        // This is the fallback that is currently being triggered.
+        return { 
+            text: "Sorry, I experienced a temporary AI service error. Please try asking your question again in a minute, or ask a more specific question." 
+        };
     }
 }

@@ -1,4 +1,4 @@
-// utils/searchKnowledge.js
+// backend/utils/searchKnowledge.js
 import { searchSimilar } from "./vectorStore.js";
 
 /**
@@ -11,10 +11,10 @@ export async function searchKnowledge(query, knowledge = []) {
     const queryLower = query.toLowerCase();
 
     // 1. First try semantic vector search
-    // This function must return an array of {chunk: string} objects or an empty array
+    // Using catch here ensures the function doesn't crash if the vector store is empty/broken
     const topResults = await searchSimilar(query, 3).catch(err => {
         console.error("Vector search failed:", err);
-        return []; // Return empty array on failure
+        return [];
     });
     
     if (topResults.length > 0) {
@@ -24,6 +24,7 @@ export async function searchKnowledge(query, knowledge = []) {
 
     // 2. Fallback: naive match in knowledge.json
     if (knowledge.length > 0) {
+        // Check if the user's query contains a keyword
         const match = knowledge.find(item => 
             (item.keyword && queryLower.includes(item.keyword.toLowerCase()))
         );

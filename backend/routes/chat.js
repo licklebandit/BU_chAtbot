@@ -7,7 +7,7 @@ import path from "path";
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 
-// 🛑 Import the correct utility functions
+// Import the correct utility functions
 import { searchKnowledge } from "../utils/searchKnowledge.js";
 import { getChatResponse } from "../utils/getChatResponse.js"; 
 
@@ -58,8 +58,7 @@ router.post("/", authenticate, async (req, res) => {
         // 1️⃣ Search knowledge base for context
         const context = await searchKnowledge(q, knowledgeBase);
 
-        // 2️⃣ Generate AI answer
-        // 🛑 Destructure the returned object { text: aiResponse } from getChatResponse.js
+        // 2️⃣ Generate AI answer (Destructures the { text: response } object)
         const { text: aiResponse } = await getChatResponse(q, context);
         const answer = aiResponse || "I’m not sure about that. Can you ask differently?";
         
