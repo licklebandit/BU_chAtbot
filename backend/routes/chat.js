@@ -9,6 +9,8 @@ import User from "../models/User.js";
 
 import { searchKnowledge } from "../utils/searchKnowledge.js";
 import { getChatResponse } from "../utils/getChatResponse.js"; 
+import { webSearch } from "../utils/webSearch.js";
+import Knowledge from "../models/Knowledge.js";
 
 const router = express.Router();
 
@@ -59,31 +61,75 @@ router.post("/", authenticate, async (req, res) => {
         // 1️⃣ Search knowledge base for context
         let context = "";
         try {
-            context = await searchKnowledge(q, knowledgeBase);
+            // Load dynamic knowledge from DB and merge with static JSON file
+            let dbKnowledge = [];
+            try {
+                dbKnowledge = await Knowledge.find().lean();
+            } catch (dbErr) {
+                console.warn('Could not load knowledge from DB:', dbErr.message || dbErr);
+                dbKnowledge = [];
+            }
+
+            const mergedKnowledge = Array.isArray(knowledgeBase) ? [...knowledgeBase, ...dbKnowledge] : dbKnowledge;
+            context = await searchKnowledge(q, mergedKnowledge);
             console.log(`📚 Context: ${context ? "FOUND" : "NOT FOUND"}`);
         } catch (searchErr) {
-            console.error("❌ searchKnowledge failed:", searchErr.message);
+            console.error("❌ searchKnowledge failed:", searchErr && searchErr.message ? searchErr.message : searchErr);
             context = ""; // Fall through with empty context
         }
 
-        // 2️⃣ Knowledge-first behavior: if we found relevant KB context, return it directly
-        let answer = "";
-        if (context && typeof context === 'string' && context.trim()) {
-            // KB has an answer — use it directly (knowledge-first approach)
-            answer = context;
-            console.log(`✅ Responding from knowledge base`);
-        } else {
-            // No KB context — try GenAI; if that fails, give a helpful message
-            try {
-                console.log(`🤖 Calling GenAI...`);
-                const { text: aiResponse } = await getChatResponse(q, context);
-                answer = aiResponse || "I'm not sure about that. Can you ask differently?";
-                console.log(`✅ GenAI response received`);
-            } catch (genaiErr) {
-                console.error("❌ GenAI call failed:", genaiErr.message);
-                answer = "I don't have information about that in my knowledge base. Please try asking a different question or contact support.";
-            }
-        }
+                // 2️⃣ Knowledge-first + RAG behavior (configurable)
+                // RAG_MODE options:
+                // - kb-only : return KB content directly
+                // - refine  : send KB context to LLM to produce a polished answer (default)
+                // - llm-only: always call LLM (ignore KB)
+                const RAG_MODE = (process.env.RAG_MODE || 'refine').toLowerCase();
+
+                let answer = "";
+
+                // Helper to call GenAI with optional context (KB or web results)
+                const callLLM = async (question, contextStr = '') => {
+                    try {
+                        console.log(`🤖 Calling GenAI (RAG_MODE=${RAG_MODE})...`);
+                        const { text: aiResponse } = await getChatResponse(question, contextStr);
+                        console.log('✅ GenAI response received');
+                        return aiResponse;
+                    } catch (genaiErr) {
+                        console.error('❌ GenAI call failed:', genaiErr && genaiErr.message ? genaiErr.message : genaiErr);
+                        return null;
+                    }
+                };
+
+                if (RAG_MODE === 'llm-only') {
+                    // Always use LLM (no KB short-circuit)
+                    const llm = await callLLM(q, '');
+                    answer = llm || "I couldn't generate an answer right now. Please try again later.";
+                } else if (context && typeof context === 'string' && context.trim()) {
+                    // KB hit
+                    if (RAG_MODE === 'kb-only') {
+                        answer = context;
+                        console.log('✅ Returning KB answer (kb-only mode)');
+                    } else {
+                        // kb-first refinement: send KB context to LLM to produce a natural reply
+                        const refined = await callLLM(q, context);
+                        answer = refined || context; // fallback to raw KB if LLM fails
+                        console.log('✅ Responding with refined KB/LLM answer');
+                    }
+                } else {
+                    // No KB match — optionally do a web search to gather context, then call LLM
+                    let webContext = '';
+                    if (process.env.WEB_SEARCH === 'true') {
+                        try {
+                            const results = await webSearch(q);
+                            if (Array.isArray(results) && results.length) webContext = results.join('\n\n');
+                        } catch (wsErr) {
+                            console.warn('Web search failed:', wsErr && wsErr.message ? wsErr.message : wsErr);
+                        }
+                    }
+
+                    const llm = await callLLM(q, webContext);
+                    answer = llm || "I don't have information about that in my knowledge base. Please try asking a different question or contact support.";
+                }
         
         // 3️⃣ Save chat if user is logged in
         if (req.user) {
@@ -128,6 +174,23 @@ router.post("/", authenticate, async (req, res) => {
 // ---------------------------
 // Chat History Route
 // ---------------------------
+// Quick test endpoint that forces an LLM-only response (useful for testing Gemini)
+router.get('/test/llm', async (req, res) => {
+    const q = String(req.query.q || 'Hello, introduce yourself in one sentence.');
+    // Temporarily force llm-only behavior for this request
+    const prevMode = process.env.RAG_MODE;
+    process.env.RAG_MODE = 'llm-only';
+    try {
+        const { text } = await getChatResponse(q, '');
+        res.json({ answer: text });
+    } catch (err) {
+        console.error('Error in /test/llm:', err && err.message ? err.message : err);
+        res.status(500).json({ answer: 'LLM test failed.' });
+    } finally {
+        process.env.RAG_MODE = prevMode;
+    }
+});
+
 router.get("/history", authenticate, async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
     try {

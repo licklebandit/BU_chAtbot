@@ -115,7 +115,8 @@ router.post("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
         }
 
         // Map frontend fields (title/content) to model fields (question/answer)
-        const newArticle = new Knowledge({ question: title, answer: content, source: 'Admin Panel' });
+    console.log('POST /api/admin/knowledge body:', req.body, 'by user:', req.user && req.user.id ? req.user.id : req.user);
+    const newArticle = new Knowledge({ question: title, answer: content, source: 'Admin Panel' });
         const savedArticle = await newArticle.save();
         res.status(201).json(savedArticle);
     } catch (err) {
@@ -187,12 +188,15 @@ router.post("/faqs", isAuthenticated, isAdmin, async (req, res) => {
             return res.status(400).json({ message: "Missing required fields: question and answer." });
         }
 
-        const newFaq = new Knowledge({ question, answer, source: 'Admin Panel' });
-        const savedFaq = await newFaq.save();
-        res.status(201).json(savedFaq);
+    console.log('POST /api/admin/faqs body:', req.body, 'by user:', req.user && req.user.id ? req.user.id : req.user);
+    const newFaq = new Knowledge({ question, answer, source: 'Admin Panel' });
+        const savedFaq = await newFaq.save();
+        res.status(201).json(savedFaq);
     } catch (err) {
-        console.error("Error creating FAQ:", err);
-        res.status(500).json({ message: "Server error creating FAQ" });
+        console.error("Error creating FAQ:", err && err.message ? err.message : err);
+        if (err && err.stack) console.error(err.stack);
+        // Return error message to help frontend debugging (dev only)
+        res.status(500).json({ message: "Server error creating FAQ", error: err && err.message ? err.message : 'Unknown error' });
     }
 });
 
@@ -247,17 +251,17 @@ router.get("/stats", isAuthenticated, isAdmin, async (req, res) => {
         
         // Assuming FAQS and Knowledge Articles are both stored in the Knowledge model
         // We will need to split them if you differentiate them.
-        const totalKnowledgeArticles = await Knowledge.countDocuments(); 
-        
-        // TEMPORARY MAPPING: For simplicity, we'll map all knowledge articles 
-        // to the 'knowledge' key and set 'faqs' to 0 until filtering logic is added.
-        
-        const summaryData = { 
-            users: totalUsers, // Renamed from totalUsers for frontend compatibility
-            conversations: totalConversations, // Renamed from totalConversations
-            faqs: totalKnowledgeArticles, // Using total count for both faqs and knowledge articles for now
-            knowledge: totalKnowledgeArticles // Using total count for both faqs and knowledge articles for now
-        };
+        const totalKnowledgeArticles = await Knowledge.countDocuments(); 
+        // Count FAQs vs knowledge by 'source' field when available
+        const faqsCount = await Knowledge.countDocuments({ source: 'Admin Panel' }).catch(() => 0);
+        const otherKnowledgeCount = Math.max(0, totalKnowledgeArticles - faqsCount);
+
+        const summaryData = { 
+            users: totalUsers,
+            conversations: totalConversations,
+            faqs: faqsCount,
+            knowledge: otherKnowledgeCount
+        };
 
         // Placeholder chart data structure (Frontend expects this to be an array)
         // You will need to implement actual date aggregation logic later.

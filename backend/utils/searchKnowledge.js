@@ -33,27 +33,32 @@ export async function searchKnowledge(query, knowledge = []) {
         return topResults.map(r => r.chunk).join("\n\n");
     }
 
-    // 2. Fallback: simple word-overlap matching in knowledge.json
+    // 2. Fallback: flexible matching across possible KB schemas (keyword/question/title) + answer/content
     if (knowledge && knowledge.length > 0) {
-        // Score each KB item by how many words it shares with the query
         const scored = knowledge.map(item => {
-            const keyword = (item.keyword || "").toLowerCase();
-            const answer = (item.answer || "").toLowerCase();
+            const keyword = ((item.keyword || item.question || item.title) || "").toLowerCase();
+            const answer = ((item.answer || item.content || item.answerText) || "").toLowerCase();
             const combined = `${keyword} ${answer}`;
-            
-            // Count matching words between query and KB item
+
+            // Exact substring match boosts score strongly
+            const exactMatch = combined.includes(queryLower) ? 5 : 0;
+
+            // Count matching words between query and KB item (ignore short words)
             const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2);
             const matchCount = queryWords.filter(w => combined.includes(w)).length;
-            
-            return { item, matchCount };
+
+            // Final score combines exact match boost with word overlap
+            const score = exactMatch + matchCount;
+            return { item, score };
         });
 
-        // Sort by match count (descending) and return best match if score > 0
-        scored.sort((a, b) => b.matchCount - a.matchCount);
-        
-        if (scored[0] && scored[0].matchCount > 0) {
-            console.log(`✅ Knowledge fallback: Found match for "${scored[0].item.keyword}" (score: ${scored[0].matchCount})`);
-            return scored[0].item.answer; 
+        // Sort by score (descending) and return best match if score > 0
+        scored.sort((a, b) => b.score - a.score);
+
+        if (scored[0] && scored[0].score > 0) {
+            const keyLabel = (scored[0].item.keyword || scored[0].item.question || scored[0].item.title) || 'item';
+            console.log(`✅ Knowledge fallback: Found match for "${keyLabel}" (score: ${scored[0].score})`);
+            return (scored[0].item.answer || scored[0].item.content || '');
         }
     }
 

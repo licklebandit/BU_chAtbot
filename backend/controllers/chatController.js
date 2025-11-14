@@ -1,10 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
 import { cosinesim } from '../utils/vectorStore.js';
+import { getChatResponse } from '../utils/getChatResponse.js';
 import Chat from '../models/Chat.js';
 import fs from 'fs';
 
-const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+// We delegate model calls to getChatResponse utility which centralizes SDK usage
 
 // Load knowledge base
 const knowledgePath = "./data/knowledge.json";
@@ -48,17 +47,9 @@ export async function handleChatQuery(req, res) {
             context += "No specific information found in our knowledge base. Please provide a general response.\n";
         }
 
-        // Get response from Gemini
-        const prompt = {
-            contents: [{
-                role: 'user',
-                parts: [{ text: `${context}\n\nQuestion: ${q}` }]
-            }]
-        };
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const answer = response.text().trim();
+        // Get response from Gemini (use centralized helper)
+        const { text: answerFromLLM } = await getChatResponse(q, context);
+        const answer = answerFromLLM || (context || "I couldn't find an answer right now.");
 
         // Save chat history if user is logged in
         if (req.user) {
