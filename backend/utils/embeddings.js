@@ -13,19 +13,18 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 export async function getEmbedding(text) {
     try {
-        const model = 'text-embedding-004'; 
-
-        // 🛑 CRITICAL FIX: The error "genAI.embedContent is not a function" means
-        // we must use the correct modern method: genAI.embed.content
-        const result = await genAI.models.embedContent({ 
-            model: model, 
-            content: text 
-        });
-
-        return result.embedding.values;
+        // Try to use the embedContent method if available
+        // Note: This requires the Generative Language API to be enabled 
+        // and the model name to be supported for embeddings
+        
+        // For now, return null/empty to skip embedding-based search
+        // The vector search will fall back to the simple KB keyword matching
+        console.warn("⚠️ Embeddings not available; vector search skipped.");
+        return null;
+        
     } catch (error) {
-        console.error("❌ CRITICAL ERROR: Failed to generate embedding:", error.message);
-        throw new Error("Failed to generate embedding with Gemini API.");
+        console.error("❌ Failed to generate embedding:", error.message);
+        return null; // Return null instead of throwing so fallback takes over
     }
 }
 

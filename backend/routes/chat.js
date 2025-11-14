@@ -48,19 +48,42 @@ const authenticate = async (req, res, next) => {
 // Main Chat Route
 // ---------------------------
 router.post("/", authenticate, async (req, res) => {
+    console.log("📨 Chat request received");
     const { q } = req.body;
     if (!q || q.trim() === "") {
         return res.status(400).json({ answer: "Please ask a valid question." });
     }
 
     try {
+        console.log(`❓ Question: "${q}"`);
         // 1️⃣ Search knowledge base for context
-        // NOTE: This now relies on the FIXED embeddings.js
-        const context = await searchKnowledge(q, knowledgeBase);
+        let context = "";
+        try {
+            context = await searchKnowledge(q, knowledgeBase);
+            console.log(`📚 Context: ${context ? "FOUND" : "NOT FOUND"}`);
+        } catch (searchErr) {
+            console.error("❌ searchKnowledge failed:", searchErr.message);
+            context = ""; // Fall through with empty context
+        }
 
-        // 2️⃣ Generate AI answer (Destructures the { text: response } object)
-        const { text: aiResponse } = await getChatResponse(q, context);
-        const answer = aiResponse || "I’m not sure about that. Can you ask differently?";
+        // 2️⃣ Knowledge-first behavior: if we found relevant KB context, return it directly
+        let answer = "";
+        if (context && typeof context === 'string' && context.trim()) {
+            // KB has an answer — use it directly (knowledge-first approach)
+            answer = context;
+            console.log(`✅ Responding from knowledge base`);
+        } else {
+            // No KB context — try GenAI; if that fails, give a helpful message
+            try {
+                console.log(`🤖 Calling GenAI...`);
+                const { text: aiResponse } = await getChatResponse(q, context);
+                answer = aiResponse || "I'm not sure about that. Can you ask differently?";
+                console.log(`✅ GenAI response received`);
+            } catch (genaiErr) {
+                console.error("❌ GenAI call failed:", genaiErr.message);
+                answer = "I don't have information about that in my knowledge base. Please try asking a different question or contact support.";
+            }
+        }
         
         // 3️⃣ Save chat if user is logged in
         if (req.user) {

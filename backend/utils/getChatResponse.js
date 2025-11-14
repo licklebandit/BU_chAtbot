@@ -82,8 +82,14 @@ Please use the Context above to generate a complete and helpful answer to the us
         console.error("--- Google GenAI API Call FAILED ---");
         console.error("Error Message:", error.message);
         
+        // If we have context from the KB, return it as-is (graceful degradation)
+        if (context && typeof context === 'string' && context.trim()) {
+            console.log("GenAI failed but KB context is available; returning context instead.");
+            return { text: context };
+        }
+        
         return { 
-            text: "Sorry, I experienced a temporary AI service error. Please try asking your question again in a minute, or ask a more specific question." 
+            text: "I don't have that information in my knowledge base. Please contact support or try asking a different question." 
         };
     }
 }

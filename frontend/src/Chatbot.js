@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+// Get API base URL from environment or use production as default
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://bu-chatbot.onrender.com";
+
 // Static styles object should be defined outside the component 
 // to prevent re-creation on every render, improving performance.
 const styles = {
@@ -86,7 +89,7 @@ function Chatbot() {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const res = await axios.get("https://bu-chatbot.onrender.com/chat/history", {
+      const res = await axios.get(`${API_BASE_URL}/chat/history`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setChats(res.data ? res.data.slice(-5).reverse() : []);
@@ -131,7 +134,7 @@ function Chatbot() {
       const token = localStorage.getItem("token");
       
       const res = await axios.post(
-        "https://bu-chatbot.onrender.com/chat",
+        `${API_BASE_URL}/chat`,
         { q: userMsg.text },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );

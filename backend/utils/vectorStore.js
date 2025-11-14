@@ -24,19 +24,46 @@ export async function addDocumentChunks(chunks, source) {
 
 // Semantic search using cosine similarity
 export async function searchSimilar(query, topK = 3) {
-  const queryEmb = await getEmbedding(query);
+  try {
+    console.log("🔍 searchSimilar called");
+    
+    // Call getEmbedding with a timeout to prevent hanging
+    let queryEmb;
+    try {
+      const embeddingPromise = getEmbedding(query);
+      // Set 2-second timeout
+      queryEmb = await Promise.race([
+        embeddingPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Embedding timeout")), 2000))
+      ]);
+    } catch (embErr) {
+      console.warn("⚠️ getEmbedding failed or timed out:", embErr.message);
+      queryEmb = null;
+    }
+    
+    // If embeddings are not available (returns null or timeout), skip vector search
+    if (!queryEmb || !Array.isArray(queryEmb) || queryEmb.length === 0) {
+      console.warn("⚠️ Vector search skipped: embeddings not available");
+      return []; // Return empty; searchKnowledge will use KB fallback
+    }
 
-  function cosineSim(a, b) {
-    const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
-    const normA = Math.sqrt(a.reduce((s, v) => s + v * v, 0));
-    const normB = Math.sqrt(b.reduce((s, v) => s + v * v, 0));
-    return dot / (normA * normB);
+    function cosineSim(a, b) {
+      if (!a || !b || !Array.isArray(a) || !Array.isArray(b)) return 0;
+      const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
+      const normA = Math.sqrt(a.reduce((s, v) => s + v * v, 0));
+      const normB = Math.sqrt(b.reduce((s, v) => s + v * v, 0));
+      return dot / (normA * normB);
+    }
+
+    const results = store
+      .filter(item => item.embedding && Array.isArray(item.embedding))
+      .map(item => ({ ...item, score: cosineSim(queryEmb, item.embedding) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, topK);
+
+    return results;
+  } catch (err) {
+    console.error("❌ searchSimilar error:", err.message);
+    return [];
   }
-
-  const results = store
-    .map(item => ({ ...item, score: cosineSim(queryEmb, item.embedding) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
-
-  return results;
 }
