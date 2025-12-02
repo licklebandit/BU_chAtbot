@@ -316,12 +316,12 @@ function LandingPage() {
               <div className="mt-6 space-y-4 text-sm text-slate-600">
                 <div className="space-y-2">
                   <p className={`font-semibold ${headlineColor}`}>Student</p>
-                  <p>How do I confirm my accommodation before arrival?</p>
+                  <p>How do I get tuition assistance in Bugema university?</p>
                 </div>
                 <div className={`space-y-2 rounded-2xl p-4 ${isDark ? "bg-slate-800/80" : "bg-slate-50"}`}>
                   <p className={`font-semibold ${headlineColor}`}>BUchatbot</p>
                   <p>
-                    Once your offer is accepted, log into the student portal to choose your residence. Facilities confirms within 24 hours and sends an email with arrival details.
+                    You can apply for work program through the university's work program office currently led by Mr. Jacob. Through him, you are given opportunity to work in your desired field as you earn some money to facilitate your tuition. Reach him at jacob@bugema.ac.ug.
                   </p>
                 </div>
                 <div className={`rounded-2xl p-4 ${isDark ? "bg-slate-800" : "bg-slate-900 text-white"}`}>
