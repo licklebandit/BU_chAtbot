@@ -1,5 +1,6 @@
 // routes/settings.js
 import express from "express";
+import { verifyAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -9,6 +10,9 @@ let chatbotSettings = {
   defaultResponseTime: 1,
   enableLogging: true,
 };
+
+// Require admin auth for all settings routes
+router.use(verifyAdmin);
 
 // GET /api/admin/settings
 router.get("/", (req, res) => {

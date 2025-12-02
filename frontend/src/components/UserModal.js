@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Save, Loader2 } from 'lucide-react';
+import { ADMIN_API_URL } from "../config/api";
 
 export default function UserModal({ isOpen, user, onClose, onSave }) {
   const [name, setName] = useState('');
@@ -42,7 +43,7 @@ export default function UserModal({ isOpen, user, onClose, onSave }) {
       payload.password = password;
     }
 
-    const url = `https://bu-chatbot.onrender.com/api/admin/users${isEdit ? '/' + user._id : ''}`;
+    const url = `${ADMIN_API_URL}/users${isEdit ? '/' + user._id : ''}`;
     const method = isEdit ? 'put' : 'post';
 
     try {

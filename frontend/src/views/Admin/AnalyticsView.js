@@ -13,9 +13,9 @@ import {
 const REFRESH_INTERVAL_SECONDS = 30; // Auto-refresh every 30 seconds
 
 const cardData = [
-  { key: 'users', title: 'Total Users', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-  { key: 'conversations', title: 'Total Conversations', icon: MessageCircle, color: 'text-green-600', bg: 'bg-green-50' },
-  { key: 'faqs', title: 'Total FAQs', icon: HelpCircle, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+  { key: 'users', title: 'Total Users', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'conversations', title: 'Total Conversations', icon: MessageCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'faqs', title: 'Total FAQs', icon: HelpCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
   { key: 'knowledge', title: 'Knowledge Articles', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
 ];
 
@@ -85,8 +85,8 @@ export default function AnalyticsView() {
   if (loading && !lastFetched) {
     return (
       <div className="text-center p-10 flex flex-col items-center justify-center min-h-[70vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
-        <p className="text-xl text-blue-600 font-medium">Loading Analytics Dashboard...</p>
+        <Loader2 className="w-10 h-10 animate-spin text-bu-primary mb-4" />
+        <p className="text-xl text-bu-primary font-medium">Loading Analytics Dashboard...</p>
       </div>
     );
   }
@@ -158,8 +158,8 @@ export default function AnalyticsView() {
                 <YAxis stroke="#6b7280" />
                 <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "4px" }} />
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: 10 }} />
-                <Line type="monotone" dataKey="users" name="New Users" stroke="#4F46E5" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="conversations" name="New Conversations" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="users" name="New Users" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="conversations" name="New Conversations" stroke="#1D4ED8" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -179,8 +179,8 @@ export default function AnalyticsView() {
                   contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "4px" }}
                 />
                 <Legend iconType="square" wrapperStyle={{ paddingTop: 10 }} />
-                <Bar dataKey="faqs" name="New FAQs" fill="#FBBF24" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="knowledge" name="New Articles" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="faqs" name="New FAQs" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="knowledge" name="New Articles" fill="#2563EB" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -79,8 +79,8 @@ export default function FaqsView() {
   const renderContent = () => {
     if (loading) return (
       <div className="text-center p-10 flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
-        <p className="text-xl text-indigo-600 font-medium">Loading FAQs...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-bu-primary mb-3" />
+        <p className="text-xl text-bu-primary font-medium">Loading FAQs...</p>
       </div>
     );
 
@@ -92,8 +92,8 @@ export default function FaqsView() {
     );
 
     if (faqs.length === 0) return (
-      <div className="text-center p-10 bg-white shadow-md rounded-xl border border-dashed border-gray-300">
-        <HelpCircle className="w-8 h-8 text-indigo-500 mx-auto mb-3" />
+      <div className="text-center p-10 bg-white shadow-md rounded-xl border border-dashed border-blue-300">
+        <HelpCircle className="w-8 h-8 text-blue-500 mx-auto mb-3" />
         <p className="text-gray-700 font-medium text-lg">No FAQs Found</p>
         <p className="text-gray-500 text-sm mt-1">Click "Add New FAQ" to create one.</p>
       </div>
@@ -102,15 +102,15 @@ export default function FaqsView() {
     return (
       <ul className="space-y-4 max-w-3xl mx-auto">
         {faqs.map(faq => (
-          <li key={faq._id} className="p-5 bg-white shadow-lg rounded-xl flex flex-col transition hover:shadow-xl border border-gray-100 hover:border-indigo-400">
+          <li key={faq._id} className="p-5 bg-white shadow-lg rounded-xl flex flex-col transition hover:shadow-xl border border-gray-100 hover:border-blue-400">
             <div className="mb-3 pb-3 border-b border-gray-200">
-              <span className="font-semibold text-indigo-600 text-xs uppercase block mb-1 flex items-center">
+              <span className="font-semibold text-blue-600 text-xs uppercase block mb-1 flex items-center">
                 <MessageSquare className="w-3 h-3 mr-1"/> QUESTION:
               </span>
               <p className="text-sm font-bold text-gray-900 leading-snug">{faq.question}</p>
             </div>
             <div className="flex-1 mb-4 text-xs text-gray-700 leading-relaxed min-h-[40px]">
-              <span className="font-semibold text-indigo-600 text-xs uppercase block mb-1 flex items-center">
+              <span className="font-semibold text-blue-600 text-xs uppercase block mb-1 flex items-center">
                 <BookOpen className="w-3 h-3 mr-1"/> ANSWER:
               </span>
               <p className="line-clamp-2">{faq.answer}</p>
@@ -132,11 +132,11 @@ export default function FaqsView() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center pb-4 border-b-4 border-indigo-500/50">
-        <h2 className="text-3xl font-extrabold text-gray-800 flex items-center gap-3">
-          <HelpCircle className="w-8 h-8 text-indigo-600"/> FAQs
+      <div className="flex justify-between items-center pb-4 border-b-4 border-bu-primary/50">
+        <h2 className="text-3xl font-extrabold text-bu-primary flex items-center gap-3">
+          <HelpCircle className="w-8 h-8 text-bu-primary"/> FAQs
         </h2>
-        <Button onClick={handleAddFaq} className="bg-indigo-600 hover:bg-indigo-700 transition font-semibold px-4 py-2 shadow-md">
+        <Button onClick={handleAddFaq} className="bg-bu-primary hover:bg-bu-primary/90 transition font-semibold px-4 py-2 shadow-md">
           <MessageSquare className="w-4 h-4 mr-2"/> Add New FAQ
         </Button>
       </div>

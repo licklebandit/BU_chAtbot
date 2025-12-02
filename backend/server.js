@@ -23,11 +23,16 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app); // ✅ the only server instance
 
-const ALLOWED_ORIGINS = [
+const defaultOrigins = [
     "http://localhost:3000",
+    "http://localhost:5173",
     "https://bu-ch-atbot.vercel.app",
-    // Add any other trusted frontend origins here
 ];
+const envOrigins = (process.env.FRONTEND_URLS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+const ALLOWED_ORIGINS = [...new Set([...defaultOrigins, ...envOrigins])];
 
 // ✅ Initialize Socket.IO
 const io = new IOServer(server, {
@@ -98,7 +103,9 @@ mongoose
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // --- ROUTES (Unchanged) ---
+// Mount chat route at both /chat and /api/chat to support different frontend expectations
 app.use("/chat", chatRoute);
+app.use("/api/chat", chatRoute);
 app.use("/api/ingest", ingestRoute);
 app.use("/auth", authRoute);
 app.use("/api/admin", adminRouter);

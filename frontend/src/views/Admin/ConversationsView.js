@@ -108,7 +108,9 @@ export default function ConversationsView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800 border-b pb-2">Conversation History</h1>
+      <div className="flex justify-between items-center pb-4 border-b-4 border-blue-500/50">
+        <h1 className="text-3xl font-extrabold text-blue-800">Conversation History</h1>
+      </div>
 
       {/* Toolbar: Search and Refresh */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -125,9 +127,9 @@ export default function ConversationsView() {
             className="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
           />
         </div>
-        <Button 
+        <Button
           onClick={fetchConversations} // Use the correct fetch function
-          className="bg-blue-600 hover:bg-blue-700 transition"
+          className="bg-bu-primary hover:bg-bu-primary/90 transition"
         >
           Export Data
         </Button>
@@ -189,7 +191,7 @@ export default function ConversationsView() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm hidden md:table-cell">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        c.status === 'Open' ? 'bg-green-100 text-green-800' : (c.status === 'New' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800')
+                        c.status === 'Open' ? 'bg-blue-100 text-blue-800' : (c.status === 'New' ? 'bg-blue-200 text-blue-900' : 'bg-gray-100 text-gray-800')
                       }`}>
                         {c.status}
                       </span>

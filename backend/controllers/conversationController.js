@@ -1,4 +1,4 @@
-import Conversation from '../models/Conversation.js';
+import Chat from '../models/Chat.js';
 
 export const getConversationStats = async (req, res) => {
     try {
@@ -8,23 +8,23 @@ export const getConversationStats = async (req, res) => {
         const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
 
         // Get total conversations count
-        const totalConversations = await Conversation.countDocuments();
+        const totalConversations = await Chat.countDocuments();
 
         // Get recent conversations counts
-        const last24Hours = await Conversation.countDocuments({ createdAt: { $gte: twentyFourHoursAgo } });
-        const lastWeek = await Conversation.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
-        const lastMonth = await Conversation.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
+        const last24Hours = await Chat.countDocuments({ updatedAt: { $gte: twentyFourHoursAgo } });
+        const lastWeek = await Chat.countDocuments({ updatedAt: { $gte: sevenDaysAgo } });
+        const lastMonth = await Chat.countDocuments({ updatedAt: { $gte: thirtyDaysAgo } });
 
         // Get daily conversation counts for the last 7 days
-        const dailyCounts = await Conversation.aggregate([
+        const dailyCounts = await Chat.aggregate([
             {
                 $match: {
-                    createdAt: { $gte: sevenDaysAgo }
+                    updatedAt: { $gte: sevenDaysAgo }
                 }
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
                     count: { $sum: 1 }
                 }
             },
@@ -34,15 +34,15 @@ export const getConversationStats = async (req, res) => {
         ]);
 
         // Get hourly counts for the last 24 hours
-        const hourlyCounts = await Conversation.aggregate([
+        const hourlyCounts = await Chat.aggregate([
             {
                 $match: {
-                    createdAt: { $gte: twentyFourHoursAgo }
+                    updatedAt: { $gte: twentyFourHoursAgo }
                 }
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d %H:00", date: "$createdAt" } },
+                    _id: { $dateToString: { format: "%Y-%m-%d %H:00", date: "$updatedAt" } },
                     count: { $sum: 1 }
                 }
             },
@@ -52,10 +52,10 @@ export const getConversationStats = async (req, res) => {
         ]);
 
         // Get average messages per conversation
-        const messageStats = await Conversation.aggregate([
+        const messageStats = await Chat.aggregate([
             {
                 $project: {
-                    messageCount: { $size: "$transcript" }
+                    messageCount: { $size: "$messages" }
                 }
             },
             {

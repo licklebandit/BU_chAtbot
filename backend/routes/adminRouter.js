@@ -2,7 +2,7 @@
 
 import express from "express";
 import User from "../models/User.js"; 
-import Conversation from "../models/Conversation.js"; 
+import Chat from "../models/Chat.js"; 
 import Knowledge from "../models/Knowledge.js"; 
 import { hash } from 'bcrypt'; 
 import { verifyUser as isAuthenticated, verifyAdmin as isAdmin } from "../middleware/authMiddleware.js";
@@ -28,35 +28,31 @@ router.get("/users", isAuthenticated, isAdmin, async (req, res) => {
 
 // POST /api/admin/user - Create a new user/admin
 router.post("/users", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-        // Note: Your frontend AdminModal enforces role: 'admin'
-        const { username, email, password, role } = req.body;
-        
-        if (!password) {
-            return res.status(400).json({ message: "Password is required for new user creation." });
+    try {
+        const { name, email, password, role } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "Name, email, and password are required." });
         }
         
-        const hashedPassword = await hash(password, 10); 
-        
-        // Assuming 'username' in your model is where you put 'name' from the frontend modal
-        const newUser = new User({ username, email, password: hashedPassword, role: role || 'user' });
-        await newUser.save();
+        const hashedPassword = await hash(password, 10); 
+        const newUser = new User({ name, email, password: hashedPassword, role: role || 'user' });
+        await newUser.save();
 
-        res.status(201).json({ message: "User created successfully" });
-    } catch (err) {
-        console.error("Error creating user:", err);
-        res.status(500).json({ message: "Server error creating user" });
-    }
+        res.status(201).json({ message: "User created successfully" });
+    } catch (err) {
+        console.error("Error creating user:", err);
+        res.status(500).json({ message: "Server error creating user" });
+    }
 });
 
 // PUT /api/admin/users/:id - Update an existing user/admin (NEW ROUTE ADDED)
 router.put("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
-        const updateFields = { username, email, role };
+        const { name, email, password, role } = req.body;
+        const updateFields = { name, email, role };
 
         if (password) {
-            // Only hash and update password if provided
             updateFields.password = await hash(password, 10);
         }
 
@@ -64,7 +60,7 @@ router.put("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
             req.params.id,
             updateFields,
             { new: true, runValidators: true }
-        ).select('-password'); // Exclude password from the response
+        ).select('-password');
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found." });
@@ -96,13 +92,15 @@ router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
 
 // GET /api/admin/knowledge - Fetch all Knowledge articles
 router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-        const articles = await Knowledge.find().sort({ createdAt: -1 });
-        res.json(articles);
-    } catch (err) {
-        console.error("Error fetching knowledge articles:", err);
-        res.status(500).json({ message: "Server error fetching knowledge articles" });
-    }
+    try {
+        const articles = await Knowledge.find({
+            $or: [{ type: { $exists: false } }, { type: "knowledge" }],
+        }).sort({ updatedAt: -1 });
+        res.json(articles);
+    } catch (err) {
+        console.error("Error fetching knowledge articles:", err);
+        res.status(500).json({ message: "Server error fetching knowledge articles" });
+    }
 });
 
 // POST /api/admin/knowledge - Create a new Knowledge article
@@ -114,9 +112,7 @@ router.post("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
             return res.status(400).json({ message: "Missing required fields: title and content." });
         }
 
-        // Map frontend fields (title/content) to model fields (question/answer)
-    console.log('POST /api/admin/knowledge body:', req.body, 'by user:', req.user && req.user.id ? req.user.id : req.user);
-    const newArticle = new Knowledge({ question: title, answer: content, source: 'Admin Panel' });
+        const newArticle = new Knowledge({ question: title, answer: content, type: "knowledge", source: 'Admin Panel' });
         const savedArticle = await newArticle.save();
         res.status(201).json(savedArticle);
     } catch (err) {
@@ -132,8 +128,7 @@ router.put("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
         
         const updatedArticle = await Knowledge.findByIdAndUpdate(
             req.params.id,
-            // Map frontend fields (title/content) to model fields (question/answer)
-            { question: title, answer: content }, 
+            { question: title, answer: content, type: "knowledge" }, 
             { new: true, runValidators: true }
         );
 
@@ -168,14 +163,13 @@ router.delete("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
 
 // GET /api/admin/faqs - Fetch all FAQs (Restored to fix FaqsView 404)
 router.get("/faqs", isAuthenticated, isAdmin, async (req, res) => {
-    try {
-        // FaqsView expects 'question' and 'answer' fields (which the model already uses)
-        const faqs = await Knowledge.find().sort({ createdAt: -1 });
-        res.json(faqs);
-    } catch (err) {
-        console.error("Error fetching FAQs:", err);
-        res.status(500).json({ message: "Server error fetching FAQs" });
-    }
+    try {
+        const faqs = await Knowledge.find({ type: "faq" }).sort({ updatedAt: -1 });
+        res.json(faqs);
+    } catch (err) {
+        console.error("Error fetching FAQs:", err);
+        res.status(500).json({ message: "Server error fetching FAQs" });
+    }
 });
 
 // POST /api/admin/faqs - Create a new FAQ
@@ -189,7 +183,7 @@ router.post("/faqs", isAuthenticated, isAdmin, async (req, res) => {
         }
 
     console.log('POST /api/admin/faqs body:', req.body, 'by user:', req.user && req.user.id ? req.user.id : req.user);
-    const newFaq = new Knowledge({ question, answer, source: 'Admin Panel' });
+        const newFaq = new Knowledge({ question, answer, source: 'Admin Panel', type: "faq" });
         const savedFaq = await newFaq.save();
         res.status(201).json(savedFaq);
     } catch (err) {
@@ -205,11 +199,11 @@ router.put("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
         const { question, answer } = req.body;
         
-        const updatedFaq = await Knowledge.findByIdAndUpdate(
-            req.params.id,
-            { question, answer }, 
-            { new: true, runValidators: true }
-        );
+        const updatedFaq = await Knowledge.findByIdAndUpdate(
+            req.params.id,
+            { question, answer, type: "faq" }, 
+            { new: true, runValidators: true }
+        );
 
         if (!updatedFaq) {
             return res.status(404).json({ message: "FAQ not found." });
@@ -246,36 +240,98 @@ router.delete("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
 // GET /api/admin/stats - Fetch general statistics 
 router.get("/stats", isAuthenticated, isAdmin, async (req, res) => {
     try {
-        const totalUsers = await User.countDocuments();
-        const totalConversations = await Conversation.countDocuments();
-        
-        // Assuming FAQS and Knowledge Articles are both stored in the Knowledge model
-        // We will need to split them if you differentiate them.
-        const totalKnowledgeArticles = await Knowledge.countDocuments(); 
-        // Count FAQs vs knowledge by 'source' field when available
-        const faqsCount = await Knowledge.countDocuments({ source: 'Admin Panel' }).catch(() => 0);
-        const otherKnowledgeCount = Math.max(0, totalKnowledgeArticles - faqsCount);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
-        const summaryData = { 
-            users: totalUsers,
-            conversations: totalConversations,
-            faqs: faqsCount,
-            knowledge: otherKnowledgeCount
-        };
+        const [
+            totalUsers,
+            adminUsers,
+            totalChats,
+            knowledgeArticles,
+            faqArticles,
+            recentChats,
+            dailyCounts,
+            responseSamples,
+        ] = await Promise.all([
+            User.countDocuments(),
+            User.countDocuments({ role: "admin" }),
+            Chat.countDocuments(),
+            Knowledge.countDocuments({ $or: [{ type: { $exists: false } }, { type: "knowledge" }] }),
+            Knowledge.countDocuments({ type: "faq" }),
+            Chat.find().sort({ updatedAt: -1 }).limit(5).populate("userId", "name email"),
+            Chat.aggregate([
+                { $match: { updatedAt: { $gte: sevenDaysAgo } } },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: {
+                                format: "%Y-%m-%d",
+                                date: "$updatedAt",
+                            },
+                        },
+                        count: { $sum: 1 },
+                    },
+                },
+                { $sort: { _id: 1 } },
+            ]),
+            Chat.find().select("messages").limit(50),
+        ]);
 
-        // Placeholder chart data structure (Frontend expects this to be an array)
-        // You will need to implement actual date aggregation logic later.
-        const chartData = [
-            { date: "Jan", users: 5, conversations: 10, faqs: 1, knowledge: 2 },
-            { date: "Feb", users: 15, conversations: 25, faqs: 3, knowledge: 5 },
-            { date: "Mar", users: 30, conversations: 50, faqs: 6, knowledge: 10 },
-            // Add more historical data points here
-        ];
+        const daySequence = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(sevenDaysAgo);
+            date.setDate(sevenDaysAgo.getDate() + i);
+            daySequence.push(date.toISOString().split("T")[0]);
+        }
 
-        // Send both summary and chart data in one combined response for efficiency
+        const dailyMap = dailyCounts.reduce((acc, item) => {
+            acc[item._id] = item.count;
+            return acc;
+        }, {});
+
+        const conversationsLast7Days = daySequence.map((date) => ({
+            date,
+            count: dailyMap[date] || 0,
+        }));
+
+        let responseTime = 1.8;
+        let totalLagMs = 0;
+        let lagSamples = 0;
+        responseSamples.forEach((chat) => {
+            for (let i = 0; i < chat.messages.length - 1; i++) {
+                const current = chat.messages[i];
+                if (current.role !== "user") continue;
+                const nextAssistant = chat.messages.slice(i + 1).find((m) => m.role === "assistant");
+                if (!nextAssistant) continue;
+                const diff = new Date(nextAssistant.timestamp).getTime() - new Date(current.timestamp).getTime();
+                if (diff >= 0) {
+                    totalLagMs += diff;
+                    lagSamples += 1;
+                }
+            }
+        });
+        if (lagSamples > 0) {
+            responseTime = Number((totalLagMs / lagSamples / 1000).toFixed(2));
+        }
+
+        const recentActivity = recentChats.map((chat) => ({
+            id: chat._id,
+            user: chat.userId?.name || chat.userId?.email || "Guest user",
+            action: chat.messages?.[chat.messages.length - 1]?.role === "assistant" ? "Assistant responded" : "User asked a question",
+            time: chat.updatedAt,
+        }));
+
         res.json({
-            summary: summaryData,
-            charts: chartData
+            users: totalUsers,
+            admins: adminUsers,
+            conversations: totalChats,
+            knowledgeArticles,
+            faqs: faqArticles,
+            responseTime,
+            charts: {
+                conversationsLast7Days,
+            },
+            recentActivity,
         });
         
     } catch (err) {

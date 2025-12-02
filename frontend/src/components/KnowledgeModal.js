@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Save, Loader2 } from 'lucide-react';
+import { ADMIN_API_URL } from "../config/api";
 
 /**
  * KnowledgeModal Component (Handles Add/Edit form logic for articles)
@@ -15,9 +16,7 @@ export default function KnowledgeModal({ isOpen, article, onClose, onSave }) {
 
   const token = localStorage.getItem("token");
   const isEdit = !!article;
-
-  // API URL: CORRECTED to match the backend route /knowledge
-  const API_BASE = "https://bu-chatbot.onrender.com/api/admin/knowledge";
+  const API_BASE = `${ADMIN_API_URL}/knowledge`;
 
   useEffect(() => {
     if (isOpen) {

@@ -61,8 +61,8 @@ export default function UsersView() {
 
   if (loading && !lastFetched) return (
     <div className="text-center p-10 flex flex-col items-center justify-center min-h-[70vh]">
-      <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4"/>
-      <p className="text-xl text-blue-600 font-medium">Loading Users...</p>
+      <Loader2 className="w-10 h-10 animate-spin text-bu-primary mb-4"/>
+      <p className="text-xl text-bu-primary font-medium">Loading Users...</p>
     </div>
   );
 
@@ -109,7 +109,7 @@ export default function UsersView() {
                 <td className="py-3 px-4 font-medium text-gray-800">{u.name}</td>
                 <td className="py-3 px-4 text-gray-600">{u.email}</td>
                 <td className="py-3 px-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>
                     {u.role.toUpperCase()}
                   </span>
                 </td>

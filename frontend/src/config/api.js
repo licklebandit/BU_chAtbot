@@ -1,24 +1,22 @@
-// src/config/api.js
+const FALLBACK_PROD_URL = "https://bu-chatbot.onrender.com";
 
-/**
- * Dynamically determines the base URL for the API.
- * This function checks the hostname to switch between local and production environments.
- * * Assumes:
- * - Local backend runs on port 8000.
- * - Production backend is hosted at the Render URL.
- */
-const getApiBaseUrl = () => {
-    // Check if the current environment is running on localhost or a local IP
+const sanitize = (value = "") => value.replace(/\/$/, "");
+
+const inferRootFromWindow = () => {
+    if (typeof window === "undefined") return "";
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        // Use the local backend URL (running on port 8000, confirmed in server.js)
-        return "http://localhost:8000/api";
+        return "http://localhost:8000";
     }
-    // Use the production URL (Replace with your actual Render URL if it changes)
-    return "https://bu-chatbot.onrender.com/api";
+    return FALLBACK_PROD_URL;
 };
 
-// Export the base URL for use throughout the application
-export const API_BASE_URL = getApiBaseUrl();
+const resolvedRoot =
+    sanitize(process.env.REACT_APP_API_BASE_URL || "") ||
+    sanitize(inferRootFromWindow()) ||
+    FALLBACK_PROD_URL;
 
-// Define the full base URL for admin-specific endpoints
+export const API_ROOT = sanitize(resolvedRoot);
+export const API_BASE_URL = `${API_ROOT}/api`;
+export const AUTH_BASE_URL = `${API_ROOT}/auth`;
 export const ADMIN_API_URL = `${API_BASE_URL}/admin`;
+export const SOCKET_URL = API_ROOT;

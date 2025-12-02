@@ -20,43 +20,70 @@ const REFRESH_INTERVAL_SECONDS = 30;
 
 // Dashboard summary cards configuration
 const cardDataConfig = [
-  { key: "users", title: "Total Users", icon: Users, color: "text-indigo-600", bg: "bg-indigo-50" },
-  { key: "admins", title: "Active Admins", icon: ShieldCheck, color: "text-blue-600", bg: "bg-blue-50" },
-  { key: "conversations", title: "Total Conversations", icon: MessageSquare, color: "text-green-600", bg: "bg-green-50" },
-  { key: "knowledgeArticles", title: "Knowledge Articles", icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
-  { key: "faqs", title: "FAQs Count", icon: HelpCircle, color: "text-yellow-600", bg: "bg-yellow-50" },
-  { key: "responseTime", title: "Avg. Response Time (s)", icon: Activity, color: "text-cyan-600", bg: "bg-cyan-50" },
+  { key: "users", title: "Total Users", icon: Users },
+  { key: "admins", title: "Active Admins", icon: ShieldCheck },
+  { key: "conversations", title: "Total Conversations", icon: MessageSquare },
+  { key: "knowledgeArticles", title: "Knowledge Articles", icon: BookOpen },
+  { key: "faqs", title: "FAQs Count", icon: HelpCircle },
+  { key: "responseTime", title: "Avg. Response Time (s)", icon: Activity },
 ];
 
 // Summary Card Component
-const SummaryCard = ({ title, value, Icon, color, bg }) => (
-  <div className={`p-5 ${bg} shadow-md rounded-lg flex items-center space-x-3 border border-gray-200 hover:shadow-lg transition-shadow`}>
-    <div className={`p-2 rounded-lg ${color} bg-white shadow-sm flex-shrink-0`}>
-      <Icon className="w-6 h-6" />
+const SummaryCard = ({ title, value, Icon }) => {
+  const displayValue =
+    typeof value === "number"
+      ? value.toLocaleString()
+      : value || "0";
+  return (
+    <div className="group rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_25px_60px_rgba(0,0,0,0.25)] backdrop-blur transition-all duration-200 hover:border-white/40 hover:shadow-[0_35px_70px_rgba(8,16,34,0.45)]">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[11px] uppercase tracking-[0.35em] text-white/60">{title}</p>
+          <p className="mt-4 text-3xl font-semibold text-white">{displayValue}</p>
+        </div>
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white/80 transition group-hover:bg-white/30 group-hover:text-white">
+          <Icon className="h-6 w-6" />
+        </span>
+      </div>
     </div>
-    <div className="truncate">
-      <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
-      <p className={`text-2xl font-extrabold ${color}`}>{value?.toLocaleString() ?? 0}</p>
-    </div>
-  </div>
-);
+  );
+};
 
-// Recent Activity Dummy Data
-const recentActivityData = [
-  { id: 1, user: "Alice C.", action: "Started new chat", time: "2 min ago" },
-  { id: 2, user: "System", action: "Knowledge base updated", time: "1 hour ago" },
-  { id: 3, user: "Bob D.", action: "Viewed FAQ: 'API limits'", time: "4 hours ago" },
-  { id: 4, user: "Jane E.", action: "Logged in", time: "1 day ago" },
+const fallbackActivity = [
+  { id: 1, user: "System", action: "Waiting for real-time data…", time: new Date().toISOString() },
 ];
 
+const formatRelativeTime = (timestamp) => {
+  if (!timestamp) return "Just now";
+  const target = new Date(timestamp);
+  const diffMs = Date.now() - target.getTime();
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+};
+
 export default function DashboardView() {
-  const [summary, setSummary] = useState({});
+  const [summary, setSummary] = useState({
+    users: 0,
+    admins: 0,
+    conversations: 0,
+    knowledgeArticles: 0,
+    faqs: 0,
+    responseTime: 0,
+    recentActivity: [],
+    charts: { conversationsLast7Days: [] },
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastFetched, setLastFetched] = useState(null);
   const [systemStatus, setSystemStatus] = useState("Operational");
 
   const token = localStorage.getItem("token");
+  const activityFeed = summary.recentActivity?.length ? summary.recentActivity : fallbackActivity;
 
   const fetchDashboard = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -67,9 +94,20 @@ export default function DashboardView() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setSummary({
-        ...res.data,
-        responseTime: (Math.random() * (1.5 - 0.2) + 0.2).toFixed(2), // Simulated
+      const payload = res.data || {};
+      setSummary((prev) => {
+        const normalizedResponseTime =
+          typeof payload.responseTime === "number"
+            ? Number(payload.responseTime.toFixed(2))
+            : prev.responseTime || 0;
+
+        return {
+          ...prev,
+          ...payload,
+          responseTime: normalizedResponseTime,
+          recentActivity: payload.recentActivity || [],
+          charts: payload.charts || prev.charts,
+        };
       });
       setLastFetched(new Date());
       setSystemStatus("Operational");
@@ -90,9 +128,9 @@ export default function DashboardView() {
 
   if (loading && !lastFetched) {
     return (
-      <div className="text-center p-10 flex flex-col items-center justify-center min-h-[70vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
-        <p className="text-xl text-blue-600 font-medium">Loading Dashboard...</p>
+      <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#0b1a34] text-white">
+        <Loader2 className="mb-4 h-10 w-10 animate-spin text-white" />
+        <p className="text-xl font-medium">Loading dashboard…</p>
       </div>
     );
   }
@@ -108,69 +146,129 @@ export default function DashboardView() {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-end pb-4 border-b-4 border-blue-500/50">
-        <div>
-          <h2 className="text-3xl font-extrabold text-blue-800">📊 Admin Dashboard</h2>
-          {lastFetched && (
-            <p className="text-sm text-gray-500 mt-1 flex items-center">
-              <RefreshCw className="w-3 h-3 mr-1" />
-              Data last updated: {lastFetched.toLocaleTimeString()} (Refreshes every {REFRESH_INTERVAL_SECONDS}s)
-            </p>
-          )}
-        </div>
-        <button
-          onClick={() => fetchDashboard(true)}
-          disabled={loading}
-          className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-lg transition ${
-            loading ? "bg-gray-400 text-gray-700 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
-          }`}
-        >
-          <RefreshCw className={`w-4 h-4 ${loading && "animate-spin"}`} />
-          {loading && lastFetched ? "Refreshing..." : "Manual Refresh"}
-        </button>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {cardDataConfig.map(({ key, title, icon, color, bg }) => (
-          <SummaryCard key={key} title={title} value={summary[key]} Icon={icon} color={color} bg={bg} />
-        ))}
-      </div>
-
-      {/* System Status & Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* System Health */}
-        <div className={`p-5 bg-white shadow-md rounded-lg border border-gray-200`}>
-          <h3 className="text-lg font-bold mb-3 text-gray-800 flex items-center gap-2">
-            <Activity className="w-5 h-5" /> System Health
-          </h3>
-          <div className={`p-3 rounded-lg font-bold text-center ${
-            systemStatus === "Operational"
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-          }`}>
-            Status: {systemStatus}
+    <div className="min-h-screen bg-[#0b1a34]">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10">
+        <div className="rounded-[32px] border border-white/10 bg-white/10 p-6 shadow-[0_40px_80px_rgba(4,7,25,0.5)] backdrop-blur">
+          <div className="flex flex-col gap-4 text-white lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Admin intelligence</p>
+              <h2 className="text-3xl font-semibold">Dashboard overview</h2>
+              {lastFetched && (
+                <p className="flex items-center gap-2 text-sm text-white/70">
+                  <RefreshCw className="h-4 w-4" /> Updated {lastFetched.toLocaleTimeString()} · Refresh every {REFRESH_INTERVAL_SECONDS}s
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col items-end gap-2 text-right">
+              <button
+                onClick={() => fetchDashboard(true)}
+                disabled={loading}
+                className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] transition ${
+                  loading
+                    ? "bg-white/20 text-white"
+                    : "bg-white text-bu-primary shadow-[0_10px_35px_rgba(255,255,255,0.35)] hover:bg-white/90"
+                }`}
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                {loading && lastFetched ? "Refreshing" : "Refresh data"}
+              </button>
+              {lastFetched && (
+                <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">
+                  Data as of {lastFetched.toLocaleTimeString()}
+                </p>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-gray-500 mt-2">Last checked: {new Date().toLocaleTimeString()}</p>
         </div>
 
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 p-5 bg-white shadow-md rounded-lg border border-gray-200">
-          <h3 className="text-lg font-bold mb-3 text-gray-800 flex items-center gap-2">
-            <Clock className="w-5 h-5" /> Recent Activity
-          </h3>
-          <ul className="divide-y divide-gray-100">
-            {recentActivityData.map((activity) => (
-              <li key={activity.id} className="py-2 flex justify-between items-center">
-                <span className="text-gray-900 font-medium">{activity.user}</span>
-                <span className="text-gray-600 flex-1 mx-4 truncate">{activity.action}</span>
-                <span className="text-xs text-gray-400">{activity.time}</span>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {cardDataConfig.map(({ key, title, icon }) => (
+            <SummaryCard key={key} title={title} value={summary[key]} Icon={icon} />
+          ))}
+        </div>
+
+        {/* System Status & Activity */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr]">
+          <div className="rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_35px_70px_rgba(8,16,34,0.45)] backdrop-blur">
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Health monitor</p>
+                <h3 className="text-2xl font-semibold">System health</h3>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] ${
+                  systemStatus === "Operational"
+                    ? "border border-emerald-300/40 bg-emerald-400/20 text-emerald-100"
+                    : "border border-rose-300/40 bg-rose-400/20 text-rose-100"
+                }`}
+              >
+                {systemStatus}
+              </span>
+            </div>
+            <p className="text-sm text-white/70">
+              Monitoring API uptime, knowledge base ingestion, and conversation processing in real time.
+            </p>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-xs uppercase tracking-[0.25em] text-white/60">Status checked</p>
+                <p className="mt-2 text-lg font-semibold">{new Date().toLocaleTimeString()}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-xs uppercase tracking-[0.25em] text-white/60">Overall state</p>
+                <p className="mt-2 text-lg font-semibold">
+                  {systemStatus === "Operational" ? "All systems go" : "Action required"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_35px_70px_rgba(8,16,34,0.45)] backdrop-blur">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Event stream</p>
+                <h3 className="text-2xl font-semibold">Recent activity</h3>
+              </div>
+              <span className="text-sm text-white/60">{activityFeed.length} events</span>
+            </div>
+            <ul className="mt-6 space-y-3">
+              {activityFeed.map((activity, index) => (
+                <li
+                  key={activity.id || index}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white">{activity.user}</p>
+                    <p className="truncate text-white/70">{activity.action || "Awaiting new events"}</p>
+                  </div>
+                  <span className="shrink-0 text-xs text-white/50">{formatRelativeTime(activity.time)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <section className="rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_35px_70px_rgba(8,16,34,0.45)] backdrop-blur">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Conversation pulse</p>
+              <h3 className="text-2xl font-semibold">Live activity ticker</h3>
+            </div>
+            <p className="text-sm text-white/70">Tracking the latest five interactions.</p>
+          </div>
+          <ul className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {activityFeed.slice(0, 6).map((activity, index) => (
+              <li
+                key={`activity-card-${index}`}
+                className="rounded-2xl border border-white/10 bg-[#10244d]/70 p-4 shadow-[0_20px_40px_rgba(3,7,18,0.35)]"
+              >
+                <p className="text-sm font-semibold text-white">{activity.user}</p>
+                <p className="mt-2 line-clamp-2 text-sm text-white/70">{activity.action || "No recent updates"}</p>
+                <p className="mt-3 text-xs text-white/50">{formatRelativeTime(activity.time)}</p>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       </div>
     </div>
   );

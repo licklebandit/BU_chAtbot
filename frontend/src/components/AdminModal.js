@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Save, Loader2 } from 'lucide-react';
+import { ADMIN_API_URL } from "../config/api";
 
 export default function AdminModal({ isOpen, admin, onClose, onSave }) {
   const [name, setName] = useState('');
@@ -13,7 +14,7 @@ export default function AdminModal({ isOpen, admin, onClose, onSave }) {
 
   const token = localStorage.getItem("token");
   const isEdit = !!admin;
-  const API_BASE = "https://bu-chatbot.onrender.com/api/admin/users"; // Corrected base URL
+  const API_BASE = `${ADMIN_API_URL}/users`;
 
   useEffect(() => {
     if (isOpen) {

@@ -13,13 +13,25 @@ router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "User already exists" });
+    // Normalize email: trim whitespace and convert to lowercase
+    const normalizedEmail = (email || "").trim().toLowerCase();
+    
+    if (!name || !normalizedEmail || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required" });
+    }
+
+    // Case-insensitive email check
+    const existing = await User.findOne({ 
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, "i") } 
+    });
+    if (existing) {
+      return res.status(400).json({ message: "User already exists with this email" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
     const newUser = new User({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashed,
       role: "user", // prevent random admin creation
     });
@@ -28,8 +40,11 @@ router.post("/signup", async (req, res) => {
 
     res.json({ message: "✅ Signup successful" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "❌ Error signing up" });
+    console.error("Signup error:", err);
+    if (err.code === 11000) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+    res.status(500).json({ message: "❌ Error signing up. Please try again." });
   }
 });
 
@@ -37,11 +52,32 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    
+    // Normalize email: trim whitespace and convert to lowercase for case-insensitive lookup
+    const normalizedEmail = (email || "").trim().toLowerCase();
+    
+    if (!normalizedEmail || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    // Case-insensitive email lookup
+    const user = await User.findOne({ 
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, "i") } 
+    });
+    
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    // Check if user has a password (in case of OAuth users)
+    if (!user.password) {
+      return res.status(400).json({ message: "Account setup incomplete. Please reset your password." });
+    }
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ message: "Invalid password" });
+    if (!valid) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
     // 🔥 Include role in token
     const token = jwt.sign(
@@ -55,8 +91,8 @@ router.post("/login", async (req, res) => {
       user: { name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "❌ Login failed" });
+    console.error("Login error:", err);
+    res.status(500).json({ message: "❌ Login failed. Please try again." });
   }
 });
 

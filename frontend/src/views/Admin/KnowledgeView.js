@@ -3,7 +3,8 @@ import axios from "axios";
 import { Button } from "../../components/ui/Button";
 import KnowledgeModal from "../../components/KnowledgeModal";
 import KnowledgeList from "../../components/KnowledgeList";
-import { Loader2, CheckCircle, AlertTriangle, BookOpen } from 'lucide-react';
+import { Loader2, CheckCircle, AlertTriangle, BookOpen } from "lucide-react";
+import { ADMIN_API_URL } from "../../config/api";
 
 const Toast = ({ message, type, onClose }) => {
   const baseClasses = "fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white flex items-center gap-2 z-[60] transition-opacity duration-300";
@@ -42,29 +43,31 @@ export default function KnowledgeView() {
   const [toast, setToast] = useState({ message: '', type: '' });
 
   const token = localStorage.getItem("token");
-  const API_BASE = "https://bu-chatbot.onrender.com/api/admin/knowledge";
+  const KNOWLEDGE_ENDPOINT = `${ADMIN_API_URL}/knowledge`;
 
   const fetchArticles = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get(API_BASE, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(KNOWLEDGE_ENDPOINT, { headers: { Authorization: `Bearer ${token}` } });
       setArticles(res.data || []);
     } catch (err) {
       console.error("Fetch error:", err);
       setError(`Failed to retrieve knowledge articles. (Error: ${err.response?.status || err.code})`);
     } finally { setLoading(false); }
-  }, [token]);
+  }, [KNOWLEDGE_ENDPOINT, token]);
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const handleAddArticle = () => { setSelectedArticle(null); setIsModalOpen(true); };
   const handleEditArticle = (item) => {
+    if (!item) return;
+    const sourceArticle = articles.find((article) => article._id === item._id) || item;
     setSelectedArticle({
-      _id: item._id,
-      title: item.keyword,
-      content: item.answer,
-      lastUpdated: item.lastUpdated,
+      _id: sourceArticle._id,
+      title: sourceArticle.question || item.keyword || "",
+      content: sourceArticle.answer || item.answer || "",
+      lastUpdated: sourceArticle.updatedAt || item.lastUpdated,
     });
     setIsModalOpen(true);
   };
@@ -75,7 +78,7 @@ export default function KnowledgeView() {
     if (!window.confirm("Are you sure you want to delete this knowledge article?")) return;
     setIsDeleting(id);
     try {
-      await axios.delete(`${API_BASE}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${KNOWLEDGE_ENDPOINT}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setArticles(prev => prev.filter(a => a._id !== id));
       setToast({ message: "Article deleted successfully.", type: 'success' });
     } catch (err) {
@@ -94,8 +97,8 @@ export default function KnowledgeView() {
   const renderContent = () => {
     if (loading) return (
       <div className="text-center p-10 flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
-        <p className="text-xl text-blue-600 font-medium">Loading Knowledge Base...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-bu-primary mb-3" />
+        <p className="text-xl text-bu-primary font-medium">Loading Knowledge Base...</p>
       </div>
     );
 
@@ -120,13 +123,13 @@ export default function KnowledgeView() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center pb-4 border-b-4 border-blue-500/50">
-        <h2 className="text-3xl font-extrabold text-blue-800 flex items-center gap-3">
-          <BookOpen className="w-8 h-8 text-blue-600"/> 🧠 Knowledge Base
+      <div className="flex justify-between items-center pb-4 border-b-4 border-bu-primary/50">
+        <h2 className="text-3xl font-extrabold text-bu-primary flex items-center gap-3">
+          <BookOpen className="w-8 h-8 text-bu-primary"/> 🧠 Knowledge Base
         </h2>
-        <Button 
-          onClick={handleAddArticle} 
-          className="bg-blue-600 hover:bg-blue-700 transition font-semibold px-4 py-2 shadow-md"
+        <Button
+          onClick={handleAddArticle}
+          className="bg-bu-primary hover:bg-bu-primary/90 transition font-semibold px-4 py-2 shadow-md"
         >
           Add Article
         </Button>

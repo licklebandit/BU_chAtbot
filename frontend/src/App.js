@@ -3,8 +3,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  // Link, // Removed since the Navbar is removed
-  useLocation,
   Navigate,
 } from "react-router-dom";
 
@@ -14,6 +12,8 @@ import Chatbot from "./Chatbot";
 import Login from "./Login";
 import Signup from "./Signup";
 import AdminRoutes from "./pages/AdminRoutes"; 
+import ForgotPassword from "./ForgotPassword";
+import { ThemeProvider } from "./context/ThemeContext";
 
 // ✅ Admin Route Protection Component
 function AdminRoute({ children }) {
@@ -21,14 +21,7 @@ function AdminRoute({ children }) {
   return role === "admin" ? children : <Navigate to="/" replace />;
 }
 
-// Main component using React hooks like useLocation
 function MainApp() {
-  // useLocation is still needed by MainApp if you want to use it for other logic,
-  // but it's no longer needed for hiding the nav bar.
-  // const location = useLocation(); 
-  
-  // The logic for 'hideNav' and the entire <nav> block are removed.
-
   return (
     <div>
       {/* The Navbar block was here, but has been entirely removed 
@@ -41,6 +34,7 @@ function MainApp() {
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected admin routes */}
         <Route
@@ -61,9 +55,11 @@ function MainApp() {
 
 function App() {
   return (
-    <Router>
-      <MainApp />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <MainApp />
+      </Router>
+    </ThemeProvider>
   );
 }
 

@@ -1,6 +1,7 @@
 // AdminLogin.js
 import React, { useState } from "react";
 import axios from "axios";
+import { AUTH_BASE_URL } from "./config/api";
 
 function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -9,11 +10,15 @@ function AdminLogin() {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post("https://bu-chatbot.onrender.com/admin/login", {
+      const res = await axios.post(`${AUTH_BASE_URL}/login`, {
         email,
         password,
       });
-      localStorage.setItem("adminToken", res.data.token);
+      if (res.data?.user?.role !== "admin") {
+        throw new Error("Not authorized as admin");
+      }
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
       window.location.href = "/admin/dashboard"; // redirect after login
     } catch (err) {
       setError("Invalid admin credentials");

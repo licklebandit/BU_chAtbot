@@ -66,21 +66,21 @@ export default function AdminsView() {
   if (loading && !lastFetched) {
     return (
       <div className="text-center p-10 flex flex-col items-center justify-center min-h-[70vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
-        <p className="text-xl text-blue-600 font-medium">Loading Administrators...</p>
+        <Loader2 className="w-10 h-10 animate-spin text-bu-primary mb-4" />
+        <p className="text-xl text-bu-primary font-medium">Loading Administrators...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-end pb-4 border-b-4 border-blue-500/50">
-        <h2 className="text-3xl font-extrabold text-blue-800">🛠️ Admin Management</h2>
+      <div className="flex justify-between items-end pb-4 border-b-4 border-bu-primary/50">
+        <h2 className="text-3xl font-extrabold text-bu-primary">🛠️ Admin Management</h2>
         <div className="flex space-x-2">
-          <Button onClick={fetchAdmins} className="flex items-center bg-blue-500 hover:bg-blue-600 px-4 py-2 font-semibold shadow-md">
+          <Button onClick={fetchAdmins} className="flex items-center bg-bu-primary hover:bg-bu-primary/90 px-4 py-2 font-semibold shadow-md">
             <RefreshCw className="w-4 h-4 mr-1" /> Refresh
           </Button>
-          <Button onClick={handleAddAdmin} className="flex items-center bg-blue-600 hover:bg-blue-700 px-4 py-2 font-semibold shadow-md">
+          <Button onClick={handleAddAdmin} className="flex items-center bg-bu-primary hover:bg-bu-primary/80 px-4 py-2 font-semibold shadow-md">
             <UserCog className="w-4 h-4 mr-1" /> Add Admin
           </Button>
         </div>
@@ -101,9 +101,9 @@ export default function AdminsView() {
             <p className="text-gray-500 text-sm mt-1">Click "Add Admin" to create a new admin.</p>
           </div>
         ) : admins.map(admin => (
-          <div key={admin._id} className="p-5 bg-white shadow-md rounded-xl flex flex-col justify-between border border-gray-100 hover:shadow-lg hover:border-blue-300 transition">
+          <div key={admin._id} className="p-5 bg-white shadow-md rounded-xl flex flex-col justify-between border border-gray-100 hover:shadow-lg hover:border-bu-primary/30 transition">
             <div className="flex items-center space-x-2 mb-2">
-              <UserCog className="w-5 h-5 text-blue-600"/>
+              <UserCog className="w-5 h-5 text-bu-primary"/>
               <h3 className="text-lg font-bold text-gray-900">{admin.username || admin.name}</h3>
             </div>
             <p className="text-gray-600 text-sm mb-3">{admin.email}</p>

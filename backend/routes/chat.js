@@ -3,6 +3,7 @@ import express from "express";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
@@ -17,17 +18,38 @@ const router = express.Router();
 // ---------------------------
 // Load knowledge base JSON
 // ---------------------------
-const knowledgePath = path.resolve("data/knowledge.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const knowledgePath = path.resolve(__dirname, "../data/knowledge.json");
 let knowledgeBase = [];
-if (fs.existsSync(knowledgePath)) {
+
+const loadKnowledgeBase = () => {
+    if (!fs.existsSync(knowledgePath)) {
+        console.warn("⚠️ knowledge.json not found. Chat context will be empty.");
+        knowledgeBase = [];
+        return;
+    }
+
     try {
-        knowledgeBase = JSON.parse(fs.readFileSync(knowledgePath, "utf8"));
-        console.log(`✅ Loaded ${knowledgeBase.length} knowledge items`);
+        const fileData = fs.readFileSync(knowledgePath, "utf8");
+        knowledgeBase = JSON.parse(fileData);
+        console.log(`✅ Loaded ${knowledgeBase.length} knowledge items from knowledge.json`);
     } catch (error) {
         console.error("⚠️ Error parsing knowledge.json:", error);
+        knowledgeBase = [];
     }
-} else {
-    console.warn("⚠️ knowledge.json not found. Chat context will be empty.");
+};
+
+loadKnowledgeBase();
+
+try {
+    fs.watchFile(knowledgePath, { interval: 5000 }, () => {
+        console.log("♻️ Detected knowledge.json change. Reloading...");
+        loadKnowledgeBase();
+    });
+} catch (watchErr) {
+    console.warn("⚠️ Failed to watch knowledge.json for changes:", watchErr.message || watchErr);
 }
 
 // ---------------------------
@@ -64,13 +86,32 @@ router.post("/", authenticate, async (req, res) => {
             // Load dynamic knowledge from DB and merge with static JSON file
             let dbKnowledge = [];
             try {
-                dbKnowledge = await Knowledge.find().lean();
+                const rawDbKnowledge = await Knowledge.find().lean();
+                // Map database knowledge to match JSON format (question -> keyword for compatibility)
+                dbKnowledge = rawDbKnowledge.map(item => ({
+                    keyword: item.question || item.keyword || '',
+                    answer: item.answer || '',
+                    question: item.question || '',
+                    title: item.title || item.question || '',
+                    ...item // Include all other fields
+                }));
             } catch (dbErr) {
                 console.warn('Could not load knowledge from DB:', dbErr.message || dbErr);
                 dbKnowledge = [];
             }
 
-            const mergedKnowledge = Array.isArray(knowledgeBase) ? [...knowledgeBase, ...dbKnowledge] : dbKnowledge;
+            // Map JSON knowledge to ensure consistent format
+            const mappedJsonKnowledge = Array.isArray(knowledgeBase) 
+                ? knowledgeBase.map(item => ({
+                    keyword: item.keyword || item.question || '',
+                    answer: item.answer || '',
+                    question: item.question || item.keyword || '',
+                    ...item
+                }))
+                : [];
+
+            const mergedKnowledge = [...mappedJsonKnowledge, ...dbKnowledge];
+            console.log(`🔁 mergedKnowledge counts: file=${mappedJsonKnowledge.length} db=${dbKnowledge.length} total=${mergedKnowledge.length}`);
             context = await searchKnowledge(q, mergedKnowledge);
             console.log(`📚 Context: ${context ? "FOUND" : "NOT FOUND"}`);
         } catch (searchErr) {
@@ -138,6 +179,7 @@ router.post("/", authenticate, async (req, res) => {
 
             chat.messages.push({ role: "user", text: q });
             chat.messages.push({ role: "assistant", text: answer });
+            chat.isUnread = true;
             await chat.save();
 
             // 4️⃣ Emit via socket.io
