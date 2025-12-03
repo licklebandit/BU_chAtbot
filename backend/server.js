@@ -16,6 +16,7 @@ import adminRouter from "./routes/adminRouter.js";
 import conversationRouter from "./routes/conversations.js";
 import analyticsRouter from "./routes/analytics.js";
 import settingsRouter from "./routes/settings.js";
+import feedbackRouter from "./routes/feedback.js";
 
 dotenv.config();
 
@@ -24,37 +25,37 @@ const app = express();
 const server = http.createServer(app); // ✅ the only server instance
 
 const defaultOrigins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://bu-ch-atbot.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://bu-ch-atbot.vercel.app",
 ];
 const envOrigins = (process.env.FRONTEND_URLS || "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 const ALLOWED_ORIGINS = [...new Set([...defaultOrigins, ...envOrigins])];
 
 // ✅ Initialize Socket.IO
 const io = new IOServer(server, {
-  cors: {
-    origin: ALLOWED_ORIGINS,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  },
+  cors: {
+    origin: ALLOWED_ORIGINS,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
 });
 
 // ✅ Socket.IO Events (Unchanged)
 io.on("connection", (socket) => {
-  console.log("✅ Client connected:", socket.id);
+  console.log("✅ Client connected:", socket.id);
 
-  socket.on("joinAdminRoom", () => {
-    socket.join("adminRoom");
-    console.log(`Admin ${socket.id} joined admin room`);
-  });
+  socket.on("joinAdminRoom", () => {
+    socket.join("adminRoom");
+    console.log(`Admin ${socket.id} joined admin room`);
+  });
 
-  socket.on("disconnect", () => {
-    console.log("❌ Client disconnected:", socket.id);
-  });
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected:", socket.id);
+  });
 });
 
 // ✅ Make io available to routes
@@ -65,42 +66,41 @@ export { io };
 
 // 1. ✅ NEW: Add Helmet for security headers, including the CSP fix
 app.use(
-    helmet({
-        crossOriginResourcePolicy: { policy: "cross-origin" }, // Necessary for static assets
-    })
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Necessary for static assets
+  }),
 );
 
 // 2. ✅ CSP Configuration to allow 'eval' for libraries like Tailwind JIT/certain dependencies
 app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: ["'self'"],
-            // 👇 THIS IS THE FIX: Allows dynamic execution for certain libraries
-            scriptSrc: ["'self'", "'unsafe-eval'", ...ALLOWED_ORIGINS], 
-            styleSrc: ["'self'", "'unsafe-inline'", ...ALLOWED_ORIGINS], // 'unsafe-inline' often needed for Tailwind JIT/styled components
-            imgSrc: ["'self'", "data:", ...ALLOWED_ORIGINS],
-            connectSrc: ["'self'", ...ALLOWED_ORIGINS, "ws:", "wss:"], // Allows websocket/API connections
-        },
-    })
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      // 👇 THIS IS THE FIX: Allows dynamic execution for certain libraries
+      scriptSrc: ["'self'", "'unsafe-eval'", ...ALLOWED_ORIGINS],
+      styleSrc: ["'self'", "'unsafe-inline'", ...ALLOWED_ORIGINS], // 'unsafe-inline' often needed for Tailwind JIT/styled components
+      imgSrc: ["'self'", "data:", ...ALLOWED_ORIGINS],
+      connectSrc: ["'self'", ...ALLOWED_ORIGINS, "ws:", "wss:"], // Allows websocket/API connections
+    },
+  }),
 );
-
 
 // 3. CORS Configuration (Unchanged)
 app.use(
-  cors({
-    origin: ALLOWED_ORIGINS,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
+  cors({
+    origin: ALLOWED_ORIGINS,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  }),
 );
 
 app.use(express.json({ limit: "10mb" }));
 
 // --- DATABASE (Unchanged) ---
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected successfully"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // --- ROUTES (Unchanged) ---
 // Mount chat route at both /chat and /api/chat to support different frontend expectations
@@ -112,18 +112,22 @@ app.use("/api/admin", adminRouter);
 app.use("/api/conversations", conversationRouter);
 app.use("/api/admin/analytics", analyticsRouter);
 app.use("/api/admin/settings", settingsRouter);
+app.use("/api/feedback", feedbackRouter);
 
 // --- HEALTH CHECK (Unchanged) ---
 app.get("/", (req, res) => {
-  res.send("🎓 Bugema University AI Chatbot backend running successfully...");
+  res.send("🎓 Bugema University AI Chatbot backend running successfully...");
 });
 
 // --- SERVER START (Unchanged) ---
 const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log("🔑 Gemini API Key:", process.env.GEMINI_API_KEY ? "✅ Yes" : "❌ No");
-  console.log("🧩 JWT Secret:", process.env.JWT_SECRET ? "✅ Yes" : "❌ No");
-  console.log("🌍 Environment:", process.env.NODE_ENV || "development");
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(
+    "🔑 Gemini API Key:",
+    process.env.GEMINI_API_KEY ? "✅ Yes" : "❌ No",
+  );
+  console.log("🧩 JWT Secret:", process.env.JWT_SECRET ? "✅ Yes" : "❌ No");
+  console.log("🌍 Environment:", process.env.NODE_ENV || "development");
 });
