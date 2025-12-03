@@ -55,7 +55,7 @@ function Login() {
 
       const response = await axios.post(
         `${AUTH_BASE_URL}/login`,
-        normalizedForm
+        normalizedForm,
       );
 
       localStorage.setItem("token", response.data.token);
@@ -67,10 +67,9 @@ function Login() {
       });
 
       setTimeout(() => {
-        navigate(
-          response.data.user.role === "admin" ? "/admin" : "/chatbot",
-          { replace: true }
-        );
+        navigate(response.data.user.role === "admin" ? "/admin" : "/chatbot", {
+          replace: true,
+        });
       }, 900);
     } catch (error) {
       setStatus({
@@ -88,15 +87,13 @@ function Login() {
     <div className={`relative min-h-screen overflow-hidden ${backgroundClass}`}>
       <div className={`pointer-events-none absolute inset-0 ${overlayClass}`} />
 
-      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-4 py-12 lg:px-8">
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-4 py-3 lg:px-8">
         <div
           className={`mx-auto w-full max-w-md rounded-3xl border border-white/10 ${cardBg} p-8 shadow-[0_40px_70px_rgba(4,7,25,0.4)] backdrop-blur`}
         >
           {/* Centered heading block */}
-          <div className="text-center mb-8">
-            <h1 className={`text-3xl font-semibold ${headingColor}`}>
-              Login
-            </h1>
+          <div className="text-center mb-4">
+            <h1 className={`text-3xl font-semibold ${headingColor}`}>Login</h1>
             <p className={`mt-2 text-sm ${subHeadingColor}`}>
               Access your conversations and manage your support intakes.
             </p>
@@ -193,14 +190,12 @@ function Login() {
               Forgot password?
             </button>
 
-            <div>
-              <p className={`text-sm ${supportText}`}>
-                Don’t have an account?
-              </p>
+            <div className="flex items-center justify-between">
+              <p className={`text-sm ${supportText}`}>Don't have an account?</p>
 
               <button
                 onClick={() => navigate("/signup")}
-                className={`mt-3 inline-flex items-center justify-center rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition ${
+                className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition ${
                   isDark
                     ? "border-slate-600 text-slate-200 hover:border-slate-400"
                     : "border-[#b8c8ff] text-[#0f2a66] hover:border-[#0033A0] hover:text-[#0033A0]"

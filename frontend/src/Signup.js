@@ -98,24 +98,24 @@ function Signup() {
     <div className={`relative min-h-screen overflow-hidden ${backgroundClass}`}>
       <div className={`pointer-events-none absolute inset-0 ${overlayClass}`} />
 
-      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-4 py-12 lg:px-8">
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-4 py-8 lg:px-8">
         <div className="mx-auto w-full max-w-md rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_40px_70px_rgba(4,7,25,0.4)] backdrop-blur">
-
           {/* CENTERED TITLE + SUBTITLE */}
           <div className="text-center">
             <h1 className={`text-3xl font-semibold ${headingColor}`}>
               Create account
             </h1>
             <p className={`mt-2 text-sm ${subHeadingColor}`}>
-              Save conversations, personalize assistance, and access more resources.
+              Save conversations and personalize assistance.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 mt-6">
-
+          <form onSubmit={handleSubmit} className="space-y-2 mt-2">
             {/* Full Name */}
             <div className="space-y-2">
-              <label className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}>
+              <label
+                className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}
+              >
                 Full name
               </label>
               <input
@@ -124,14 +124,16 @@ function Signup() {
                 value={form.name}
                 onChange={handleChange}
                 required
-                placeholder="Jane Doe"
+                placeholder="Jane Kaddu"
                 className={`w-full rounded-2xl border px-4 py-3 text-sm transition focus:outline-none focus:ring-2 ${inputBorder} ${inputFocus}`}
               />
             </div>
 
             {/* Email */}
             <div className="space-y-2">
-              <label className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}>
+              <label
+                className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}
+              >
                 Email
               </label>
               <input
@@ -147,7 +149,9 @@ function Signup() {
 
             {/* Password */}
             <div className="space-y-2">
-              <label className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}>
+              <label
+                className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}
+              >
                 Password
               </label>
               <div className="relative">
@@ -165,14 +169,20 @@ function Signup() {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <label className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}>
+              <label
+                className={`text-xs font-semibold uppercase tracking-[0.25em] ${labelColor}`}
+              >
                 Confirm password
               </label>
               <div className="relative">
@@ -190,7 +200,11 @@ function Signup() {
                   onClick={() => setShowConfirm((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600"
                 >
-                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirm ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -217,24 +231,26 @@ function Signup() {
             >
               {loading ? "Creating account…" : "Create account"}
             </button>
-
           </form>
 
           {/* Login Redirect */}
-          <div className="mt-6 text-center">
-            <p className={`text-sm ${supportText}`}>Already have an account?</p>
-            <button
-              onClick={() => navigate("/login")}
-              className={`mt-3 inline-flex items-center justify-center rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition ${
-                isDark
-                  ? "border-slate-600 text-slate-200 hover:border-slate-400"
-                  : "border-[#b8c8ff] text-[#0f2a66] hover:border-[#0033A0] hover:text-[#0033A0]"
-              }`}
-            >
-              Log in
-            </button>
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <p className={`text-sm ${supportText}`}>
+                Already have an account?
+              </p>
+              <button
+                onClick={() => navigate("/login")}
+                className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.25em] transition ${
+                  isDark
+                    ? "border-slate-600 text-slate-200 hover:border-slate-400"
+                    : "border-[#b8c8ff] text-[#0f2a66] hover:border-[#0033A0] hover:text-[#0033A0]"
+                }`}
+              >
+                Log in
+              </button>
+            </div>
           </div>
-
         </div>
       </div>
     </div>

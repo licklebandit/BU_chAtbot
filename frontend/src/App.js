@@ -11,9 +11,10 @@ import LandingPage from "./LandingPage";
 import Chatbot from "./Chatbot";
 import Login from "./Login";
 import Signup from "./Signup";
-import AdminRoutes from "./pages/AdminRoutes"; 
+import AdminRoutes from "./pages/AdminRoutes";
 import ForgotPassword from "./ForgotPassword";
 import { ThemeProvider } from "./context/ThemeContext";
+import { SocketProvider } from "./context/SocketContext";
 
 // ✅ Admin Route Protection Component
 function AdminRoute({ children }) {
@@ -24,7 +25,7 @@ function AdminRoute({ children }) {
 function MainApp() {
   return (
     <div>
-      {/* The Navbar block was here, but has been entirely removed 
+      {/* The Navbar block was here, but has been entirely removed
       to hide it from all pages, as requested.
       */}
 
@@ -45,7 +46,7 @@ function MainApp() {
             </AdminRoute>
           }
         />
-        
+
         {/* Fallback for unknown routes */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
@@ -56,9 +57,11 @@ function MainApp() {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-        <MainApp />
-      </Router>
+      <SocketProvider>
+        <Router>
+          <MainApp />
+        </Router>
+      </SocketProvider>
     </ThemeProvider>
   );
 }

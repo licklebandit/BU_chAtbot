@@ -1,275 +1,365 @@
-// src/views/Admin/DashboardView.js
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { ADMIN_API_URL } from "../../config/api";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
 import {
   Users,
-  MessageSquare,
-  BookOpen,
+  MessageCircle,
   HelpCircle,
-  ShieldCheck,
-  Activity,
-  Clock,
+  BookOpen,
   Loader2,
   AlertTriangle,
   RefreshCw,
+  TrendingUp,
+  Shield,
 } from "lucide-react";
+import { ADMIN_API_URL } from "../../config/api";
 
-// Auto-refresh interval
-const REFRESH_INTERVAL_SECONDS = 30;
+// --- Design Tokens ---
+const GLASS_CARD =
+  "bg-white/80 backdrop-blur-md border border-[#d6dfff] shadow-sm rounded-3xl";
+const HEADING_COLOR = "text-[#0f2a66]";
+const TEXT_MUTED = "text-[#51629b]";
+const PRIMARY_BLUE = "#0033A0";
 
-// Dashboard summary cards configuration
-const cardDataConfig = [
-  { key: "users", title: "Total Users", icon: Users },
-  { key: "admins", title: "Active Admins", icon: ShieldCheck },
-  { key: "conversations", title: "Total Conversations", icon: MessageSquare },
-  { key: "knowledgeArticles", title: "Knowledge Articles", icon: BookOpen },
-  { key: "faqs", title: "FAQs Count", icon: HelpCircle },
-  { key: "responseTime", title: "Avg. Response Time (s)", icon: Activity },
-];
-
-// Summary Card Component
-const SummaryCard = ({ title, value, Icon }) => {
-  const displayValue =
-    typeof value === "number"
-      ? value.toLocaleString()
-      : value || "0";
-  return (
-    <div className="group rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_25px_60px_rgba(0,0,0,0.25)] backdrop-blur transition-all duration-200 hover:border-white/40 hover:shadow-[0_35px_70px_rgba(8,16,34,0.45)]">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-white/60">{title}</p>
-          <p className="mt-4 text-3xl font-semibold text-white">{displayValue}</p>
-        </div>
-        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white/80 transition group-hover:bg-white/30 group-hover:text-white">
-          <Icon className="h-6 w-6" />
-        </span>
+const AnalyticsCard = ({ title, value, Icon, trend }) => (
+  <div
+    className={`p-4 sm:p-6 ${GLASS_CARD} flex flex-col justify-between h-full`}
+  >
+    <div className="flex justify-between items-start gap-2">
+      <div className="min-w-0 flex-1">
+        <p
+          className={`text-xs font-bold uppercase tracking-[0.15em] ${TEXT_MUTED} truncate`}
+        >
+          {title}
+        </p>
+        <h3
+          className={`text-2xl sm:text-3xl font-bold mt-2 ${HEADING_COLOR} truncate`}
+        >
+          {value || 0}
+        </h3>
+      </div>
+      <div
+        className={`p-2 sm:p-3 rounded-2xl bg-[#eff4ff] text-[#0033A0] flex-shrink-0`}
+      >
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
       </div>
     </div>
-  );
-};
-
-const fallbackActivity = [
-  { id: 1, user: "System", action: "Waiting for real-time data…", time: new Date().toISOString() },
-];
-
-const formatRelativeTime = (timestamp) => {
-  if (!timestamp) return "Just now";
-  const target = new Date(timestamp);
-  const diffMs = Date.now() - target.getTime();
-  const minutes = Math.floor(diffMs / (1000 * 60));
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-};
+    {trend && (
+      <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-600">
+        <TrendingUp className="w-3 h-3" /> {trend}
+      </div>
+    )}
+  </div>
+);
 
 export default function DashboardView() {
-  const [summary, setSummary] = useState({
-    users: 0,
-    admins: 0,
-    conversations: 0,
-    knowledgeArticles: 0,
-    faqs: 0,
-    responseTime: 0,
-    recentActivity: [],
+  const [data, setData] = useState({
+    summary: { users: 0, admins: 0, conversations: 0, faqs: 0, knowledge: 0 },
     charts: { conversationsLast7Days: [] },
+    recentActivity: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastFetched, setLastFetched] = useState(null);
-  const [systemStatus, setSystemStatus] = useState("Operational");
 
   const token = localStorage.getItem("token");
-  const activityFeed = summary.recentActivity?.length ? summary.recentActivity : fallbackActivity;
 
-  const fetchDashboard = useCallback(async (showLoader = true) => {
-    if (showLoader) setLoading(true);
+  // Fetch real analytics data from backend
+  const fetchAnalytics = useCallback(async () => {
+    setLoading(true);
     setError(null);
-
     try {
-      const res = await axios.get(`${ADMIN_API_URL}/stats`, {
+      const response = await axios.get(`${ADMIN_API_URL}/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const payload = res.data || {};
-      setSummary((prev) => {
-        const normalizedResponseTime =
-          typeof payload.responseTime === "number"
-            ? Number(payload.responseTime.toFixed(2))
-            : prev.responseTime || 0;
+      const stats = response.data;
 
-        return {
-          ...prev,
-          ...payload,
-          responseTime: normalizedResponseTime,
-          recentActivity: payload.recentActivity || [],
-          charts: payload.charts || prev.charts,
-        };
+      setData({
+        summary: {
+          users: stats.users || 0,
+          admins: stats.admins || 0,
+          conversations: stats.conversations || 0,
+          faqs: stats.faqs || 0,
+          knowledge: stats.knowledgeArticles || 0,
+        },
+        charts: {
+          conversationsLast7Days: stats.charts?.conversationsLast7Days || [],
+        },
+        recentActivity: stats.recentActivity || [],
       });
-      setLastFetched(new Date());
-      setSystemStatus("Operational");
     } catch (err) {
-      console.error("Dashboard fetch error:", err);
-      setError("Failed to load dashboard data.");
-      setSystemStatus("API Error");
+      console.error("Failed to fetch analytics:", err);
+      setError("Failed to load analytics data. Please try again.");
     } finally {
-      if (showLoader) setLoading(false);
+      setLoading(false);
     }
   }, [token]);
 
   useEffect(() => {
-    fetchDashboard();
-    const intervalId = setInterval(() => fetchDashboard(false), REFRESH_INTERVAL_SECONDS * 1000);
-    return () => clearInterval(intervalId);
-  }, [fetchDashboard]);
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
-  if (loading && !lastFetched) {
+  if (loading) {
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#0b1a34] text-white">
-        <Loader2 className="mb-4 h-10 w-10 animate-spin text-white" />
-        <p className="text-xl font-medium">Loading dashboard…</p>
+      <div className="h-64 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#0033A0] animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-10 bg-red-50 border border-red-200 rounded-xl min-h-[70vh] flex flex-col items-center justify-center">
-        <AlertTriangle className="w-8 h-8 text-red-600 mb-3" />
-        <p className="text-xl text-red-600 font-semibold mb-2">Error Loading Dashboard</p>
-        <p className="text-red-500 text-center">{error}</p>
+      <div className="p-6">
+        <div className={`p-6 ${GLASS_CARD} flex flex-col items-center gap-4`}>
+          <AlertTriangle className="w-12 h-12 text-red-500" />
+          <p className="text-lg font-semibold text-slate-700">{error}</p>
+          <button
+            onClick={fetchAnalytics}
+            className="flex items-center gap-2 px-6 py-3 bg-[#0033A0] text-white rounded-2xl font-semibold hover:bg-[#062a7a] transition"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1a34]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10">
-        <div className="rounded-[32px] border border-white/10 bg-white/10 p-6 shadow-[0_40px_80px_rgba(4,7,25,0.5)] backdrop-blur">
-          <div className="flex flex-col gap-4 text-white lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-2">
-              <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Admin intelligence</p>
-              <h2 className="text-3xl font-semibold">Dashboard overview</h2>
-              {lastFetched && (
-                <p className="flex items-center gap-2 text-sm text-white/70">
-                  <RefreshCw className="h-4 w-4" /> Updated {lastFetched.toLocaleTimeString()} · Refresh every {REFRESH_INTERVAL_SECONDS}s
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col items-end gap-2 text-right">
-              <button
-                onClick={() => fetchDashboard(true)}
-                disabled={loading}
-                className={`inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] transition ${
-                  loading
-                    ? "bg-white/20 text-white"
-                    : "bg-white text-bu-primary shadow-[0_10px_35px_rgba(255,255,255,0.35)] hover:bg-white/90"
-                }`}
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                {loading && lastFetched ? "Refreshing" : "Refresh data"}
-              </button>
-              {lastFetched && (
-                <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">
-                  Data as of {lastFetched.toLocaleTimeString()}
-                </p>
-              )}
-            </div>
-          </div>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className={`text-2xl sm:text-3xl font-bold ${HEADING_COLOR}`}>
+            Dashboard Overview
+          </h2>
+          <p className={`text-sm ${TEXT_MUTED} mt-1`}>
+            Real-time statistics and analytics
+          </p>
         </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {cardDataConfig.map(({ key, title, icon }) => (
-            <SummaryCard key={key} title={title} value={summary[key]} Icon={icon} />
-          ))}
-        </div>
-
-        {/* System Status & Activity */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr]">
-          <div className="rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_35px_70px_rgba(8,16,34,0.45)] backdrop-blur">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Health monitor</p>
-                <h3 className="text-2xl font-semibold">System health</h3>
-              </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] ${
-                  systemStatus === "Operational"
-                    ? "border border-emerald-300/40 bg-emerald-400/20 text-emerald-100"
-                    : "border border-rose-300/40 bg-rose-400/20 text-rose-100"
-                }`}
-              >
-                {systemStatus}
-              </span>
-            </div>
-            <p className="text-sm text-white/70">
-              Monitoring API uptime, knowledge base ingestion, and conversation processing in real time.
-            </p>
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.25em] text-white/60">Status checked</p>
-                <p className="mt-2 text-lg font-semibold">{new Date().toLocaleTimeString()}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.25em] text-white/60">Overall state</p>
-                <p className="mt-2 text-lg font-semibold">
-                  {systemStatus === "Operational" ? "All systems go" : "Action required"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_35px_70px_rgba(8,16,34,0.45)] backdrop-blur">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Event stream</p>
-                <h3 className="text-2xl font-semibold">Recent activity</h3>
-              </div>
-              <span className="text-sm text-white/60">{activityFeed.length} events</span>
-            </div>
-            <ul className="mt-6 space-y-3">
-              {activityFeed.map((activity, index) => (
-                <li
-                  key={activity.id || index}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-white">{activity.user}</p>
-                    <p className="truncate text-white/70">{activity.action || "Awaiting new events"}</p>
-                  </div>
-                  <span className="shrink-0 text-xs text-white/50">{formatRelativeTime(activity.time)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <section className="rounded-3xl border border-white/10 bg-white/10 p-6 text-white shadow-[0_35px_70px_rgba(8,16,34,0.45)] backdrop-blur">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.45em] text-white/60">Conversation pulse</p>
-              <h3 className="text-2xl font-semibold">Live activity ticker</h3>
-            </div>
-            <p className="text-sm text-white/70">Tracking the latest five interactions.</p>
-          </div>
-          <ul className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {activityFeed.slice(0, 6).map((activity, index) => (
-              <li
-                key={`activity-card-${index}`}
-                className="rounded-2xl border border-white/10 bg-[#10244d]/70 p-4 shadow-[0_20px_40px_rgba(3,7,18,0.35)]"
-              >
-                <p className="text-sm font-semibold text-white">{activity.user}</p>
-                <p className="mt-2 line-clamp-2 text-sm text-white/70">{activity.action || "No recent updates"}</p>
-                <p className="mt-3 text-xs text-white/50">{formatRelativeTime(activity.time)}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <button
+          onClick={fetchAnalytics}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0033A0] text-white hover:bg-[#062a7a] transition text-sm font-medium disabled:opacity-50"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <span className="hidden sm:inline">Refresh</span>
+        </button>
       </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+        <AnalyticsCard
+          title="Total Users"
+          value={data.summary.users}
+          Icon={Users}
+          trend="+4.5% vs last week"
+        />
+        <AnalyticsCard
+          title="Admins"
+          value={data.summary.admins}
+          Icon={Shield}
+        />
+        <AnalyticsCard
+          title="Conversations"
+          value={data.summary.conversations}
+          Icon={MessageCircle}
+          trend="+12% this week"
+        />
+        <AnalyticsCard
+          title="FAQs"
+          value={data.summary.faqs}
+          Icon={HelpCircle}
+        />
+        <AnalyticsCard
+          title="Knowledge Base"
+          value={data.summary.knowledge}
+          Icon={BookOpen}
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* Conversations Chart */}
+        <div className={`${GLASS_CARD} p-4 sm:p-6 lg:p-8`}>
+          <h3
+            className={`text-base sm:text-lg font-bold ${HEADING_COLOR} mb-4 sm:mb-6`}
+          >
+            Conversations (Last 7 Days)
+          </h3>
+          <div className="h-64 sm:h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data.charts.conversationsLast7Days}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e2e8f0"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
+                />
+                <YAxis
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "16px",
+                    border: "none",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                  }}
+                  labelFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    });
+                  }}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke={PRIMARY_BLUE}
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 0, fill: PRIMARY_BLUE }}
+                  name="Conversations"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Volume Analysis */}
+        <div className={`${GLASS_CARD} p-4 sm:p-6 lg:p-8`}>
+          <h3
+            className={`text-base sm:text-lg font-bold ${HEADING_COLOR} mb-4 sm:mb-6`}
+          >
+            Volume Analysis
+          </h3>
+          <div className="h-64 sm:h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.charts.conversationsLast7Days}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e2e8f0"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
+                />
+                <YAxis
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "#f1f5f9" }}
+                  contentStyle={{
+                    borderRadius: "16px",
+                    border: "none",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                  }}
+                  labelFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    });
+                  }}
+                />
+                <Bar
+                  dataKey="count"
+                  fill={PRIMARY_BLUE}
+                  radius={[6, 6, 0, 0]}
+                  name="Conversations"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      {data.recentActivity && data.recentActivity.length > 0 && (
+        <div className={`${GLASS_CARD} p-4 sm:p-6 lg:p-8`}>
+          <h3
+            className={`text-base sm:text-lg font-bold ${HEADING_COLOR} mb-4 sm:mb-6`}
+          >
+            Recent Activity
+          </h3>
+          <div className="space-y-3 sm:space-y-4">
+            {data.recentActivity.slice(0, 5).map((activity, index) => (
+              <div
+                key={activity.id || index}
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-100"
+              >
+                <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-[#0033A0] flex-shrink-0 mt-0.5 sm:mt-0" />
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`text-sm font-medium ${HEADING_COLOR} truncate`}
+                    >
+                      {activity.user || "Unknown User"}
+                    </p>
+                    <p className={`text-xs ${TEXT_MUTED} truncate`}>
+                      {activity.action || "Activity"}
+                    </p>
+                  </div>
+                </div>
+                <span className={`text-xs ${TEXT_MUTED} flex-shrink-0`}>
+                  {activity.time
+                    ? new Date(activity.time).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "N/A"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

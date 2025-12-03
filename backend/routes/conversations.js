@@ -15,8 +15,11 @@ const normalizeMessages = (messages = []) =>
 
 const mapChatToConversation = (chat) => {
   const normalizedMessages = normalizeMessages(chat.messages || []);
-  const lastMessage = normalizedMessages[normalizedMessages.length - 1]?.text || "No messages yet";
-  const firstUserMessage = normalizedMessages.find((m) => m.sender === "user")?.text || "";
+  const lastMessage =
+    normalizedMessages[normalizedMessages.length - 1]?.text ||
+    "No messages yet";
+  const firstUserMessage =
+    normalizedMessages.find((m) => m.sender === "user")?.text || "";
 
   return {
     _id: chat._id,
@@ -66,7 +69,7 @@ router.get("/recent", verifyAdmin, async (req, res) => {
         updatedAt: chat.updatedAt,
         snippet: chat.messages?.[0]?.text || "",
         isUnread: chat.isUnread,
-      }))
+      })),
     );
   } catch (error) {
     console.error("Error getting recent conversations:", error);
@@ -86,7 +89,7 @@ router.get("/user/:userId", async (req, res) => {
         snippet: chat.messages?.[0]?.text || "",
         messages: normalizeMessages(chat.messages),
         updatedAt: chat.updatedAt,
-      }))
+      })),
     );
   } catch (error) {
     console.error("Error getting user conversations:", error);
@@ -97,7 +100,10 @@ router.get("/user/:userId", async (req, res) => {
 // --- Get single conversation by ID ---
 router.get("/:id", verifyAdmin, async (req, res) => {
   try {
-    const chat = await Chat.findById(req.params.id).populate("userId", "name email");
+    const chat = await Chat.findById(req.params.id).populate(
+      "userId",
+      "name email",
+    );
     if (!chat) {
       return res.status(404).json({ message: "Conversation not found" });
     }
@@ -114,7 +120,7 @@ router.put("/:id/read", verifyAdmin, async (req, res) => {
     const chat = await Chat.findByIdAndUpdate(
       req.params.id,
       { isUnread: false },
-      { new: true }
+      { new: true },
     ).populate("userId", "name email");
     if (!chat) {
       return res.status(404).json({ message: "Conversation not found" });
@@ -123,6 +129,20 @@ router.put("/:id/read", verifyAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error marking conversation as read:", error);
     res.status(500).json({ message: "Failed to mark conversation as read" });
+  }
+});
+
+// --- Delete conversation ---
+router.delete("/:id", verifyAdmin, async (req, res) => {
+  try {
+    const chat = await Chat.findByIdAndDelete(req.params.id);
+    if (!chat) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+    res.json({ message: "Conversation deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting conversation:", error);
+    res.status(500).json({ message: "Failed to delete conversation" });
   }
 });
 
