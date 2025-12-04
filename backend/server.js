@@ -6,7 +6,10 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import http from "http";
 import { Server as IOServer } from "socket.io";
-import helmet from "helmet"; // ✅ NEW: Import helmet for security headers
+import helmet from "helmet"; 
+// ✅ NEW: Import path and define __dirname for static file serving
+import path from "path";
+import { fileURLToPath } from "url";
 
 // ✅ Import all routes
 import chatRoute from "./routes/chat.js";
@@ -20,9 +23,14 @@ import feedbackRouter from "./routes/feedback.js";
 
 dotenv.config();
 
+// ✅ NEW: Setup __filename and __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // --- APP SETUP ---
 const app = express();
 const server = http.createServer(app); // ✅ the only server instance
+// ... (rest of APP SETUP is unchanged) ...
 
 const defaultOrigins = [
   "http://localhost:3000",
@@ -96,8 +104,13 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 
+// Serve uploaded images statically
+// ✅ FIXED: Ensures path.join works correctly in ES modules environment
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // --- DATABASE (Unchanged) ---
 mongoose
+// ... (rest of the file is unchanged) ...
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected successfully"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));

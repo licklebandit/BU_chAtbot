@@ -4,6 +4,8 @@ import fs from "fs";
 import jwt from "jsonwebtoken";
 import path from "path";
 import { fileURLToPath } from "url";
+// ✅ NEW: Import multer for handling file uploads
+import multer from "multer"; 
 
 import Chat from "../models/Chat.js";
 import User from "../models/User.js";
@@ -21,11 +23,48 @@ import {
 const router = express.Router();
 
 // ---------------------------
-// Load knowledge base JSON
+// Setup __filename and __dirname for ES Modules
 // ---------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ---------------------------
+// Multer configuration for image uploads
+// ---------------------------
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // ✅ Use the correct path relative to the project root (assuming chat.js is in routes/)
+    // The server.js already configured /uploads to be static, so we just need the local path.
+    const uploadDir = path.join(__dirname, '..', 'uploads'); 
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    // Use the original extension
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname)); 
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
+
+// ---------------------------
+// Load knowledge base JSON (Unchanged)
+// ---------------------------
 const knowledgePath = path.resolve(__dirname, "../data/knowledge.json");
 let knowledgeBase = [];
 
@@ -63,7 +102,7 @@ try {
 }
 
 // ---------------------------
-// Middleware: Authenticate
+// Middleware: Authenticate (Unchanged)
 // ---------------------------
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -79,15 +118,33 @@ const authenticate = async (req, res, next) => {
 };
 
 // ---------------------------
-// Main Chat Route
+// Image Upload Route (Unchanged, looks correct)
+// ---------------------------
+router.post('/upload-image', authenticate, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    // Create URL for the uploaded file
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error('Image upload error:', error);
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
+// ---------------------------
+// Main Chat Route (Unchanged Logic - already correctly handles `imageUrl`)
 // ---------------------------
 router.post("/", authenticate, async (req, res) => {
   console.log("📨 Chat request received");
-  const { q } = req.body;
-  if (!q || q.trim() === "") {
-    return res.status(400).json({ answer: "Please ask a valid question." });
+  const { q, imageUrl } = req.body;
+  if ((!q || q.trim() === "") && !imageUrl) {
+    return res.status(400).json({ answer: "Please ask a valid question or provide an image." });
   }
-
+  // ... (rest of the route logic is unchanged and looks correct) ...
   try {
     console.log(`❓ Question: "${q}"`);
 
@@ -161,6 +218,7 @@ router.post("/", authenticate, async (req, res) => {
         const { text: aiResponse } = await getChatResponse(
           question,
           contextStr,
+          imageUrl,
         );
         console.log("✅ GenAI response received");
         return aiResponse;
@@ -220,12 +278,16 @@ router.post("/", authenticate, async (req, res) => {
       let chat = await Chat.findOne({ userId: req.user._id });
       if (!chat) chat = new Chat({ userId: req.user._id, messages: [] });
 
-      chat.messages.push({
+      const userMessage = {
         role: "user",
         text: q,
         intent: intent,
         confidence: confidence,
-      });
+      };
+      if (imageUrl) {
+        userMessage.image = imageUrl;
+      }
+      chat.messages.push(userMessage);
       chat.messages.push({
         role: "assistant",
         text: answer,

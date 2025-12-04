@@ -1,7 +1,9 @@
+// hooks/useSpeechRecognition.js
 import { useState, useEffect, useRef } from 'react';
 
 const useSpeechRecognition = (onResult) => {
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef(null);
   const finalTranscriptRef = useRef('');
 
@@ -11,23 +13,25 @@ const useSpeechRecognition = (onResult) => {
       
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
+        recognitionRef.current.continuous = false;
         recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = 'en-US';
 
         recognitionRef.current.onresult = (event) => {
           let interimTranscript = '';
+          finalTranscriptRef.current = '';
           
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-              finalTranscriptRef.current += transcript;
+              finalTranscriptRef.current += transcript + ' ';
             } else {
               interimTranscript += transcript;
             }
           }
           
           if (onResult) {
-            onResult(finalTranscriptRef.current + interimTranscript);
+            onResult((finalTranscriptRef.current + interimTranscript).trim());
           }
         };
 
@@ -37,46 +41,76 @@ const useSpeechRecognition = (onResult) => {
         };
 
         recognitionRef.current.onend = () => {
-          if (isListening) {
-            recognitionRef.current.start();
-          }
+          setIsListening(false);
         };
       }
     }
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        recognitionRef.current.abort();
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
       }
     };
-  }, [isListening, onResult]);
+  }, [onResult]);
 
-  const startListening = () => {
+  const startListening = (lang = 'en-US') => {
     if (recognitionRef.current) {
       finalTranscriptRef.current = '';
+      recognitionRef.current.lang = lang;
+      
+      try {
+        recognitionRef.current.abort();
+      } catch (e) { }
+      
       recognitionRef.current.start();
       setIsListening(true);
     }
   };
 
   const stopListening = () => {
-    if (recognitionRef.current) {
+    if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
-      setIsListening(false);
-      return finalTranscriptRef.current;
+      const finalResult = finalTranscriptRef.current.trim();
+      finalTranscriptRef.current = '';
+      return finalResult;
     }
     return '';
   };
 
   const speak = (text, lang = 'en-US') => {
-    if ('speechSynthesis' in window) {
+    if ('speechSynthesis' in window && text) {
+      window.speechSynthesis.cancel();
+      
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
       window.speechSynthesis.speak(utterance);
     }
   };
+  
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
 
-  return { isListening, startListening, stopListening, speak };
+  return { 
+    isListening, 
+    isSpeaking,
+    startListening, 
+    stopListening, 
+    speak,
+    stopSpeaking
+  };
 };
 
+// ✅ FIX: Export as default
 export default useSpeechRecognition;

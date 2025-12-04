@@ -15,9 +15,10 @@ const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
  * Get AI response using Google Gemini with context
  * @param {string} userQuestion - The question asked by the user.
  * @param {string} context - The relevant text retrieved from the knowledge base.
+ * @param {string} imageUrl - Optional URL of an image to include in the query.
  * @returns {Promise<{text: string}>}
  */
-export async function getChatResponse(userQuestion, context = "") {
+export async function getChatResponse(userQuestion, context = "", imageUrl = null) {
   if (!process.env.GEMINI_API_KEY) {
     return { text: "Backend service error: API Key is missing." };
   }
@@ -34,6 +35,7 @@ IMPORTANT GUIDELINES:
 - If the Context is empty or doesn't contain the answer to a university question, politely state that you don't have that information in your knowledge base
 - For questions not related to Bugema University (general questions, personal advice, etc.), respond politely and helpfully but gently redirect to university-related topics
 - Always maintain a friendly, professional tone
+- DO NOT use Markdown formatting, such as asterisks (*), hashtags (#), or dashes (-). Present information using plain text, paragraphs, and numbered lists if necessary, but avoid special characters for styling.
 - If you cannot help with a non-university question, suggest they contact the appropriate support services
 
 Example responses for off-topic questions:
@@ -47,6 +49,7 @@ IMPORTANT GUIDELINES:
 - For university-related questions without specific context, provide helpful general guidance when possible
 - For questions not related to Bugema University, respond politely but gently redirect to university topics
 - Always maintain a friendly, professional tone representing Bugema University
+- DO NOT use Markdown formatting, such as asterisks (*), hashtags (#), or dashes (-). Present information using plain text, paragraphs, and numbered lists if necessary, but avoid special characters for styling.
 - Do not fabricate university-specific facts; if you don't know something specific about Bugema, say so
 
 Example responses for off-topic questions:
@@ -61,6 +64,7 @@ IMPORTANT GUIDELINES:
 - For general questions not related to the university, provide brief, helpful responses but gently encourage university-related inquiries
 - Use provided Context when available and relevant
 - Always maintain a friendly, professional tone representing Bugema University
+- DO NOT use Markdown formatting, such as asterisks (*), hashtags (#), or dashes (-). Present information using plain text, paragraphs, and numbered lists if necessary, but avoid special characters for styling.
 - Do not fabricate facts; if you don't know something, say so honestly
 
 For off-topic questions, provide a brief helpful response followed by a gentle redirect:
@@ -68,7 +72,7 @@ For off-topic questions, provide a brief helpful response followed by a gentle r
     }
 
     // 2. Build the new user prompt (Focus on synthesis)
-    const userPrompt = `
+    let userPrompt = `
 Context:
 ---
 ${context.trim() || "No specific context was found."}
@@ -77,6 +81,10 @@ ${context.trim() || "No specific context was found."}
 Question: ${userQuestion.trim()}
 
 Please generate a complete and helpful answer to the user's question. If Context is provided, incorporate it where useful; otherwise answer based on general knowledge.`;
+
+    if (imageUrl) {
+      userPrompt += `\n\nImage provided: ${imageUrl}`;
+    }
 
     // 3. Respect GEMINI_MODEL env var if set, otherwise try a list of candidate models until one succeeds.
     const envModel =
@@ -111,8 +119,34 @@ Please generate a complete and helpful answer to the user's question. If Context
         const combinedPrompt = `${systemInstruction}\n\n${userPrompt}`;
 
         console.log(`     Sending generateContent request...`);
+
+        // Prepare parts for the content
+        const parts = [{ text: combinedPrompt }];
+
+        // If imageUrl is provided, fetch and add the image
+        if (imageUrl) {
+          try {
+            const axios = (await import('axios')).default;
+            const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+            const imageBuffer = Buffer.from(imageResponse.data);
+            const mimeType = imageResponse.headers['content-type'] || 'image/jpeg';
+            const base64Image = imageBuffer.toString('base64');
+
+            parts.push({
+              inlineData: {
+                mimeType: mimeType,
+                data: base64Image
+              }
+            });
+            console.log(`     Image added to request (${mimeType})`);
+          } catch (imageError) {
+            console.warn(`⚠️ Failed to fetch image from ${imageUrl}:`, imageError.message);
+            // Continue without image
+          }
+        }
+
         const response = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: combinedPrompt }] }],
+          contents: [{ role: "user", parts: parts }],
         });
 
         // Response received; avoid dumping large JSON to logs in normal operation

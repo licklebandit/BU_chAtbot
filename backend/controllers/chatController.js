@@ -18,10 +18,10 @@ if (fs.existsSync(knowledgePath)) {
 }
 
 export async function handleChatQuery(req, res) {
-    const { q } = req.body;
-    
-    if (!q || q.trim() === "") {
-        return res.status(400).json({ answer: "Please ask a valid question." });
+    const { q, imageUrl } = req.body;
+
+    if ((!q || q.trim() === "") && !imageUrl) {
+        return res.status(400).json({ answer: "Please ask a valid question or provide an image." });
     }
 
     try {
@@ -48,8 +48,11 @@ export async function handleChatQuery(req, res) {
         }
 
         // Get response from Gemini (use centralized helper)
-        const { text: answerFromLLM } = await getChatResponse(q, context);
-        const answer = answerFromLLM || (context || "I couldn't find an answer right now.");
+        const { text: answerFromLLM } = await getChatResponse(q, context, imageUrl);
+        let answer = answerFromLLM || (context || "I couldn't find an answer right now.");
+
+        // Remove asterisks from the response for clean text display
+        answer = answer.replace(/\*/g, '');
 
         // Save chat history if user is logged in
         if (req.user) {
@@ -58,8 +61,12 @@ export async function handleChatQuery(req, res) {
                 chat = new Chat({ userId: req.user._id, messages: [] });
             }
 
+            const userMessage = { role: "user", text: q };
+            if (imageUrl) {
+                userMessage.image = imageUrl;
+            }
             chat.messages.push(
-                { role: "user", text: q },
+                userMessage,
                 { role: "assistant", text: answer }
             );
             await chat.save();
