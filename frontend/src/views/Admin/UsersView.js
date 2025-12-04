@@ -398,7 +398,7 @@ export default function UsersView() {
               <h2
                 className={`text-xl sm:text-2xl lg:text-3xl font-bold ${HEADING_COLOR} truncate`}
               >
-                User Management
+                Users
               </h2>
               <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-bold flex-shrink-0">
                 {users.length} total

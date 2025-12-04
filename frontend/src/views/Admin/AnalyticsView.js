@@ -179,7 +179,7 @@ export default function AnalyticsView() {
             <div className="flex items-center gap-3 mb-2">
               <Activity className={`w-7 h-7 ${HEADING_COLOR}`} />
               <h2 className={`text-3xl font-bold ${HEADING_COLOR}`}>
-                Analytics Dashboard
+                Analytics
               </h2>
               {autoRefresh && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold animate-pulse">

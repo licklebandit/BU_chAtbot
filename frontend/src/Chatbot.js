@@ -31,6 +31,7 @@ import FeedbackButton from "./components/FeedbackButton";
 import TypingIndicator from "./components/TypingIndicator";
 import SuggestedQuestions from "./components/SuggestedQuestions";
 import ExportChatButton from "./components/ExportChatButton";
+import useSpeechRecognition from "./hooks/useSpeechRecognition";
 
 // --- Constants ---
 const FREE_QUESTION_LIMIT = 3;
@@ -191,6 +192,61 @@ const SidebarSection = ({
   );
 };
 
+// --- VoiceInput Component (Combined Approach) ---
+const VoiceInput = ({ 
+  onTranscript, 
+  currentLanguage, 
+  isDark, 
+  isListening, 
+  toggleListening 
+}) => {
+  const { t } = useTranslation();
+  
+  // Use the speech recognition hook
+  const { 
+    isListening: hookIsListening, 
+    isSpeaking,
+    startListening, 
+    stopListening, 
+    speak,
+    stopSpeaking
+  } = useSpeechRecognition((text) => {
+    onTranscript(text);
+  });
+
+  const handleVoiceToggle = () => {
+    if (isListening || hookIsListening) {
+      const finalText = stopListening();
+      if (finalText) {
+        onTranscript(finalText);
+      }
+    } else {
+      const speechLang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
+      startListening(speechLang);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleVoiceToggle}
+      className={`flex-shrink-0 p-3 rounded-xl border transition ${
+        isListening || hookIsListening
+          ? "border-red-500 bg-red-500 text-white"
+          : isDark 
+            ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
+            : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
+      }`}
+      title={isListening || hookIsListening ? t('stopListening') : t('listening')}
+    >
+      {isListening || hookIsListening ? (
+        <MicOff className="h-5 w-5" />
+      ) : (
+        <Mic className="h-5 w-5" />
+      )}
+    </button>
+  );
+};
+
 // --- Main Chatbot Component ---
 const Chatbot = () => {
   const { t, i18n } = useTranslation();
@@ -218,233 +274,10 @@ const Chatbot = () => {
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  
-  // Audio recording states
-  const [isRecording, setIsRecording] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [recordingTranscript, setRecordingTranscript] = useState("");
-  const [interimTranscript, setInterimTranscript] = useState("");
+  const [isListening, setIsListening] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
-  const recognitionRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const timerRef = useRef(null);
-  const sidebarRef = useRef(null);
-  const languageDropdownRef = useRef(null);
-
-  // Close language dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        languageDropdownRef.current &&
-        !languageDropdownRef.current.contains(event.target) &&
-        !event.target.closest('[data-language-button]')
-      ) {
-        setLanguageDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Initialize speech recognition
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
-        recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
-
-        recognitionRef.current.onresult = (event) => {
-          let interim = '';
-          let final = '';
-          
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcriptPart = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              final += transcriptPart + ' ';
-            } else {
-              interim += transcriptPart;
-            }
-          }
-          
-          if (final) {
-            setRecordingTranscript(prev => prev + final);
-            setInput(prev => prev + (prev ? ' ' : '') + final.trim());
-          }
-          
-          if (interim) {
-            setInterimTranscript(interim);
-          }
-        };
-
-        recognitionRef.current.onerror = (event) => {
-          console.error('Speech recognition error:', event.error);
-          if (event.error === 'not-allowed') {
-            alert('Microphone access was denied. Please allow microphone access to use voice input.');
-          }
-          stopRecording();
-        };
-
-        recognitionRef.current.onend = () => {
-          if (isRecording && !isPaused) {
-            // Restart recognition if it ended unexpectedly
-            try {
-              recognitionRef.current.start();
-            } catch (e) {
-              console.error('Error restarting recognition:', e);
-            }
-          }
-        };
-      } else {
-        console.warn('Speech recognition not supported in this browser');
-      }
-    }
-
-    return () => {
-      stopRecording();
-    };
-  }, [currentLanguage]);
-
-  // Start recording function
-  const startRecording = async () => {
-    try {
-      // Request microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      // Start media recorder (optional - for audio recording)
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      
-      mediaRecorderRef.current.start();
-      
-      // Start speech recognition
-      if (recognitionRef.current) {
-        recognitionRef.current.lang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
-        recognitionRef.current.start();
-      }
-      
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-      
-      setIsRecording(true);
-      setIsPaused(false);
-      setRecordingTranscript("");
-      setInterimTranscript("");
-      
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      alert('Could not access microphone. Please check permissions.');
-    }
-  };
-
-  // Pause recording
-  const pauseRecording = () => {
-    if (recognitionRef.current && isRecording && !isPaused) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {
-        console.error('Error pausing recognition:', e);
-      }
-      
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.pause();
-      }
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      
-      setIsPaused(true);
-    }
-  };
-
-  // Resume recording
-  const resumeRecording = () => {
-    if (isRecording && isPaused) {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.lang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
-          recognitionRef.current.start();
-        } catch (e) {
-          console.error('Error resuming recognition:', e);
-        }
-      }
-      
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.resume();
-      }
-      
-      timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-      
-      setIsPaused(false);
-    }
-  };
-
-  // Stop recording
-  const stopRecording = () => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {
-        console.error('Error stopping recognition:', e);
-      }
-    }
-    
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-    }
-    
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    
-    setIsRecording(false);
-    setIsPaused(false);
-    setRecordingTime(0);
-    
-    // Finalize the transcript
-    if (recordingTranscript.trim()) {
-      setInput(prev => {
-        const newInput = prev ? `${prev} ${recordingTranscript.trim()}` : recordingTranscript.trim();
-        return newInput;
-      });
-    }
-    
-    setRecordingTranscript("");
-    setInterimTranscript("");
-    audioChunksRef.current = [];
-  };
-
-  // Cancel recording
-  const cancelRecording = () => {
-    stopRecording();
-    setInput(prev => prev); // Keep existing input
-  };
-
-  // Format time for display
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   // Scroll to bottom
   const scrollToBottom = () =>
@@ -531,6 +364,16 @@ const Chatbot = () => {
         window.speechSynthesis.speak(utterance);
       }
     }
+  };
+
+  // Handle audio transcript
+  const handleAudioTranscript = (transcript) => {
+    setInput(prev => prev ? `${prev} ${transcript}` : transcript);
+  };
+
+  // Toggle listening state
+  const toggleListening = () => {
+    setIsListening(!isListening);
   };
 
   // Load chat from history
@@ -769,7 +612,6 @@ const Chatbot = () => {
 
       {/* Sidebar */}
       <aside
-        ref={sidebarRef}
         className={`fixed top-0 left-0 z-40 h-full w-72 transform lg:translate-x-0 transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } ${sidebarClasses} flex-shrink-0 flex flex-col gap-4 p-4 overflow-y-auto`}
@@ -777,10 +619,12 @@ const Chatbot = () => {
         {/* Sidebar Header with Logo */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-              <MessageSquare className="h-5 w-5 text-white" />
-            </div>
-            <h3 className={`text-lg font-bold ${headingColor}`}>BU Chat</h3>
+            <img
+            src="/bot.png"  // This points to public/bot.png
+            alt="BU Chatbot"
+            className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+            />
+            <h3 className={`text-lg font-bold ${headingColor}`}>BUChatbot</h3>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -822,15 +666,14 @@ const Chatbot = () => {
             </div>
           )}
 
-          {/* Language Selector - FIXED z-index issue */}
-          <div className="relative" ref={languageDropdownRef}>
+          {/* Language Selector */}
+          <div className="relative">
             <button
-              data-language-button
               onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
               className={`w-full flex items-center justify-between px-4 py-2 text-sm rounded-lg transition-colors ${
                 isDark 
-                  ? "bg-slate-800/50 hover:bg-slate-700/50 text-white" 
-                  : "bg-gray-50 hover:bg-gray-100 text-gray-800"
+                  ? "hover:bg-slate-700/50" 
+                  : "hover:bg-gray-100"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -844,7 +687,7 @@ const Chatbot = () => {
               />
             </button>
             {languageDropdownOpen && (
-              <div className={`absolute z-50 mt-1 w-full rounded-lg shadow-lg border overflow-hidden ${
+              <div className={`absolute z-10 mt-1 w-full rounded-lg shadow-lg border overflow-hidden ${
                 isDark 
                   ? "bg-slate-800 border-slate-700" 
                   : "bg-white border-gray-200"
@@ -1027,103 +870,6 @@ const Chatbot = () => {
               : "border-[#d8e2ff] bg-white/90"
           }`}
         >
-          {/* Recording Status Display */}
-          {isRecording && (
-            <div className={`mb-3 p-3 rounded-lg border ${
-              isDark 
-                ? "bg-slate-800/50 border-slate-700" 
-                : "bg-blue-50 border-blue-200"
-            }`}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${isPaused ? 'bg-yellow-500' : 'bg-red-500 animate-pulse'}`} />
-                  <span className="text-sm font-medium">
-                    {isPaused ? 'Recording Paused' : 'Recording...'}
-                  </span>
-                  <span className="text-xs font-mono bg-black/20 dark:bg-white/20 px-2 py-0.5 rounded">
-                    {formatTime(recordingTime)}
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-1">
-                  {!isPaused ? (
-                    <button
-                      onClick={pauseRecording}
-                      className={`p-1.5 rounded-lg ${
-                        isDark 
-                          ? "hover:bg-slate-700" 
-                          : "hover:bg-blue-100"
-                      }`}
-                      title="Pause recording"
-                    >
-                      <Square className="h-4 w-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={resumeRecording}
-                      className={`p-1.5 rounded-lg ${
-                        isDark 
-                          ? "hover:bg-slate-700" 
-                          : "hover:bg-blue-100"
-                      }`}
-                      title="Resume recording"
-                    >
-                      <Play className="h-4 w-4" />
-                    </button>
-                  )}
-                  
-                  <button
-                    onClick={stopRecording}
-                    className={`p-1.5 rounded-lg ${
-                      isDark 
-                        ? "bg-green-700 hover:bg-green-600" 
-                        : "bg-green-600 hover:bg-green-700"
-                    } text-white`}
-                    title="Stop and add to input"
-                  >
-                    <Send className="h-4 w-4" />
-                  </button>
-                  
-                  <button
-                    onClick={cancelRecording}
-                    className={`p-1.5 rounded-lg ${
-                      isDark 
-                        ? "bg-red-700 hover:bg-red-600" 
-                        : "bg-red-600 hover:bg-red-700"
-                    } text-white`}
-                    title="Cancel recording"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              
-              {/* Transcript Display */}
-              <div className={`text-sm mt-2 p-2 rounded ${
-                isDark 
-                  ? "bg-slate-900/50 text-slate-300" 
-                  : "bg-white text-gray-700"
-              }`}>
-                <div className="font-medium mb-1">Transcript:</div>
-                <div className="max-h-20 overflow-y-auto">
-                  {recordingTranscript && (
-                    <div className="mb-1">{recordingTranscript}</div>
-                  )}
-                  {interimTranscript && (
-                    <div className="italic text-gray-500 dark:text-gray-400">
-                      {interimTranscript}
-                    </div>
-                  )}
-                  {!recordingTranscript && !interimTranscript && (
-                    <div className="text-gray-500 dark:text-gray-400 italic">
-                      Start speaking... (Your speech will appear here)
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Image Preview */}
           {imagePreview && (
             <div className="mb-3 flex items-center gap-3">
@@ -1162,27 +908,20 @@ const Chatbot = () => {
                   ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
                   : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
               }`}
-              disabled={loading || isRecording}
+              disabled={loading}
               title={t('uploadImage')}
             >
               <ImageIcon className="h-5 w-5" />
             </button>
 
             {/* Voice Input Button */}
-            {!isRecording ? (
-              <button
-                onClick={startRecording}
-                className={`flex-shrink-0 p-3 rounded-xl border transition ${
-                  isDark 
-                    ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
-                    : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
-                }`}
-                disabled={loading}
-                title="Start voice recording"
-              >
-                <Mic className="h-5 w-5" />
-              </button>
-            ) : null}
+            <VoiceInput
+              onTranscript={handleAudioTranscript}
+              currentLanguage={currentLanguage}
+              isDark={isDark}
+              isListening={isListening}
+              toggleListening={toggleListening}
+            />
 
             {/* Text Input */}
             <textarea
@@ -1194,16 +933,16 @@ const Chatbot = () => {
                   sendMessage();
                 }
               }}
-              placeholder={isRecording ? "Speaking... (your speech appears above)" : t('typeMessage')}
+              placeholder={t('typeMessage')}
               className={`flex-1 resize-none rounded-xl border px-4 py-3 text-sm transition focus:outline-none focus:ring-2 max-h-36 ${inputClass}`}
               rows={1}
-              disabled={loading || isRecording}
+              disabled={loading}
             />
 
             {/* Send Button */}
             <button
               onClick={() => sendMessage()}
-              disabled={loading || (!input.trim() && !selectedImage) || isRecording}
+              disabled={loading || (!input.trim() && !selectedImage)}
               className={`flex-shrink-0 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#0033A0]/20 transition disabled:opacity-60 disabled:shadow-none ${buttonPrimary}`}
             >
               {loading ? (

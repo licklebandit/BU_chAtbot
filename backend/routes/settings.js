@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Simulated settings (replace with DB later)
 let chatbotSettings = {
-  chatbotName: "BU Chatbot",
+  chatbotName: "BUChatbot",
   defaultResponseTime: 1,
   enableLogging: true,
 };

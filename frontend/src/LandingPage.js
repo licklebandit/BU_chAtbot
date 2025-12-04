@@ -186,7 +186,7 @@ function LandingPage() {
     : "sticky top-0 z-20 border-b border-white/60 bg-white/80 backdrop-blur";
   const navLinkClass = isDark
     ? "transition text-slate-300 hover:text-white"
-    : "transition text-slate-600 hover:text-[#0033A0]";
+    : "transition text-slate-800 hover:text-[#0033A0]";
   const headlineColor = isDark ? "text-slate-100" : "text-[#0b2254]";
   const bodyColor = isDark ? "text-slate-300" : "text-[#2d3e73]";
   const mutedColor = isDark ? "text-slate-400" : "text-slate-500";

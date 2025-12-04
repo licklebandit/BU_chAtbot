@@ -132,10 +132,37 @@ router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
 // GET /api/admin/knowledge - Fetch all Knowledge articles
 router.get("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
   try {
-    const articles = await Knowledge.find({
+    // Fetch from database
+    const dbArticles = await Knowledge.find({
       $or: [{ type: { $exists: false } }, { type: "knowledge" }],
     }).sort({ updatedAt: -1 });
-    res.json(articles);
+
+    let allArticles = [...dbArticles];
+
+    // Also fetch from static file and merge
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'backend/data/knowledge.json');
+      if (fs.existsSync(filePath)) {
+        const staticData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const staticArticles = staticData.map((item, index) => ({
+          _id: `static-${index}`,
+          question: item.keyword,
+          answer: item.answer,
+          keyword: item.keyword,
+          source: 'Static File',
+          type: 'knowledge',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }));
+        allArticles = allArticles.concat(staticArticles);
+      }
+    } catch (fileErr) {
+      console.warn("Static knowledge file fetch failed:", fileErr.message);
+    }
+
+    res.json(allArticles);
   } catch (err) {
     console.error("Error fetching knowledge articles:", err);
     res

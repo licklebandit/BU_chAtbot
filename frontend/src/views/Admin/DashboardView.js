@@ -161,10 +161,16 @@ export default function DashboardView() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
         <AnalyticsCard
-          title="Total Users"
+          title="Users"
           value={data.summary.users}
           Icon={Users}
           trend="+4.5% vs last week"
+        />
+        <AnalyticsCard
+          title="Chats"
+          value={data.summary.conversations}
+          Icon={MessageCircle}
+          trend="+12% this week"
         />
         <AnalyticsCard
           title="Admins"
@@ -172,18 +178,12 @@ export default function DashboardView() {
           Icon={Shield}
         />
         <AnalyticsCard
-          title="Conversations"
-          value={data.summary.conversations}
-          Icon={MessageCircle}
-          trend="+12% this week"
-        />
-        <AnalyticsCard
           title="FAQs"
           value={data.summary.faqs}
           Icon={HelpCircle}
         />
         <AnalyticsCard
-          title="Knowledge Base"
+          title="Articles"
           value={data.summary.knowledge}
           Icon={BookOpen}
         />
