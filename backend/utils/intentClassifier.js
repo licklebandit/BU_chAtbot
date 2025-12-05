@@ -1,274 +1,300 @@
-// backend/utils/intentClassifier.js
+// utils/intentClassifier.js - COMPLETE UPDATED VERSION
 
-/**
- * Intent Classifier for University Chatbot
- * Categorizes user queries into predefined intents for better analytics and routing
- */
-
-const intentKeywords = {
-  admissions: [
-    'admission', 'apply', 'application', 'entry', 'requirements', 'qualify',
-    'acceptance', 'enroll', 'enrollment', 'join', 'admit', 'intake',
-    'entry requirements', 'how to apply', 'application process', 'entry points',
-    'admission letter', 'acceptance letter', 'cutoff points', 'minimum requirements'
-  ],
-  academics: [
-    'course', 'program', 'degree', 'curriculum', 'syllabus', 'module',
-    'lecture', 'class', 'timetable', 'schedule', 'exam', 'test', 'assessment',
-    'academic', 'study', 'learning', 'semester', 'trimester', 'credit', 'gpa',
-    'results', 'grades', 'transcript', 'retake', 'supplementary', 'coursework'
-  ],
-  fees: [
-    'fee', 'fees', 'tuition', 'payment', 'cost', 'price', 'pay', 'billing',
-    'invoice', 'amount', 'money', 'charge', 'how much', 'expense', 'financial',
-    'installment', 'balance', 'owe', 'debt', 'payment plan', 'pay structure',
-    'functional fees', 'caution fees', 'registration fees'
-  ],
-  scholarships: [
-    'scholarship', 'bursary', 'financial aid', 'grant', 'sponsorship',
-    'funding', 'loan', 'student loan', 'helb', 'allowance', 'stipend',
-    'discount', 'waiver', 'free education', 'government sponsorship'
-  ],
-  campus_life: [
-    'campus', 'life', 'club', 'society', 'guild', 'event', 'activity',
-    'sports', 'recreation', 'entertainment', 'cafeteria', 'dining', 'food',
-    'chapel', 'church', 'worship', 'fellowship', 'library', 'facility',
-    'gym', 'swimming', 'football', 'basketball', 'volleyball'
-  ],
-  hostel: [
-    'hostel', 'accommodation', 'housing', 'room', 'dormitory', 'residence',
-    'lodge', 'rental', 'rent', 'bedspace', 'roommate', 'off-campus',
-    'on-campus', 'booking', 'reservation', 'hostel fees', 'hostel booking'
-  ],
-  faculty: [
-    'faculty', 'school', 'department', 'dean', 'professor', 'lecturer',
-    'instructor', 'teacher', 'staff', 'department of', 'faculty of',
-    'business', 'education', 'theology', 'science', 'nursing', 'medicine',
-    'agriculture', 'engineering', 'computing', 'ict', 'law'
-  ],
-  programs: [
-    'bachelor', 'masters', 'diploma', 'certificate', 'phd', 'doctorate',
-    'postgraduate', 'undergraduate', 'degree program', 'course offerings',
-    'what programs', 'available courses', 'offered programs', 'study options',
-    'bba', 'bcom', 'bed', 'bsc', 'mba', 'med', 'msc'
-  ],
-  registration: [
-    'register', 'registration', 'sign up', 'enlist', 'student id', 'id card',
-    're-register', 'course registration', 'unit registration', 'add course',
-    'drop course', 'change course', 'course selection', 'registration deadline',
-    'late registration', 'registration process', 'how to register'
-  ],
-  graduation: [
-    'graduate', 'graduation', 'clearance', 'convocation', 'ceremony',
-    'gown', 'certificate', 'degree certificate', 'completion', 'final year',
-    'graduation requirements', 'graduation fee', 'graduation list', 'alumni',
-    'graduation date', 'graduation process', 'how to graduate'
-  ],
-  support: [
-    'help', 'support', 'assistance', 'problem', 'issue', 'error', 'bug',
-    'complaint', 'feedback', 'contact', 'reach', 'email', 'phone', 'call',
-    'office', 'desk', 'counseling', 'guidance', 'advising', 'mentor',
-    'ict support', 'technical support', 'portal help', 'system help'
-  ],
-  emergency: [
-    'emergency', 'urgent', 'critical', 'immediate', 'crisis', 'security',
-    'accident', 'medical', 'health', 'sick', 'hospital', 'clinic', 'doctor',
-    'nurse', 'ambulance', 'fire', 'police', 'safety', 'danger', 'threat'
-  ]
+// University-related intents
+export const universityIntents = {
+  'admission': {
+    keywords: ['admission', 'admit', 'apply', 'application', 'entry', 'enroll', 'enrollment', 'join', 'applicant'],
+    weight: 10,
+    categories: ['admissions']
+  },
+  'fees': {
+    keywords: ['fee', 'fees', 'tuition', 'cost', 'payment', 'pay', 'price', 'charge', 'financial'],
+    weight: 10,
+    categories: ['fees', 'financial']
+  },
+  'courses': {
+    keywords: ['course', 'courses', 'program', 'programs', 'degree', 'degrees', 'study', 'studies', 'major', 'subject', 'curriculum'],
+    weight: 9,
+    categories: ['academic']
+  },
+  'library': {
+    keywords: ['library', 'libraries', 'book', 'books', 'reading', 'study', 'research', 'resource'],
+    weight: 8,
+    categories: ['facilities']
+  },
+  'contact': {
+    keywords: ['contact', 'phone', 'email', 'address', 'location', 'reach', 'call', 'message', 'mail'],
+    weight: 8,
+    categories: ['general', 'contact']
+  },
+  'accommodation': {
+    keywords: ['hostel', 'dorm', 'dormitory', 'accommodation', 'housing', 'residence', 'living', 'room', 'stay'],
+    weight: 8,
+    categories: ['accommodation']
+  },
+  'scholarship': {
+    keywords: ['scholarship', 'bursary', 'financial aid', 'funding', 'grant', 'sponsor', 'sponsorship', 'award' ,'available', 'there are'],
+    weight: 8,
+    categories: ['financial']
+  },
+  'registration': {
+    keywords: ['register', 'registration', 'enroll', 'enrollment', 'sign up', 'signup'],
+    weight: 7,
+    categories: ['academic']
+  },
+  'exam': {
+    keywords: ['exam', 'exams', 'examination', 'test', 'tests', 'assessment', 'paper'],
+    weight: 7,
+    categories: ['academic']
+  },
+  'graduation': {
+    keywords: ['graduate', 'graduation', 'complete', 'completion', 'finish', 'convocation', 'ceremony'],
+    weight: 7,
+    categories: ['academic']
+  },
+  'portal': {
+    keywords: ['portal', 'website', 'online', 'system', 'platform', 'login', 'account'],
+    weight: 6,
+    categories: ['technical']
+  },
+  'medical': {
+    keywords: ['medical', 'health', 'clinic', 'hospital', 'doctor', 'nurse', 'treatment', 'sick'],
+    weight: 6,
+    categories: ['services']
+  },
+  'international': {
+    keywords: ['international', 'foreign', 'overseas', 'abroad', 'global', 'visa', 'passport'],
+    weight: 6,
+    categories: ['admissions']
+  },
+  'administration': {
+    keywords: ['vc', 'vice chancellor', 'chancellor', 'dean', 'warden', 'principal', 'director', 'head'],
+    weight: 6,
+    categories: ['administration']
+  },
+  'campus': {
+    keywords: ['campus', 'building', 'facility', 'ground', 'premises', 'site', 'bensdoff'],
+    weight: 5,
+    categories: ['campus']
+  },
+  'student_life': {
+    keywords: ['student', 'life', 'activities', 'clubs', 'sports', 'social', 'cafeteria', 'food'],
+    weight: 5,
+    categories: ['student life']
+  },
+  'general_info': {
+    keywords: ['bugema', 'university', 'college', 'institution', 'school', 'academy'],
+    weight: 4,
+    categories: ['general']
+  }
 };
 
-/**
- * Classify user query into an intent category
- * @param {string} query - User's question or message
- * @returns {Object} - { intent: string, confidence: number }
- */
-export function classifyIntent(query) {
-  if (!query || typeof query !== 'string') {
-    return { intent: 'other', confidence: 0 };
+// Non-KB intents (should go to Gemini)
+export const nonKbIntents = {
+  'greeting': {
+    patterns: [/^(hello|hi|hey|greetings|good\s+(morning|afternoon|evening))$/i, /how\s+are\s+you/i],
+    weight: 100
+  },
+  'farewell': {
+    patterns: [/^(bye|goodbye|see you|farewell)$/i, /thanks|thank you/i],
+    weight: 100
+  },
+  'joke': {
+    patterns: [/joke|funny|humor|laugh|comedy|haha/i, /tell.*joke|make.*laugh/i],
+    weight: 100
+  },
+  'story': {
+    patterns: [/story|tale|narrative/i, /tell.*story|write.*story/i],
+    weight: 100
+  },
+  'creative': {
+    patterns: [/poem|poetry|song|lyric|verse|rhyme/i, /write.*poem|compose.*song/i],
+    weight: 100
+  },
+  'philosophy': {
+    patterns: [/meaning.*life|purpose.*life|why.*exist/i, /philosophy|existential/i],
+    weight: 100
+  },
+  'weather': {
+    patterns: [/weather|temperature|forecast|rain|sun/i],
+    weight: 100
+  },
+  'time': {
+    patterns: [/what.*time|current.*time|clock/i, /date|today.*date|calendar/i],
+    weight: 100
+  },
+  'personal': {
+    patterns: [/yourself|who.*are.*you|about.*you/i, /what.*can.*you.*do/i],
+    weight: 80
+  },
+  'opinion': {
+    patterns: [/what.*think.*about|opinion.*on|view.*on/i],
+    weight: 80
   }
+};
 
-  const normalizedQuery = query.toLowerCase().trim();
-  const words = normalizedQuery.split(/\s+/);
-
-  // Score each intent based on keyword matches
-  const scores = {};
-  let maxScore = 0;
-  let maxIntent = 'other';
-
-  for (const [intent, keywords] of Object.entries(intentKeywords)) {
-    let score = 0;
-
-    for (const keyword of keywords) {
-      // Check for exact keyword match
-      if (normalizedQuery.includes(keyword.toLowerCase())) {
-        // Multi-word keywords get higher weight
-        const weight = keyword.split(' ').length;
-        score += weight;
+// Main intent detection function
+export function detectIntent(query) {
+  const queryLower = query.toLowerCase().trim();
+  
+  // First check for non-KB intents
+  for (const [intentName, intentData] of Object.entries(nonKbIntents)) {
+    for (const pattern of intentData.patterns) {
+      if (pattern.test(queryLower)) {
+        return {
+          intent: intentName,
+          type: 'non-kb',
+          confidence: intentData.weight / 100,
+          shouldUseGemini: true,
+          reason: `Matches non-KB intent: ${intentName}`
+        };
       }
     }
-
-    scores[intent] = score;
-
-    if (score > maxScore) {
-      maxScore = score;
-      maxIntent = intent;
+  }
+  
+  // Check for university-related intents
+  const intentScores = {};
+  
+  for (const [intentName, intentData] of Object.entries(universityIntents)) {
+    let score = 0;
+    
+    for (const keyword of intentData.keywords) {
+      const keywordRegex = new RegExp(`\\b${keyword}\\b`, 'i');
+      if (keywordRegex.test(queryLower)) {
+        score += intentData.weight;
+        
+        // Bonus for exact word match
+        if (queryLower.includes(` ${keyword} `) || 
+            queryLower.startsWith(`${keyword} `) || 
+            queryLower.endsWith(` ${keyword}`)) {
+          score += 2;
+        }
+        
+        // Bonus for plural forms
+        if (queryLower.includes(`${keyword}s`) || queryLower.includes(`${keyword}es`)) {
+          score += 1;
+        }
+      }
+    }
+    
+    if (score > 0) {
+      intentScores[intentName] = score;
     }
   }
-
-  // Calculate confidence (0-1 scale)
-  // More matches = higher confidence
-  const totalWords = words.length;
-  const confidence = maxScore > 0
-    ? Math.min(maxScore / totalWords, 1.0)
-    : 0;
-
-  // If confidence is too low, classify as 'other'
-  if (confidence < 0.1 && maxScore < 2) {
-    return { intent: 'other', confidence: 0 };
+  
+  // Sort by score
+  const sortedIntents = Object.entries(intentScores).sort((a, b) => b[1] - a[1]);
+  
+  if (sortedIntents.length > 0) {
+    const [topIntent, score] = sortedIntents[0];
+    const confidence = Math.min(score / 100, 1);
+    
+    return {
+      intent: topIntent,
+      type: 'university',
+      confidence: confidence,
+      shouldUseGemini: false,
+      reason: `University intent detected: ${topIntent} (score: ${score})`,
+      allScores: intentScores
+    };
   }
-
+  
+  // No intent detected
   return {
-    intent: maxIntent,
-    confidence: parseFloat(confidence.toFixed(2)),
-    scores // Return all scores for debugging
+    intent: 'unknown',
+    type: 'unknown',
+    confidence: 0,
+    shouldUseGemini: true,
+    reason: 'No specific intent detected'
   };
 }
 
-/**
- * Get suggested quick replies based on intent
- * @param {string} intent - The classified intent
- * @returns {Array<string>} - Array of suggested follow-up questions
- */
-export function getSuggestedQuestions(intent) {
-  const suggestions = {
-    admissions: [
-      "What are the admission requirements?",
-      "How do I apply for admission?",
-      "When is the next intake?",
-      "What are the entry points?"
-    ],
-    academics: [
-      "What courses do you offer?",
-      "How do I check my results?",
-      "What is the exam timetable?",
-      "How do I get my transcript?"
-    ],
-    fees: [
-      "What are the tuition fees?",
-      "Can I pay in installments?",
-      "How do I check my fee balance?",
-      "What payment methods are accepted?"
-    ],
-    scholarships: [
-      "What scholarships are available?",
-      "How do I apply for a scholarship?",
-      "What are the scholarship requirements?",
-      "When do scholarship applications open?"
-    ],
-    campus_life: [
-      "What clubs and societies are available?",
-      "Tell me about campus events",
-      "What sports facilities do you have?",
-      "Where is the library?"
-    ],
-    hostel: [
-      "How do I book a hostel?",
-      "What are the hostel fees?",
-      "What accommodation options are available?",
-      "Can I get off-campus accommodation?"
-    ],
-    faculty: [
-      "What faculties do you have?",
-      "Who is the dean of business?",
-      "Tell me about the faculty of education",
-      "How do I contact a lecturer?"
-    ],
-    programs: [
-      "What degree programs do you offer?",
-      "Tell me about the business programs",
-      "What is the duration of the programs?",
-      "What are the program requirements?"
-    ],
-    registration: [
-      "How do I register for courses?",
-      "When is the registration deadline?",
-      "How do I get my student ID?",
-      "Can I change my registered courses?"
-    ],
-    graduation: [
-      "What are the graduation requirements?",
-      "How do I apply for graduation?",
-      "When is the graduation ceremony?",
-      "How do I get my graduation clearance?"
-    ],
-    support: [
-      "How can I contact ICT support?",
-      "Where is the student affairs office?",
-      "How do I give feedback?",
-      "Who can help me with my issue?"
-    ],
-    emergency: [
-      "What are the emergency contacts?",
-      "Where is the medical center?",
-      "How do I report a security issue?",
-      "What should I do in an emergency?"
-    ],
-    other: [
-      "Tell me about Bugema University",
-      "Where is the campus located?",
-      "What are the contact details?",
-      "How do I access the student portal?"
-    ]
-  };
-
-  return suggestions[intent] || suggestions.other;
+// Check if query is mixed (contains both university and non-university elements)
+export function isMixedQuery(query) {
+  const queryLower = query.toLowerCase();
+  
+  // Check for mixed patterns
+  const mixedPatterns = [
+    /(joke|funny|humor|laugh).*(university|admission|fee|cours|library|contact)/i,
+    /(university|admission|fee|cours|library|contact).*(joke|funny|humor|laugh)/i,
+    /(story|poem|song).*(university|admission|fee|cours|library|contact)/i,
+    /(university|admission|fee|cours|library|contact).*(story|poem|song)/i,
+    /(weather|time|date).*(university|admission|fee|cours|library|contact)/i,
+    /(university|admission|fee|cours|library|contact).*(weather|time|date)/i
+  ];
+  
+  return mixedPatterns.some(pattern => pattern.test(queryLower));
 }
 
-/**
- * Get priority level based on intent
- * @param {string} intent - The classified intent
- * @returns {string} - Priority level: low, medium, high, urgent
- */
+// Get recommended KB categories based on intent
+export function getRecommendedCategories(intentResult) {
+  if (intentResult.type !== 'university') {
+    return [];
+  }
+  
+  const intentData = universityIntents[intentResult.intent];
+  return intentData?.categories || [];
+}
+
+// Simple intent classification (for feedback.js compatibility)
+export function classifyIntent(query) {
+    const intentResult = detectIntent(query);
+    return {
+        intent: intentResult.intent,
+        type: intentResult.type,
+        confidence: intentResult.confidence,
+        shouldUseGemini: intentResult.shouldUseGemini
+    };
+}
+
+// Get intent priority
 export function getIntentPriority(intent) {
-  const priorities = {
-    emergency: 'urgent',
-    support: 'high',
-    fees: 'high',
-    admissions: 'medium',
-    registration: 'medium',
-    graduation: 'medium',
-    academics: 'medium',
-    scholarships: 'medium',
-    programs: 'low',
-    faculty: 'low',
-    campus_life: 'low',
-    hostel: 'low',
-    other: 'low'
-  };
-
-  return priorities[intent] || 'low';
+    const priorityMap = {
+        'admission': 1,
+        'fees': 1,
+        'courses': 2,
+        'contact': 1,
+        'library': 2,
+        'accommodation': 2,
+        'scholarship': 2,
+        'registration': 2,
+        'exam': 3,
+        'graduation': 3,
+        'portal': 2,
+        'medical': 3,
+        'international': 2,
+        'administration': 2,
+        'campus': 3,
+        'student_life': 3,
+        'general_info': 4
+    };
+    
+    return priorityMap[intent] || 5;
 }
 
-/**
- * Determine if query requires human escalation
- * @param {string} intent - The classified intent
- * @param {number} confidence - The classification confidence
- * @returns {boolean} - True if should escalate to human
- */
-export function shouldEscalate(intent, confidence) {
-  // Escalate if urgent or if confidence is too low
-  if (intent === 'emergency') return true;
-  if (confidence < 0.3) return true;
-
-  // Escalate support queries with low confidence
-  if (intent === 'support' && confidence < 0.5) return true;
-
-  return false;
+// Additional helper function for chat.js compatibility
+export function shouldUseKnowledgeBase(query) {
+  const intentResult = detectIntent(query);
+  
+  if (intentResult.shouldUseGemini) {
+    return false;
+  }
+  
+  if (isMixedQuery(query)) {
+    return false;
+  }
+  
+  return true;
 }
 
+// Export all functions
 export default {
+  universityIntents,
+  nonKbIntents,
+  detectIntent,
+  isMixedQuery,
+  getRecommendedCategories,
   classifyIntent,
-  getSuggestedQuestions,
   getIntentPriority,
-  shouldEscalate
+  shouldUseKnowledgeBase
 };

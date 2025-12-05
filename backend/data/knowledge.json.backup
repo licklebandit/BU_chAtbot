@@ -1,0 +1,201 @@
+[
+  {
+    "keyword": "admission requirements",
+    "answer": "To be admitted to Bugema University, applicants must present their academic certificates and meet the minimum entry requirements as per the program applied for. For undergraduate programs, you need a Uganda Advanced Certificate of Education (UACE) or its equivalent. For postgraduate programs, a bachelor's degree is required.",
+    "category": "admissions",
+    "tags": [
+      "admissions",
+      "requirements",
+      "application",
+      "entry"
+    ],
+    "priority": 1
+  },
+  {
+    "keyword": "tuition fees",
+    "answer": "Tuition fees at Bugema University vary depending on the program and level of study. Undergraduate programs typically range from 1,500,000 to 2,500,000 UGX per semester. Postgraduate programs range from 2,000,000 to 3,500,000 UGX per semester. Please visit the finance office or official website for the updated fee structure.",
+    "category": "fees",
+    "tags": [
+      "fees",
+      "tuition",
+      "payments",
+      "finance"
+    ],
+    "priority": 1
+  },
+  {
+    "keyword": "courses offered",
+    "answer": "Bugema University offers programs in Business Administration, Computing & IT, Education, Theology, Health Sciences (Nursing, Public Health), Agriculture, and Social Sciences. We offer certificates, diplomas, bachelor's degrees, master's degrees, and PhD programs.",
+    "category": "academic",
+    "tags": [
+      "courses",
+      "programs",
+      "academics",
+      "degrees"
+    ],
+    "priority": 2
+  },
+  {
+    "keyword": "How do i get admissions of Bugema university?",
+    "answer": "To get admissions at Bugema university, Reach out our online platform or visit our offices physically.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-04T17:08:52.956Z"
+  },
+  {
+    "keyword": "How do i reach bensdoff?",
+    "answer": "Walk through the main gate, its the first building immediately after the main gate.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-04T17:08:52.956Z"
+  },
+  {
+    "keyword": "What seperates a day and a student at bugema university?",
+    "answer": "Day students don't have access to university resources like hostels and cafeteria, while residential students do. Day students commute daily, while residential students live on campus.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-04T17:08:52.956Z"
+  },
+  {
+    "keyword": "Who is the current vice chancellor or vc of bugema university?",
+    "answer": "Mr Kafeero Masiko is the current Vice Chancellor of Bugema University.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-04T17:08:52.956Z"
+  },
+  {
+    "keyword": "Who is the warden bensdoff at bugema university?",
+    "answer": "Mummy Getrude is the warden of Bensdoff hostel at Bugema University.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-04T17:08:52.956Z"
+  },
+  {
+    "keyword": "contact information",
+    "answer": "Bugema University Main Campus is located along Gayaza-Zirobwe Road. Phone: +256 392 730 324, Email: info@bugemauniv.ac.ug, Website: www.bugemauniv.ac.ug",
+    "category": "general",
+    "tags": [
+      "contact",
+      "location",
+      "phone",
+      "email"
+    ],
+    "priority": 1
+  },
+  {
+    "keyword": "library hours",
+    "answer": "The university library is open Monday to Friday from 8:00 AM to 10:00 PM, Saturday from 9:00 AM to 6:00 PM, and Sunday from 2:00 PM to 8:00 PM.",
+    "category": "facilities",
+    "tags": [
+      "library",
+      "hours",
+      "facilities"
+    ],
+    "priority": 2
+  },
+  {
+    "keyword": "registration process",
+    "answer": "Registration involves: 1) Paying tuition fees, 2) Course registration at the academic registry, 3) Getting student ID, 4) Orientation attendance. Both online and physical registration are available.",
+    "category": "academic",
+    "tags": [
+      "registration",
+      "process",
+      "enrollment"
+    ],
+    "priority": 1
+  },
+  {
+    "keyword": "scholarships available",
+    "answer": "Bugema University offers various scholarships including: Academic Excellence Scholarships, Sports Scholarships, Need-Based Scholarships, and Church-Sponsored Scholarships. Apply through the financial aid office.",
+    "category": "financial",
+    "tags": [
+      "scholarships",
+      "financial aid",
+      "bursary"
+    ],
+    "priority": 2
+  },
+  {
+    "keyword": "hostel accommodation",
+    "answer": "Hostel accommodation is available for both male and female students. Facilities include beds, study tables, WiFi, and 24/7 security. Apply early as spaces are limited.",
+    "category": "accommodation",
+    "tags": [
+      "hostel",
+      "accommodation",
+      "housing"
+    ],
+    "priority": 2
+  },
+  {
+    "keyword": "exam timetable",
+    "answer": "Exam timetables are usually released 2 weeks before exams. Check the notice boards, student portal, or academic office for the latest exam schedules.",
+    "category": "academic",
+    "tags": [
+      "exams",
+      "timetable",
+      "schedule"
+    ],
+    "priority": 3
+  },
+  {
+    "keyword": "graduation requirements",
+    "answer": "To graduate, students must: 1) Complete all required course credits, 2) Clear all outstanding fees, 3) Have no disciplinary cases, 4) Apply for graduation through the academic registry.",
+    "category": "academic",
+    "tags": [
+      "graduation",
+      "requirements",
+      "completion"
+    ],
+    "priority": 2
+  },
+  {
+    "keyword": "student portal",
+    "answer": "The student portal (portal.bugemauniv.ac.ug) allows students to: view results, register courses, check fees balance, download transcripts, and access course materials. Login with your student number and password.",
+    "category": "technical",
+    "tags": [
+      "portal",
+      "online",
+      "student system"
+    ],
+    "priority": 1
+  },
+  {
+    "keyword": "medical services",
+    "answer": "The university has a medical clinic that provides basic healthcare services to students. It's located near the administration block and is open during working hours. Emergency services are available 24/7.",
+    "category": "services",
+    "tags": [
+      "medical",
+      "health",
+      "clinic"
+    ],
+    "priority": 2
+  },
+  {
+    "keyword": "international students",
+    "answer": "International students need: 1) Valid passport, 2) Academic transcripts, 3) Student visa, 4) Medical insurance. Contact the international students office for assistance with accommodation and orientation.",
+    "category": "admissions",
+    "tags": [
+      "international",
+      "foreign",
+      "visa"
+    ],
+    "priority": 2
+  }
+  {
+  "keyword": "library location",
+  "answer": "The Bugema University library is located in the main academic block, next to the ICT center. It's on the ground floor of the administration building. The library has two sections: reference section and lending section.",
+  "category": "facilities",
+  "tags": ["library", "location", "academic", "facilities"],
+  "priority": 2
+}
+]

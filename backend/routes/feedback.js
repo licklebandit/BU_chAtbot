@@ -5,7 +5,7 @@ import Chat from "../models/Chat.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import PDFDocument from "pdfkit";
-import { classifyIntent, getIntentPriority } from "../utils/intentClassifier.js";
+import { classifyIntent, getIntentPriority } from "../utils/intentClassifier.js"; 
 
 const router = express.Router();
 
