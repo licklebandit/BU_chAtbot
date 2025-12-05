@@ -1,129 +1,125 @@
-// backend/utils/searchKnowledge.js
-import { searchSimilar } from "./vectorStore.js";
+// backend/utils/searchKnowledge.js - FIXED VERSION
 import Knowledge from "../models/Knowledge.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
- * Search the knowledge base using semantic search.
- * @param {string} query
- * @returns {string} context string (containing only the relevant info)
+ * Search the knowledge base with aggressive matching
  */
 export async function searchKnowledge(query) {
-    console.log(`🔍 Starting knowledge search for: "${query}"`);
+    if (!query || typeof query !== 'string') return "";
+    
+    const cleanQuery = query.toLowerCase().trim();
+    console.log(`🔍 Searching knowledge for: "${cleanQuery}"`);
     
     try {
-        // First try semantic vector search
-        let topResults = [];
-        try {
-            const vectorSearchPromise = searchSimilar(query, 3);
-            topResults = await Promise.race([
-                vectorSearchPromise,
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Vector search timeout')), 2000))
-            ]).catch(err => {
-                console.warn("Vector search failed or timed out:", err.message);
-                return [];
-            });
-        } catch (err) {
-            console.error("Vector search error:", err);
-            topResults = [];
-        }
-
-        if (topResults && topResults.length > 0) {
-            console.log(`✅ Vector search found ${topResults.length} result(s)`);
-            return topResults.map(r => r.chunk).join("\n\n");
-        }
-
-        // Fallback to database search
-        const allKnowledge = await getKnowledgeFromAllSources();
-        
-        if (allKnowledge && allKnowledge.length > 0) {
-            const bestMatches = findBestMatches(query, allKnowledge);
+        // OPTION 1: Load from knowledge.json file directly
+        const jsonPath = path.join(__dirname, '../data/knowledge.json');
+        if (fs.existsSync(jsonPath)) {
+            const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+            console.log(`📚 Loaded ${rawData.length} items from knowledge.json`);
             
-            if (bestMatches.length > 0) {
-                console.log(`✅ Found ${bestMatches.length} fallback match(es)`);
-                return bestMatches.map(m => {
-                    const title = m.item.keyword || m.item.question || 'Information';
-                    const content = m.item.answer || m.item.content || '';
-                    return `${title}: ${content}`;
-                }).join('\n\n');
+            // Convert to Knowledge model format if needed
+            const kbItems = rawData.map(item => ({
+                question: item.keyword,
+                answer: item.answer,
+                tags: item.tags || [],
+                category: item.category || "academic"
+            }));
+            
+            const directMatch = findDirectMatch(cleanQuery, kbItems);
+            if (directMatch) {
+                console.log(`✅ Found direct match in knowledge.json: "${directMatch.question}"`);
+                return directMatch.answer;
             }
         }
         
-        console.log(`❌ No knowledge found for: "${query}"`);
+        // OPTION 2: Search MongoDB
+        try {
+            // First, try exact or near-exact match
+            const exactMatch = await Knowledge.findOne({
+                $or: [
+                    { question: { $regex: cleanQuery, $options: 'i' } },
+                    { answer: { $regex: cleanQuery, $options: 'i' } }
+                ],
+                isActive: true
+            });
+            
+            if (exactMatch) {
+                console.log(`✅ Found exact DB match: "${exactMatch.question}"`);
+                return exactMatch.answer;
+            }
+            
+            // Try word-by-word matching
+            const words = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+            if (words.length > 0) {
+                const wordRegex = words.join('|');
+                const wordMatch = await Knowledge.findOne({
+                    $or: [
+                        { question: { $regex: wordRegex, $options: 'i' } },
+                        { answer: { $regex: wordRegex, $options: 'i' } }
+                    ],
+                    isActive: true
+                });
+                
+                if (wordMatch) {
+                    console.log(`✅ Found word match in DB: "${wordMatch.question}"`);
+                    return wordMatch.answer;
+                }
+            }
+            
+        } catch (dbError) {
+            console.warn("Database search error:", dbError.message);
+        }
+        
+        console.log("❌ No matches found in knowledge base");
         return "";
         
     } catch (error) {
-        console.error("Knowledge search error:", error);
+        console.error("searchKnowledge error:", error);
         return "";
     }
 }
 
-// Helper function to get knowledge from all sources
-async function getKnowledgeFromAllSources() {
-    const allKnowledge = [];
-    
-    try {
-        // Fetch from database
-        const dbKnowledge = await Knowledge.find({ isActive: true }).lean();
-        allKnowledge.push(...dbKnowledge.map(item => ({
-            ...item,
-            source: item.source || 'Database'
-        })));
-        console.log(`📚 Loaded ${dbKnowledge.length} items from database`);
-    } catch (dbErr) {
-        console.warn("Database knowledge fetch failed:", dbErr.message);
-    }
-
-    try {
-        // Fetch from static file
-        const fs = await import('fs');
-        const path = await import('path');
-        const filePath = path.join(process.cwd(), 'backend/data/knowledge.json');
-        if (fs.existsSync(filePath)) {
-            const staticData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-            allKnowledge.push(...staticData.map(item => ({
-                ...item,
-                source: 'Static File',
-                question: item.keyword,
-                answer: item.answer
-            })));
-            console.log(`📄 Loaded ${staticData.length} items from JSON file`);
+// Helper function for direct matching
+function findDirectMatch(query, items) {
+    // Try exact keyword match first
+    for (const item of items) {
+        const keyword = (item.question || '').toLowerCase();
+        if (keyword.includes(query) || query.includes(keyword)) {
+            return item;
         }
-    } catch (fileErr) {
-        console.warn("Static knowledge file fetch failed:", fileErr.message);
     }
     
-    return allKnowledge;
+    // Try word matching
+    const words = query.split(/\s+/).filter(w => w.length > 2);
+    for (const item of items) {
+        const keyword = (item.question || '').toLowerCase();
+        const answer = (item.answer || '').toLowerCase();
+        const combined = `${keyword} ${answer}`;
+        
+        let matchScore = 0;
+        for (const word of words) {
+            if (combined.includes(word)) {
+                matchScore++;
+            }
+        }
+        
+        // If at least 50% of words match, return it
+        if (matchScore > 0 && matchScore >= words.length * 0.5) {
+            return item;
+        }
+    }
+    
+    return null;
 }
 
-// Helper function to find best matches
-function findBestMatches(query, allKnowledge) {
-    const normalize = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-    const queryLower = normalize(query);
-    const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2);
-
-    const scored = allKnowledge.map(item => {
-        const keyword = normalize(item.keyword || item.question || '');
-        const answer = normalize(item.answer || item.content || '');
-        const combined = `${keyword} ${answer}`.trim();
-
-        // Score calculations
-        let score = 0;
-        
-        // Exact phrase match
-        if (combined.includes(queryLower)) score += 10;
-        
-        // Word matches
-        queryWords.forEach(word => {
-            if (combined.includes(word)) score += 3;
-        });
-        
-        // Priority bonus
-        if (item.priority) score += item.priority;
-        
-        return { item, score };
-    });
-
-    // Sort by score and return top matches
-    scored.sort((a, b) => b.score - a.score);
-    return scored.filter(s => s.score > 0).slice(0, 3);
+// Also export for backward compatibility
+export async function searchKnowledgeWithFallback(query, knowledge = []) {
+    const result = await searchKnowledge(query);
+    return result || "";
 }

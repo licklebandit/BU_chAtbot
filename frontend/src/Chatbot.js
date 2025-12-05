@@ -24,6 +24,7 @@ import {
   VolumeX,
   MessageSquare,
   MicOff,
+  AlertCircle,
 } from "lucide-react";
 import { API_BASE_URL } from "./config/api";
 import { useTheme } from "./context/ThemeContext";
@@ -192,58 +193,168 @@ const SidebarSection = ({
   );
 };
 
-// --- VoiceInput Component (Combined Approach) ---
+// --- VoiceInput Component (Fixed - No Repetition) ---
 const VoiceInput = ({ 
   onTranscript, 
   currentLanguage, 
-  isDark, 
-  isListening, 
-  toggleListening 
+  isDark
 }) => {
   const { t } = useTranslation();
+  const [localError, setLocalError] = useState(null);
+  const [showStatus, setShowStatus] = useState(false);
+  const statusTimeoutRef = useRef(null);
+  const hasSentTranscriptRef = useRef(false);
   
-  // Use the speech recognition hook
   const { 
-    isListening: hookIsListening, 
-    isSpeaking,
+    isListening, 
+    error,
+    isSupported,
     startListening, 
-    stopListening, 
-    speak,
-    stopSpeaking
+    stopListening 
   } = useSpeechRecognition((text) => {
-    onTranscript(text);
+    console.log('VoiceInput: Received FINAL transcript:', text);
+    if (text && text.trim()) {
+      // Only send transcript if we haven't already sent one for this session
+      // or if it's different from what we already sent
+      if (!hasSentTranscriptRef.current) {
+        onTranscript(text);
+        hasSentTranscriptRef.current = true;
+      }
+    }
   });
 
-  const handleVoiceToggle = () => {
-    if (isListening || hookIsListening) {
-      const finalText = stopListening();
-      if (finalText) {
-        onTranscript(finalText);
+  // Update local error when hook error changes
+  useEffect(() => {
+    if (error) {
+      setLocalError(error);
+    }
+  }, [error]);
+
+  // Clear status timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
       }
+    };
+  }, []);
+
+  const handleVoiceToggle = async () => {
+    console.log('Voice toggle clicked');
+    setLocalError(null);
+    
+    if (!isSupported) {
+      const msg = 'Voice input requires Chrome or Edge browser.';
+      alert(msg);
+      return;
+    }
+    
+    if (isListening) {
+      console.log('Stopping listening...');
+      stopListening();
+      setShowStatus(false);
+      hasSentTranscriptRef.current = false;
     } else {
-      const speechLang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
-      startListening(speechLang);
+      console.log('Starting listening...');
+      setShowStatus(true);
+      hasSentTranscriptRef.current = false; // Reset for new session
+      
+      // Clear any existing timeout
+      if (statusTimeoutRef.current) {
+        clearTimeout(statusTimeoutRef.current);
+      }
+      
+      // Hide status after 5 seconds if still listening
+      statusTimeoutRef.current = setTimeout(() => {
+        setShowStatus(false);
+      }, 5000);
+      
+      try {
+        const speechLang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
+        console.log('Using language:', speechLang);
+        await startListening(speechLang);
+        
+      } catch (err) {
+        console.error('Failed to start listening:', err);
+        setLocalError('Failed to start listening. Please try again.');
+        setShowStatus(false);
+      }
     }
   };
 
-  return (
-    <button
-      onClick={handleVoiceToggle}
-      className={`flex-shrink-0 p-3 rounded-xl border transition ${
-        isListening || hookIsListening
-          ? "border-red-500 bg-red-500 text-white"
-          : isDark 
-            ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
-            : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
-      }`}
-      title={isListening || hookIsListening ? t('stopListening') : t('listening')}
-    >
-      {isListening || hookIsListening ? (
-        <MicOff className="h-5 w-5" />
-      ) : (
+  // If not supported, show disabled button
+  if (!isSupported) {
+    return (
+      <button
+        disabled
+        className={`flex-shrink-0 p-3 rounded-xl border transition ${
+          isDark 
+            ? "border-slate-700 bg-slate-800/20 text-slate-400" 
+            : "border-[#d6dfff] bg-gray-100 text-gray-400"
+        }`}
+        title={t('voiceNotSupported') || "Voice input not supported"}
+      >
         <Mic className="h-5 w-5" />
+      </button>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleVoiceToggle}
+        type="button"
+        className={`flex-shrink-0 p-3 rounded-xl border transition ${
+          isListening
+            ? "border-red-500 bg-red-500 text-white animate-pulse"
+            : isDark 
+              ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
+              : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
+        }`}
+        title={
+          isListening 
+            ? "Click to stop voice recording (will send complete transcript)" 
+            : "Click to start voice recording"
+        }
+      >
+        {isListening ? (
+          <div className="relative">
+            <MicOff className="h-5 w-5" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-ping"></div>
+          </div>
+        ) : (
+          <Mic className="h-5 w-5" />
+        )}
+      </button>
+      
+      {/* Status indicator */}
+      {(showStatus || isListening) && (
+        <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 text-xs rounded shadow-lg ${
+          isListening ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+        }`}>
+          <div className="flex items-center gap-1">
+            {isListening ? (
+              <>
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span>Listening... Speak a complete sentence</span>
+              </>
+            ) : (
+              <span>Starting voice input...</span>
+            )}
+          </div>
+        </div>
       )}
-    </button>
+      
+      {/* Error indicator */}
+      {localError && !isListening && (
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 bg-red-500 text-white text-xs rounded shadow-lg max-w-xs">
+          <div className="flex items-center gap-1">
+            <AlertCircle className="h-3 w-3 flex-shrink-0" />
+            <span className="truncate">{localError}</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -274,7 +385,6 @@ const Chatbot = () => {
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -345,6 +455,9 @@ const Chatbot = () => {
         
         const utterance = new SpeechSynthesisUtterance(message.text);
         utterance.lang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
         
         utterance.onstart = () => {
           setIsSpeaking(true);
@@ -368,12 +481,14 @@ const Chatbot = () => {
 
   // Handle audio transcript
   const handleAudioTranscript = (transcript) => {
-    setInput(prev => prev ? `${prev} ${transcript}` : transcript);
-  };
-
-  // Toggle listening state
-  const toggleListening = () => {
-    setIsListening(!isListening);
+    console.log('Chatbot received transcript:', transcript);
+    if (transcript && transcript.trim()) {
+      setInput(prev => {
+        const newText = prev ? `${prev} ${transcript}` : transcript;
+        console.log('Setting input to:', newText);
+        return newText;
+      });
+    }
   };
 
   // Load chat from history
@@ -919,8 +1034,6 @@ const Chatbot = () => {
               onTranscript={handleAudioTranscript}
               currentLanguage={currentLanguage}
               isDark={isDark}
-              isListening={isListening}
-              toggleListening={toggleListening}
             />
 
             {/* Text Input */}

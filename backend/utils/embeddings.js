@@ -1,40 +1,65 @@
-// backend/utils/embeddings.js
+// backend/utils/embeddings.js - FIXED VERSION
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Initialize Gemini client with API key
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-/**
- * Generates an embedding vector for a given text.
- * @param {string} text 
- * @returns {Promise<number[]>} The embedding vector.
- */
 export async function getEmbedding(text) {
     try {
-        // Try to use the embedContent method if available
-        // Note: This requires the Generative Language API to be enabled 
-        // and the model name to be supported for embeddings
+        if (!text || typeof text !== 'string' || text.trim() === '') {
+            return null;
+        }
         
-        // For now, return null/empty to skip embedding-based search
-        // The vector search will fall back to the simple KB keyword matching
-        console.warn("⚠️ Embeddings not available; vector search skipped.");
+        // Use the embedding model
+        const model = genAI.getGenerativeModel({ 
+            model: "embedding-001"  // Gemini embedding model
+        });
+        
+        // Generate embedding
+        const result = await model.embedContent(text);
+        const embedding = result.embedding;
+        
+        if (embedding && embedding.values) {
+            return embedding.values; // Return the embedding values
+        } else if (embedding) {
+            return embedding;
+        }
+        
+        console.warn("⚠️ No embedding returned for text");
         return null;
-        
     } catch (error) {
         console.error("❌ Failed to generate embedding:", error.message);
-        return null; // Return null instead of throwing so fallback takes over
+        
+        // Fallback: Create a simple hash-based embedding for testing
+        if (process.env.NODE_ENV === 'development') {
+            console.log("⚠️ Using fallback embedding for development");
+            return createSimpleEmbedding(text);
+        }
+        
+        return null;
     }
 }
 
-export function chunkText(text, chunkSize = 800, overlap = 200) {
-    const chunks = [];
-    let start = 0;
-    while (start < text.length) {
-        const end = start + chunkSize;
-        chunks.push(text.slice(start, end));
-        start += chunkSize - overlap;
+// Simple fallback embedding for development
+function createSimpleEmbedding(text) {
+    const embedding = new Array(384).fill(0); // 384-dimension embedding
+    const words = text.toLowerCase().split(/\s+/);
+    
+    // Simple word hash distribution
+    words.forEach(word => {
+        const hash = word.split('').reduce((acc, char) => {
+            return acc + char.charCodeAt(0);
+        }, 0);
+        const index = hash % 384;
+        embedding[index] += 0.1;
+    });
+    
+    // Normalize
+    const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+    if (norm > 0) {
+        return embedding.map(val => val / norm);
     }
-    return chunks;
+    
+    return embedding;
 }

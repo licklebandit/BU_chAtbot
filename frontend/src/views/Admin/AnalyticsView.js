@@ -1,523 +1,191 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { ADMIN_API_URL } from "../../config/api";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer, BarChart, Bar,
 } from "recharts";
 import {
-  Users,
-  MessageCircle,
-  HelpCircle,
-  BookOpen,
-  Loader2,
-  AlertTriangle,
-  RefreshCw,
-  TrendingUp,
-  Clock,
-  Activity,
-  UserCheck,
-  Eye,
-  Filter,
-  TrendingDown,
-  Zap,
+  Users, MessageCircle, HelpCircle, BookOpen,
+  Loader2, AlertTriangle, RefreshCw
 } from "lucide-react";
-import { ADMIN_API_URL } from "../../config/api";
 
-// --- Design Tokens (Matching Landing Page) ---
-const GLASS_CARD =
-  "bg-white/90 backdrop-blur-md border border-[#d6dfff] shadow-lg shadow-[#0033A0]/10 rounded-3xl";
-const HEADING_COLOR = "text-[#0f2a66]";
-const TEXT_MUTED = "text-[#51629b]";
-const PRIMARY_BLUE = "#0033A0";
+const REFRESH_INTERVAL_SECONDS = 30; // Auto-refresh every 30 seconds
 
-const AnalyticsCard = ({
-  title,
-  value,
-  Icon,
-  trend = null,
-  subtitle = null,
-  iconBg = "bg-[#eff4ff]",
-  iconColor = "text-[#0033A0]",
-}) => (
-  <div
-    className={`p-6 ${GLASS_CARD} flex flex-col justify-between h-full transform transition-all duration-300 hover:shadow-xl hover:scale-[1.02]`}
-  >
-    <div className="flex justify-between items-start">
-      <div className="flex-1">
-        <p
-          className={`text-xs font-bold uppercase tracking-[0.15em] ${TEXT_MUTED} mb-2`}
-        >
-          {title}
-        </p>
-        <h3 className={`text-3xl font-bold ${HEADING_COLOR}`}>{value}</h3>
-        {subtitle && <p className={`text-sm mt-2 ${TEXT_MUTED}`}>{subtitle}</p>}
-      </div>
-      <div className={`p-3 rounded-2xl ${iconBg} ${iconColor} shrink-0`}>
-        <Icon className="w-6 h-6" />
-      </div>
+const cardData = [
+  { key: 'users', title: 'Total Users', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'conversations', title: 'Total Conversations', icon: MessageCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'faqs', title: 'Total FAQs', icon: HelpCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'knowledge', title: 'Knowledge Articles', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
+];
+
+const SummaryCard = ({ title, value, Icon, color, bg }) => (
+  <div className={`p-5 ${bg} shadow-md rounded-lg flex items-center space-x-3 border border-gray-200 hover:shadow-lg transition-shadow`}>
+    <div className={`p-2 rounded-lg ${color} bg-white shadow-sm flex-shrink-0`}>
+      <Icon className="w-6 h-6" />
     </div>
-    {trend && (
-      <div className="mt-4 pt-3 border-t border-[#d6dfff]">
-        <div
-          className={`flex items-center gap-2 text-xs font-semibold ${
-            trend.positive ? "text-emerald-600" : "text-red-600"
-          }`}
-        >
-          {trend.positive ? (
-            <TrendingUp className="w-4 h-4" />
-          ) : (
-            <TrendingDown className="w-4 h-4" />
-          )}
-          <span>
-            {trend.value} vs {trend.period}
-          </span>
-        </div>
-      </div>
-    )}
+    <div className="truncate">
+      <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
+      <p className={`text-2xl font-extrabold ${color}`}>{value?.toLocaleString() ?? 0}</p>
+    </div>
   </div>
 );
 
 export default function AnalyticsView() {
-  const [data, setData] = useState({
-    summary: {},
-    charts: { conversationsLast7Days: [] },
-    recentActivity: [],
-  });
+  const [chartData, setChartData] = useState([]);
+  const [summary, setSummary] = useState({});
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState("7d");
   const [error, setError] = useState(null);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [lastFetched, setLastFetched] = useState(null);
 
   const token = localStorage.getItem("token");
 
-  // Fetch Real Analytics Data
-  const fetchAnalytics = useCallback(async () => {
-    setLoading(true);
+  const fetchAnalytics = useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     setError(null);
-
     try {
-      const response = await axios.get(`${ADMIN_API_URL}/stats`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { timeRange },
-      });
+      const [summaryRes, chartRes] = await Promise.all([
+        axios.get(`${ADMIN_API_URL}/analytics/summary`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${ADMIN_API_URL}/analytics/charts`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
 
-      const statsData = response.data;
-
-      // Process data for charts
-      const processedData = {
-        summary: {
-          users: statsData.users || 0,
-          conversations: statsData.conversations || 0,
-          faqs: statsData.faqs || 0,
-          knowledge: statsData.knowledgeArticles || 0,
-          avgResponseTime: statsData.responseTime || 0,
-          admins: statsData.admins || 0,
-        },
-        charts: statsData.charts || { conversationsLast7Days: [] },
-        recentActivity: statsData.recentActivity || [],
-      };
-
-      setData(processedData);
+      setSummary(summaryRes.data || {});
+      setChartData(chartRes.data || []);
+      setLastFetched(new Date());
     } catch (err) {
-      console.error("Analytics fetch failed:", err);
-      setError(err.response?.data?.message || "Failed to load analytics data");
+      console.error("Analytics fetch error:", err);
+      let errorMessage = "Failed to load analytics data.";
+      if (err.code === "ERR_NETWORK") {
+        errorMessage = "Network Error: Cannot reach the server (Check if your backend is running/deployed).";
+      } else if (err.response) {
+        if (err.response.status === 404) {
+          errorMessage = "404 Error: Analytics endpoints not found. (Did you add the new backend routes?)";
+        } else if ([401, 403].includes(err.response.status)) {
+          errorMessage = "Authentication Error: You are not authorized. Please log in again.";
+        } else {
+          errorMessage = `Server Error (${err.response.status}): Failed to load data.`;
+        }
+      }
+      setError(errorMessage);
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
-  }, [token, timeRange]);
+  }, [token]);
 
   useEffect(() => {
     fetchAnalytics();
+    const intervalId = setInterval(() => fetchAnalytics(false), REFRESH_INTERVAL_SECONDS * 1000);
+    return () => clearInterval(intervalId);
   }, [fetchAnalytics]);
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    if (!autoRefresh) return;
-
-    const interval = setInterval(() => {
-      fetchAnalytics();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [autoRefresh, fetchAnalytics]);
-
-  if (loading && !data.summary.users) {
+  if (loading && !lastFetched) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#eff4ff] via-white to-[#d9e5ff]">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-[#0033A0] animate-spin mb-4 mx-auto" />
-          <p className={`text-lg font-semibold ${HEADING_COLOR}`}>
-            Loading Real-Time Analytics...
-          </p>
-          <p className={`text-sm ${TEXT_MUTED} mt-2`}>
-            Fetching latest statistics from the database
-          </p>
-        </div>
+      <div className="text-center p-10 flex flex-col items-center justify-center min-h-[70vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
+        <p className="text-xl text-blue-600 font-medium">Loading Analytics Dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-10 bg-red-50 border border-red-200 rounded-xl min-h-[70vh] flex flex-col items-center justify-center">
+        <AlertTriangle className="w-8 h-8 text-red-600 mb-3" />
+        <p className="text-xl text-red-600 font-semibold mb-2">Error Loading Data</p>
+        <p className="text-red-500 text-center">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#eff4ff] via-white to-[#d9e5ff] p-4 md:p-6 space-y-6">
-      {/* Header with Real-time Indicator */}
-      <div className={`p-6 ${GLASS_CARD}`}>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <>
+      {/* MAIN CONTAINER */}
+      <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+        {/* Header Section */}
+        <div className="flex justify-between items-end pb-4 border-b-4 border-blue-500/50">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Activity className={`w-7 h-7 ${HEADING_COLOR}`} />
-              <h2 className={`text-3xl font-bold ${HEADING_COLOR}`}>
-                Analytics
-              </h2>
-              {autoRefresh && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold animate-pulse">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Live</span>
-                </div>
-              )}
-            </div>
-            <p className={`text-sm ${TEXT_MUTED}`}>
-              Real-time insights and performance metrics
-            </p>
+            <h2 className="text-3xl font-extrabold text-blue-800">📈 Analytics Dashboard</h2>
+            {lastFetched && (
+              <p className="text-sm text-gray-500 mt-1 flex items-center">
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Data last updated: {lastFetched.toLocaleTimeString()} (Refreshes every {REFRESH_INTERVAL_SECONDS}s)
+              </p>
+            )}
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition ${
-                autoRefresh
-                  ? "bg-green-100 text-green-700"
-                  : "bg-slate-100 text-slate-600"
-              }`}
-            >
-              <Zap className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
-              </span>
-            </button>
-            <div className="flex items-center gap-2">
-              <Filter className={`w-4 h-4 ${TEXT_MUTED}`} />
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-                className="rounded-xl border border-[#d6dfff] bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0033A0] shadow-sm"
-              >
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-                <option value="90d">Last 90 days</option>
-              </select>
-            </div>
-            <button
-              onClick={fetchAnalytics}
-              disabled={loading}
-              className="p-2.5 rounded-xl bg-[#0033A0] text-white hover:bg-[#062a7a] transition shadow-lg shadow-[#0033A0]/30 disabled:opacity-50"
-              title="Refresh Now"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Error Banner */}
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 text-red-800">
-          <AlertTriangle className="w-5 h-5 shrink-0" />
-          <div>
-            <p className="font-semibold">Unable to fetch live data</p>
-            <p className="text-sm">{error}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <AnalyticsCard
-          title="Total Users"
-          value={data.summary.users?.toLocaleString() || "0"}
-          Icon={Users}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
-          trend={{ positive: true, value: "+12.5%", period: "last week" }}
-        />
-        <AnalyticsCard
-          title="Conversations"
-          value={data.summary.conversations?.toLocaleString() || "0"}
-          Icon={MessageCircle}
-          iconBg="bg-purple-100"
-          iconColor="text-purple-600"
-          trend={{ positive: true, value: "+8.3%", period: "last week" }}
-        />
-        <AnalyticsCard
-          title="Knowledge Base"
-          value={data.summary.knowledge?.toLocaleString() || "0"}
-          Icon={BookOpen}
-          iconBg="bg-green-100"
-          iconColor="text-green-600"
-          subtitle="Articles"
-        />
-        <AnalyticsCard
-          title="Avg Response"
-          value={`${data.summary.avgResponseTime?.toFixed(1) || "0"}s`}
-          Icon={Clock}
-          iconBg="bg-orange-100"
-          iconColor="text-orange-600"
-          trend={{ positive: true, value: "-18%", period: "last month" }}
-        />
-      </div>
-
-      {/* Secondary Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <AnalyticsCard
-          title="FAQs"
-          value={data.summary.faqs?.toLocaleString() || "0"}
-          Icon={HelpCircle}
-          iconBg="bg-indigo-100"
-          iconColor="text-indigo-600"
-        />
-        <AnalyticsCard
-          title="Admins"
-          value={data.summary.admins?.toLocaleString() || "0"}
-          Icon={UserCheck}
-          iconBg="bg-pink-100"
-          iconColor="text-pink-600"
-        />
-        <AnalyticsCard
-          title="System Status"
-          value="Operational"
-          Icon={Activity}
-          iconBg="bg-emerald-100"
-          iconColor="text-emerald-600"
-          subtitle="All systems running"
-        />
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Conversation Trends */}
-        <div className={`${GLASS_CARD} p-8`}>
-          <h3
-            className={`text-xl font-bold ${HEADING_COLOR} mb-6 flex items-center gap-2`}
+          <button
+            onClick={() => fetchAnalytics(true)}
+            disabled={loading}
+            className={`flex items-center space-x-2 px-4 py-2 text-sm font-semibold rounded-lg transition ${
+              loading
+                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+            }`}
           >
-            <MessageCircle className="w-5 h-5" />
-            Conversation Trends
-          </h3>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.charts.conversationsLast7Days || []}>
-                <defs>
-                  <linearGradient id="colorConv" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor={PRIMARY_BLUE}
-                      stopOpacity={0.3}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor={PRIMARY_BLUE}
-                      stopOpacity={0}
-                    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#e2e8f0"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="date"
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    return date.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                />
-                <YAxis
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "16px",
-                    border: "none",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                    background: "white",
-                  }}
-                  labelFormatter={(value) => {
-                    const date = new Date(value);
-                    return date.toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="count"
-                  stroke={PRIMARY_BLUE}
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorConv)"
-                  name="Conversations"
-                />
-              </AreaChart>
+            <RefreshCw className={`w-4 h-4 ${loading && "animate-spin"}`} />
+            {loading && lastFetched ? "Refreshing..." : "Manual Refresh"}
+          </button>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cardData.map(({ key, title, icon, color, bg }) => (
+            <SummaryCard
+              key={key}
+              title={title}
+              value={summary[key] || 0}
+              Icon={icon}
+              color={color}
+              bg={bg}
+            />
+          ))}
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Line Chart */}
+          <div className="bg-white p-5 shadow-md rounded-lg border border-gray-200">
+            <h3 className="text-lg font-bold mb-4 text-gray-800 border-b pb-2">
+              User & Conversation Trends
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis dataKey="date" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "4px" }} />
+                <Legend iconType="circle" wrapperStyle={{ paddingTop: 10 }} />
+                <Line type="monotone" dataKey="users" name="New Users" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="conversations" name="New Conversations" stroke="#1D4ED8" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
 
-        {/* Daily Volume Bar Chart */}
-        <div className={`${GLASS_CARD} p-8`}>
-          <h3
-            className={`text-xl font-bold ${HEADING_COLOR} mb-6 flex items-center gap-2`}
-          >
-            <BarChart className="w-5 h-5" />
-            Daily Volume
-          </h3>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.charts.conversationsLast7Days || []}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#e2e8f0"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="date"
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    return date.toLocaleDateString("en-US", {
-                      weekday: "short",
-                    });
-                  }}
-                />
-                <YAxis
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
+          {/* Bar Chart */}
+          <div className="bg-white p-5 shadow-md rounded-lg border border-gray-200">
+            <h3 className="text-lg font-bold mb-4 text-gray-800 border-b pb-2">
+              Content Growth (FAQs & Knowledge)
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
+                <XAxis dataKey="date" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
                 <Tooltip
-                  cursor={{ fill: "#f1f5f9" }}
-                  contentStyle={{
-                    borderRadius: "16px",
-                    border: "none",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                  }}
+                  cursor={{ fill: "rgba(239, 246, 255, 0.5)" }}
+                  contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "4px" }}
                 />
-                <Bar
-                  dataKey="count"
-                  fill={PRIMARY_BLUE}
-                  radius={[8, 8, 0, 0]}
-                  name="Conversations"
-                />
+                <Legend iconType="square" wrapperStyle={{ paddingTop: 10 }} />
+                <Bar dataKey="faqs" name="New FAQs" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="knowledge" name="New Articles" fill="#2563EB" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
-
-      {/* Recent Activity */}
-      <div className={`${GLASS_CARD} p-8`}>
-        <h3
-          className={`text-xl font-bold ${HEADING_COLOR} mb-6 flex items-center gap-2`}
-        >
-          <Activity className="w-5 h-5" />
-          Recent Activity
-        </h3>
-        <div className="space-y-3">
-          {data.recentActivity && data.recentActivity.length > 0 ? (
-            data.recentActivity.map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 bg-[#f8fafc] rounded-2xl hover:bg-[#eff4ff] transition"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#0033A0] text-white flex items-center justify-center font-bold text-sm">
-                    {activity.user?.charAt(0) || "U"}
-                  </div>
-                  <div>
-                    <p className={`font-semibold ${HEADING_COLOR}`}>
-                      {activity.user || "Unknown User"}
-                    </p>
-                    <p className={`text-sm ${TEXT_MUTED}`}>
-                      {activity.action || "Interacted with chatbot"}
-                    </p>
-                  </div>
-                </div>
-                <span className={`text-xs ${TEXT_MUTED}`}>
-                  {activity.time
-                    ? new Date(activity.time).toLocaleTimeString()
-                    : "Just now"}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-8">
-              <Activity className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-              <p className={`${TEXT_MUTED}`}>No recent activity</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Stats Summary */}
-      <div className={`${GLASS_CARD} p-8`}>
-        <h3 className={`text-xl font-bold ${HEADING_COLOR} mb-6`}>
-          Quick Stats Summary
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center">
-            <div className={`text-4xl font-bold ${HEADING_COLOR} mb-2`}>
-              {data.summary.users || 0}
-            </div>
-            <p className={`text-sm ${TEXT_MUTED}`}>Total Users</p>
-          </div>
-          <div className="text-center">
-            <div className={`text-4xl font-bold ${HEADING_COLOR} mb-2`}>
-              {data.summary.conversations || 0}
-            </div>
-            <p className={`text-sm ${TEXT_MUTED}`}>Conversations</p>
-          </div>
-          <div className="text-center">
-            <div className={`text-4xl font-bold ${HEADING_COLOR} mb-2`}>
-              {data.summary.knowledge || 0}
-            </div>
-            <p className={`text-sm ${TEXT_MUTED}`}>Articles</p>
-          </div>
-          <div className="text-center">
-            <div className={`text-4xl font-bold ${HEADING_COLOR} mb-2`}>
-              {data.summary.faqs || 0}
-            </div>
-            <p className={`text-sm ${TEXT_MUTED}`}>FAQs</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

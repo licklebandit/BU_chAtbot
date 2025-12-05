@@ -19,7 +19,8 @@ import conversationRouter from "./routes/conversations.js";
 import analyticsRouter from "./routes/analytics.js";
 import settingsRouter from "./routes/settings.js";
 import feedbackRouter from "./routes/feedback.js";
-
+import simpleChatRoute from "./routes/simpleChat.js";
+import testKbRoute from "./routes/test_kb.js";
 dotenv.config();
 
 // ✅ Environment checks BEFORE anything else
@@ -137,6 +138,9 @@ app.use("/api/conversations", conversationRouter);
 app.use("/api/admin/analytics", analyticsRouter);
 app.use("/api/admin/settings", settingsRouter);
 app.use("/api/feedback", feedbackRouter);
+app.use("/api/simple", simpleChatRoute);
+app.use("/api/test", testKbRoute);
+
 
 // --- HEALTH CHECK ---
 app.get("/", (req, res) => {
