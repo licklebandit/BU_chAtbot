@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-import { useTranslation } from 'react-i18next';
 import {
   Send,
   Loader2,
@@ -17,8 +16,6 @@ import {
   Square,
   Play,
   Trash2,
-  Globe,
-  ChevronDown,
   Image as ImageIcon,
   Volume2,
   VolumeX,
@@ -37,12 +34,54 @@ import useSpeechRecognition from "./hooks/useSpeechRecognition";
 // --- Constants ---
 const FREE_QUESTION_LIMIT = 3;
 
-// Language code mapping for speech recognition and TTS
-const SPEECH_LANG_MAP = {
-  en: 'en-US',
-  sw: 'sw-KE',
-  fr: 'fr-FR',
-  lg: 'lg-UG'
+// Static content for English-only version
+const STATIC_CONTENT = {
+  // UI Text
+  newChat: "Hello! I'm BUchatbot, your campus assistant. How can I help you today?",
+  newChatButton: 'New Chat',
+  send: 'Send',
+  logout: 'Logout',
+  login: 'Login',
+  searchPlaceholder: 'Search conversations...',
+  yourHistory: 'Your History',
+  quickTopics: 'Quick Topics',
+  universityResources: 'University Resources',
+  supportProfile: 'Support & Profile',
+  freeQuestions: 'Free Questions',
+  unlimitedAccess: 'Please log in for unlimited access.',
+  uploadFailed: '❌ Failed to upload image. Please try again.',
+  imageSelected: 'Image selected',
+  uploadImage: 'Upload Image',
+  voiceNotSupported: 'Voice input not supported',
+  readAloud: 'Read Aloud',
+  conversation: 'Conversation',
+  
+  // Quick topics list
+  quickTopicsList: [
+    "What are the library hours?",
+    "How do I register for classes?",
+    "Where is the student center?",
+    "What dining options are available?",
+    "How do I access my student email?",
+    "Where can I find academic advising?"
+  ],
+  
+  // Resource links
+  resourceLinks: [
+    { label: 'Academic Calendar', prompt: 'Show me the academic calendar for this semester' },
+    { label: 'Campus Map', prompt: 'Where can I find a campus map?' },
+    { label: 'Tuition Payment', prompt: 'How do I pay my tuition?' },
+    { label: 'Library Resources', prompt: 'What resources are available in the library?' },
+    { label: 'Career Services', prompt: 'Tell me about career services' }
+  ],
+  
+  // Support links
+  supportLinks: [
+    { label: 'Technical Support', prompt: 'I need technical support' },
+    { label: 'Academic Advising', prompt: 'How do I contact academic advising?' },
+    { label: 'Counseling Services', prompt: 'Tell me about counseling services' },
+    { label: 'Financial Aid', prompt: 'How do I apply for financial aid?' }
+  ]
 };
 
 const generateId = () =>
@@ -71,9 +110,15 @@ const formatTimestamp = (value) => {
 };
 
 // --- MessageBubble Component ---
-const MessageBubble = ({ message, previousMessage, onSpeak, isSpeaking, speakingMessageId }) => {
+const MessageBubble = ({ 
+  message, 
+  previousMessage, 
+  onSpeak, 
+  isSpeaking, 
+  speakingMessageId,
+  chatId // Add this prop
+}) => {
   const { isDark } = useTheme();
-  const { t } = useTranslation();
   const isUser = message.role === "user";
   
   const bubbleClasses = isUser
@@ -123,6 +168,7 @@ const MessageBubble = ({ message, previousMessage, onSpeak, isSpeaking, speaking
               messageId={message.id}
               question={previousMessage?.text || ""}
               answer={message.text}
+              chatId={chatId} // Pass chatId here
               onFeedbackSubmit={(feedback) => {
                 console.log("Feedback submitted:", feedback);
               }}
@@ -134,7 +180,7 @@ const MessageBubble = ({ message, previousMessage, onSpeak, isSpeaking, speaking
                   ? "hover:bg-slate-700 text-slate-400" 
                   : "hover:bg-gray-100 text-gray-600"
               }`}
-              title={t('speak')}
+              title="Read Aloud"
             >
               {isThisMessageSpeaking ? (
                 <VolumeX className="h-4 w-4" />
@@ -193,13 +239,11 @@ const SidebarSection = ({
   );
 };
 
-// --- VoiceInput Component (Fixed - No Repetition) ---
+// --- VoiceInput Component ---
 const VoiceInput = ({ 
   onTranscript, 
-  currentLanguage, 
   isDark
 }) => {
-  const { t } = useTranslation();
   const [localError, setLocalError] = useState(null);
   const [showStatus, setShowStatus] = useState(false);
   const statusTimeoutRef = useRef(null);
@@ -214,8 +258,6 @@ const VoiceInput = ({
   } = useSpeechRecognition((text) => {
     console.log('VoiceInput: Received FINAL transcript:', text);
     if (text && text.trim()) {
-      // Only send transcript if we haven't already sent one for this session
-      // or if it's different from what we already sent
       if (!hasSentTranscriptRef.current) {
         onTranscript(text);
         hasSentTranscriptRef.current = true;
@@ -270,9 +312,7 @@ const VoiceInput = ({
       }, 5000);
       
       try {
-        const speechLang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
-        console.log('Using language:', speechLang);
-        await startListening(speechLang);
+        await startListening('en-US');
         
       } catch (err) {
         console.error('Failed to start listening:', err);
@@ -292,7 +332,7 @@ const VoiceInput = ({
             ? "border-slate-700 bg-slate-800/20 text-slate-400" 
             : "border-[#d6dfff] bg-gray-100 text-gray-400"
         }`}
-        title={t('voiceNotSupported') || "Voice input not supported"}
+        title="Voice input not supported"
       >
         <Mic className="h-5 w-5" />
       </button>
@@ -360,12 +400,11 @@ const VoiceInput = ({
 
 // --- Main Chatbot Component ---
 const Chatbot = () => {
-  const { t, i18n } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
   
   // State Management
   const [messages, setMessages] = useState([
-    createAssistantMessage(t('welcome')),
+    createAssistantMessage(STATIC_CONTENT.newChat),
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -381,8 +420,6 @@ const Chatbot = () => {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   
@@ -425,18 +462,14 @@ const Chatbot = () => {
     else setChats([]);
   }, [getToken, fetchChats]);
 
-  // Update welcome message when language changes
-  useEffect(() => {
-    if (messages.length === 1 && messages[0].role === 'assistant') {
-      setMessages([createAssistantMessage(t('welcome'))]);
-    }
-  }, [i18n.language]);
-
-  // Language change handler
-  const handleLanguageChange = (lang) => {
-    i18n.changeLanguage(lang);
-    setCurrentLanguage(lang);
-    setLanguageDropdownOpen(false);
+  const handleNewChat = () => {
+    setMessages([createAssistantMessage(STATIC_CONTENT.newChat)]);
+    setInput("");
+    setCurrentChatId(null);
+    setSelectedImage(null);
+    setImagePreview(null);
+    setSpeakingMessageId(null);
+    setIsSpeaking(false);
   };
 
   // Handle text-to-speech for messages
@@ -454,7 +487,7 @@ const Chatbot = () => {
         window.speechSynthesis.cancel(); // Cancel any ongoing speech
         
         const utterance = new SpeechSynthesisUtterance(message.text);
-        utterance.lang = SPEECH_LANG_MAP[currentLanguage] || 'en-US';
+        utterance.lang = 'en-US';
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
@@ -503,12 +536,13 @@ const Chatbot = () => {
     }));
     setMessages(hydrated);
     setSuggestedQuestions([]);
+    setCurrentChatId(chat._id);
     if (sidebarOpen) setSidebarOpen(false);
   };
 
   // Reset chat
   const resetChat = () => {
-    setMessages([createAssistantMessage(t('newChat'))]);
+    setMessages([createAssistantMessage(STATIC_CONTENT.newChat)]);
     setSuggestedQuestions([]);
     setCurrentChatId(null);
     if (!isLoggedIn) setFreeCount(0);
@@ -563,7 +597,7 @@ const Chatbot = () => {
       setMessages((prev) => [
         ...prev,
         createAssistantMessage(
-          `🔒 ${t('freeQuestions')} ${t('unlimitedAccess')}.`,
+          `🔒 Free questions exhausted. Please log in for unlimited access.`,
         ),
       ]);
       return;
@@ -576,7 +610,7 @@ const Chatbot = () => {
       if (!imageUrl) {
         setMessages((prev) => [
           ...prev,
-          createAssistantMessage(t('uploadFailed') || "❌ Failed to upload image. Please try again."),
+          createAssistantMessage("❌ Failed to upload image. Please try again."),
         ]);
         return;
       }
@@ -690,11 +724,6 @@ const Chatbot = () => {
 
   const remainingQuestions = Math.max(0, FREE_QUESTION_LIMIT - freeCount);
 
-  // Get translated quick topics and resource links
-  const quickTopicsList = t('quickTopicsList', { returnObjects: true }) || [];
-  const resourceLinksList = t('resourceLinks', { returnObjects: true }) || [];
-  const supportLinksList = t('supportLinks', { returnObjects: true }) || [];
-
   // Styling classes
   const backgroundClass = isDark ? "bg-[#0f172a]" : "bg-[#eff4ff]";
   const panelClasses = isDark
@@ -735,9 +764,9 @@ const Chatbot = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <img
-            src="/bot.png"  // This points to public/bot.png
-            alt="BU Chatbot"
-            className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+              src="/bot.png"
+              alt="BU Chatbot"
+              className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
             />
             <h3 className={`text-lg font-bold ${headingColor}`}>BUChatbot</h3>
           </div>
@@ -750,7 +779,7 @@ const Chatbot = () => {
                   : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
               }`}
             >
-              {t('newChatButton')}
+              {STATIC_CONTENT.newChatButton}
             </button>
             <button
               className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
@@ -771,7 +800,7 @@ const Chatbot = () => {
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('searchPlaceholder')}
+                placeholder={STATIC_CONTENT.searchPlaceholder}
                 className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm transition ${
                   isDark 
                     ? "bg-slate-800/50 border border-slate-700 text-slate-200 focus:ring-2 focus:ring-blue-500/50" 
@@ -781,62 +810,15 @@ const Chatbot = () => {
             </div>
           )}
 
-          {/* Language Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-              className={`w-full flex items-center justify-between px-4 py-2 text-sm rounded-lg transition-colors ${
-                isDark 
-                  ? "hover:bg-slate-700/50" 
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                <span>{t('selectLanguage')}</span>
-              </div>
-              <ChevronDown 
-                className={`h-4 w-4 transition-transform ${
-                  languageDropdownOpen ? 'transform rotate-180' : ''
-                }`} 
-              />
-            </button>
-            {languageDropdownOpen && (
-              <div className={`absolute z-10 mt-1 w-full rounded-lg shadow-lg border overflow-hidden ${
-                isDark 
-                  ? "bg-slate-800 border-slate-700" 
-                  : "bg-white border-gray-200"
-              }`}>
-                {Object.entries(t('languages', { returnObjects: true })).map(([code, name]) => (
-                  <button
-                    key={code}
-                    onClick={() => handleLanguageChange(code)}
-                    className={`w-full text-left px-4 py-2 text-sm ${
-                      currentLanguage === code
-                        ? isDark 
-                          ? 'bg-slate-700 text-blue-400' 
-                          : 'bg-blue-50 text-blue-600'
-                        : isDark 
-                          ? 'text-gray-200 hover:bg-slate-700' 
-                          : 'text-gray-800 hover:bg-gray-100'
-                    }`}
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Chat History */}
           {isLoggedIn && (
             <SidebarSection
-              title={t('yourHistory')}
+              title={STATIC_CONTENT.yourHistory}
               icon={History}
               items={filteredChats.slice(0, 6).map((chat) => ({
                 label:
                   chat.messages?.find((m) => m.role === "user")?.text ||
-                  t('conversation'),
+                  STATIC_CONTENT.conversation,
                 action: () => loadChat(chat),
                 timestamp: formatTimestamp(chat.updatedAt),
               }))}
@@ -845,37 +827,34 @@ const Chatbot = () => {
 
           {/* Quick Topics */}
           <SidebarSection
-            title={t('quickTopics')}
+            title={STATIC_CONTENT.quickTopics}
             icon={BookOpen}
-            items={Array.isArray(quickTopicsList) ? quickTopicsList.map((topic) => ({
+            items={STATIC_CONTENT.quickTopicsList.map((topic) => ({
               label: topic,
               action: () => handleQuickAsk(topic),
-            })) : []}
+            }))}
           />
 
           {/* University Resources */}
           <SidebarSection
-            title={t('universityResources')}
+            title={STATIC_CONTENT.universityResources}
             icon={BookOpen}
-            items={Array.isArray(resourceLinksList) ? resourceLinksList.map(({ label, prompt }) => ({
+            items={STATIC_CONTENT.resourceLinks.map(({ label, prompt }) => ({
               label,
               action: () => handleQuickAsk(prompt),
-            })) : []}
+            }))}
           />
         </div>
 
         {/* Footer */}
         <div className={`mt-auto pt-4 border-t space-y-3 ${headerBorder}`}>
           <SidebarSection
-            title={t('supportProfile')}
+            title={STATIC_CONTENT.supportProfile}
             icon={Shield}
-            items={Array.isArray(supportLinksList) ? 
-              (isLoggedIn ? supportLinksList : supportLinksList.slice(1)).map(
-                ({ label, prompt }) => ({
-                  label,
-                  action: () => handleQuickAsk(prompt),
-                }),
-              ) : []}
+            items={STATIC_CONTENT.supportLinks.map(({ label, prompt }) => ({
+              label,
+              action: () => handleQuickAsk(prompt),
+            }))}
           />
 
           <div className="flex justify-between items-center pt-2 text-sm">
@@ -900,12 +879,12 @@ const Chatbot = () => {
                     : "bg-white text-red-600 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
-                <LogOut className="h-4 w-4" /> {t('logout')}
+                <LogOut className="h-4 w-4" /> {STATIC_CONTENT.logout}
               </button>
             ) : (
               <span className="text-sm">
                 <a href="/login" className={isDark ? "text-[#9db8ff] hover:text-white" : "text-[#0033A0] hover:text-[#062a7a]"}>
-                  {t('login')}
+                  {STATIC_CONTENT.login}
                 </a>
               </span>
             )}
@@ -943,7 +922,7 @@ const Chatbot = () => {
                     : "bg-yellow-100 text-yellow-800"
                 }`}
               >
-                {t('freeQuestions')}: {remainingQuestions}
+                Free Questions: {remainingQuestions}
               </span>
             )}
           </div>
@@ -959,6 +938,7 @@ const Chatbot = () => {
               onSpeak={handleSpeak}
               isSpeaking={isSpeaking}
               speakingMessageId={speakingMessageId}
+              chatId={currentChatId} // Pass currentChatId to MessageBubble
             />
           ))}
           {loading && <TypingIndicator />}
@@ -991,7 +971,7 @@ const Chatbot = () => {
               <div className="relative">
                 <img
                   src={imagePreview}
-                  alt={t('imageSelected')}
+                  alt="Selected"
                   className="w-16 h-16 object-cover rounded-lg border"
                 />
                 <button
@@ -1002,7 +982,7 @@ const Chatbot = () => {
                 </button>
               </div>
               <p className={`text-sm ${mutedColor}`}>
-                {t('imageSelected')}
+                Image selected
               </p>
             </div>
           )}
@@ -1024,7 +1004,7 @@ const Chatbot = () => {
                   : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
               }`}
               disabled={loading}
-              title={t('uploadImage')}
+              title="Upload Image"
             >
               <ImageIcon className="h-5 w-5" />
             </button>
@@ -1032,7 +1012,6 @@ const Chatbot = () => {
             {/* Voice Input Button */}
             <VoiceInput
               onTranscript={handleAudioTranscript}
-              currentLanguage={currentLanguage}
               isDark={isDark}
             />
 
@@ -1046,7 +1025,7 @@ const Chatbot = () => {
                   sendMessage();
                 }
               }}
-              placeholder={t('typeMessage')}
+              placeholder="Type your message..."
               className={`flex-1 resize-none rounded-xl border px-4 py-3 text-sm transition focus:outline-none focus:ring-2 max-h-36 ${inputClass}`}
               rows={1}
               disabled={loading}
@@ -1063,7 +1042,7 @@ const Chatbot = () => {
               ) : (
                 <Send className="h-5 w-5" />
               )}
-              <span className="hidden sm:inline">{t('send')}</span>
+              <span className="hidden sm:inline">Send</span>
             </button>
           </div>
         </div>

@@ -622,5 +622,487 @@
   "tags": ["computing", "informatics", "programs", "it", "technology"],
   "priority": 2,
   "synonyms": ["computing programs", "it programs", "computer science", "informatics courses", "technology programs"]
-}
+},
+[
+  {
+    "keyword": "agriculture programs",
+    "answer": "Bugema University School of Agricultural and Applied Sciences offers: 1. Bachelor of Science in Agriculture (Crop Science Option) - Focus on crop production, plant breeding, biotechnology; 2. Bachelor of Science in Agriculture (Animal Science Option) - Focus on animal production, nutrition, breeding; 3. Bachelor of Science in Agribusiness Innovations and Management - Business aspects of agriculture; 4. Bachelor of Science in Environmental Science - Environmental conservation and management; 5. Diploma in Agriculture; 6. Diploma in Crop Production and Management; 7. Diploma in Animal Production and Management; 8. Certificate in Agriculture.",
+    "category": "academic",
+    "tags": ["agriculture", "farming", "crops", "animals", "agribusiness"],
+    "priority": 1,
+    "synonyms": ["agricultural sciences", "farming programs", "crop science", "animal science", "agriculture courses"]
+  },
+  {
+    "keyword": "bsc agriculture crop science",
+    "answer": "Bachelor of Science in Agriculture (Crop Science Option) at Bugema University focuses on: Crop production technologies, Plant breeding and genetics, Soil science and fertility, Crop protection (pests/diseases), Postharvest technologies, Agricultural biotechnology, Climate-smart agriculture, Horticulture, Weed management. Duration: 4 years. Career opportunities: Agricultural officer, Crop consultant, Plant breeder, Agronomist, Farm manager, Agricultural researcher.",
+    "category": "academic",
+    "tags": ["agriculture", "crop", "science", "plants", "farming"],
+    "priority": 1,
+    "synonyms": ["crop science degree", "plant science", "agriculture crop option", "bsc crop science"]
+  },
+  {
+    "keyword": "bsc agriculture animal science",
+    "answer": "Bachelor of Science in Agriculture (Animal Science Option) at Bugema University focuses on: Animal nutrition and feeding, Livestock breeding and genetics, Animal health and disease control, Pasture and forage management, Animal behavior and welfare, Meat and milk production, Poultry production, Animal biotechnology. Duration: 4 years. Career opportunities: Livestock officer, Animal nutritionist, Veterinary assistant, Farm manager, Livestock consultant, Animal researcher.",
+    "category": "academic",
+    "tags": ["agriculture", "animal", "science", "livestock", "veterinary"],
+    "priority": 1,
+    "synonyms": ["animal science degree", "livestock science", "agriculture animal option", "bsc animal science"]
+  },
+  {
+    "keyword": "bsc agribusiness",
+    "answer": "Bachelor of Science in Agribusiness Innovations and Management at Bugema University combines agriculture with business management. Covers: Agricultural economics, Farm business management, Agricultural marketing, Agribusiness entrepreneurship, Agricultural finance, Supply chain management, Agricultural policy, Innovation in agriculture. Duration: 4 years. Career opportunities: Agribusiness manager, Agricultural entrepreneur, Farm business consultant, Agricultural marketing officer, Agricultural loan officer.",
+    "category": "academic",
+    "tags": ["agribusiness", "agriculture", "business", "management", "entrepreneurship"],
+    "priority": 1,
+    "synonyms": ["agribusiness degree", "agricultural business", "farm management", "bsc agribusiness management"]
+  },
+  {
+    "keyword": "bsc environmental science",
+    "answer": "Bachelor of Science in Environmental Science at Bugema University focuses on: Environmental conservation, Natural resource management, Pollution control, Environmental impact assessment, Climate change studies, Biodiversity conservation, Environmental policy, Sustainable development. Duration: 4 years. Career opportunities: Environmental officer, Conservationist, Environmental consultant, Pollution control officer, Natural resource manager, Environmental educator.",
+    "category": "academic",
+    "tags": ["environmental", "science", "conservation", "ecology", "sustainability"],
+    "priority": 1,
+    "synonyms": ["environmental science degree", "environmental studies", "conservation science", "bsc environmental"]
+  },
+  {
+    "keyword": "food technology program",
+    "answer": "Bachelor of Science in Food Technology & Human Nutrition at Bugema University focuses on: Food processing and preservation, Food chemistry and analysis, Food microbiology, Food safety and quality control, Human nutrition, Food product development, Food packaging, Food regulations. Duration: 4 years. Career opportunities: Food technologist, Quality control officer, Food safety inspector, Nutritionist, Food product developer, Food processing manager.",
+    "category": "academic",
+    "tags": ["food", "technology", "nutrition", "processing", "science"],
+    "priority": 1,
+    "synonyms": ["food science", "food technology degree", "human nutrition", "bsc food technology"]
+  },
+  {
+    "keyword": "business administration program",
+    "answer": "Bachelor of Business Administration (BBA) at Bugema University School of Business covers: Management principles, Marketing, Finance, Accounting, Human resources, Operations management, Business law, Entrepreneurship, Strategic management. Duration: 4 years. Career opportunities: Business manager, Marketing executive, Financial analyst, HR manager, Entrepreneur, Business consultant.",
+    "category": "academic",
+    "tags": ["business", "administration", "bba", "management", "commerce"],
+    "priority": 1,
+    "synonyms": ["bba degree", "business management", "business studies", "bachelor of business"]
+  },
+  {
+    "keyword": "bsc accounting",
+    "answer": "Bachelor of Science in Accounting at Bugema University focuses on: Financial accounting, Management accounting, Auditing, Taxation, Corporate finance, Accounting information systems, Financial reporting, Cost accounting. Duration: 4 years. Professional qualifications: Prepares for CPA, ACCA, CIMA. Career opportunities: Accountant, Auditor, Tax consultant, Financial analyst, Cost accountant, Internal auditor.",
+    "category": "academic",
+    "tags": ["accounting", "finance", "accounts", "auditing", "taxation"],
+    "priority": 1,
+    "synonyms": ["accounting degree", "bachelor of accounting", "accountancy", "bsc accounts"]
+  },
+  {
+    "keyword": "bsc finance and banking",
+    "answer": "Bachelor of Science in Finance and Banking at Bugema University covers: Corporate finance, Investment analysis, Banking operations, Financial markets, Risk management, International finance, Financial planning, Banking regulations. Duration: 4 years. Career opportunities: Banker, Financial analyst, Investment advisor, Credit analyst, Risk manager, Financial planner, Loan officer.",
+    "category": "academic",
+    "tags": ["finance", "banking", "financial", "investment", "bank"],
+    "priority": 1,
+    "synonyms": ["finance degree", "banking degree", "financial management", "bsc finance"]
+  },
+  {
+    "keyword": "human resource management",
+    "answer": "Bachelor of Arts in Human Resource Management at Bugema University focuses on: Recruitment and selection, Training and development, Performance management, Compensation and benefits, Labor relations, Organizational behavior, HR planning, Employment law. Duration: 4 years. Career opportunities: HR manager, Recruitment officer, Training coordinator, Compensation analyst, HR consultant, Labor relations officer.",
+    "category": "academic",
+    "tags": ["human", "resource", "hr", "management", "personnel"],
+    "priority": 1,
+    "synonyms": ["hr degree", "human resources", "hr management", "ba human resource"]
+  },
+  {
+    "keyword": "economics program",
+    "answer": "Bachelor of Arts in Economics at Bugema University covers: Microeconomics, Macroeconomics, Development economics, International economics, Monetary economics, Econometrics, Public finance, Economic policy. Duration: 4 years. Career opportunities: Economist, Policy analyst, Economic researcher, Financial analyst, Development officer, Banking professional, Government economist.",
+    "category": "academic",
+    "tags": ["economics", "economy", "economic", "finance", "policy"],
+    "priority": 1,
+    "synonyms": ["economics degree", "bachelor of economics", "ba economics", "economic studies"]
+  },
+  {
+    "keyword": "entrepreneurship program",
+    "answer": "Bachelor of Entrepreneurship & Small Business Management at Bugema University focuses on: Business idea generation, Business plan development, Small business management, Venture capital, Innovation management, Family business, Social entrepreneurship, Business incubation. Duration: 4 years. Career opportunities: Entrepreneur, Business owner, Business consultant, Startup advisor, Innovation manager, Business development officer.",
+    "category": "academic",
+    "tags": ["entrepreneurship", "business", "small business", "startup", "innovation"],
+    "priority": 1,
+    "synonyms": ["entrepreneurship degree", "small business management", "business entrepreneurship", "bachelor of entrepreneurship"]
+  },
+  {
+    "keyword": "procurement and supply chain",
+    "answer": "Bachelor of Procurement & Supply Chain Management at Bugema University covers: Purchasing management, Inventory control, Logistics management, Supply chain strategy, Contract management, Supplier relationship management, Procurement law, Global supply chains. Duration: 4 years. Career opportunities: Procurement officer, Supply chain manager, Logistics coordinator, Purchasing manager, Inventory controller, Contract manager.",
+    "category": "academic",
+    "tags": ["procurement", "supply", "chain", "logistics", "purchasing"],
+    "priority": 1,
+    "synonyms": ["procurement degree", "supply chain management", "logistics degree", "bachelor of procurement"]
+  },
+  {
+    "keyword": "secretarial studies",
+    "answer": "Bachelor of Secretarial Studies and Office Administration at Bugema University focuses on: Office management, Business communication, Records management, Meeting management, Administrative procedures, Office technology, Business etiquette, Executive assistance. Duration: 4 years. Career opportunities: Secretary, Office administrator, Administrative assistant, Executive assistant, Records manager, Office manager.",
+    "category": "academic",
+    "tags": ["secretarial", "office", "administration", "secretary", "administrative"],
+    "priority": 1,
+    "synonyms": ["secretarial degree", "office administration", "administrative studies", "bachelor of secretarial"]
+  },
+  {
+    "keyword": "education programs",
+    "answer": "Bugema University School of Education offers: 1. Bachelor of Arts with Education (Arts subjects); 2. Bachelor of Science with Education (Science subjects); 3. Diploma in Education (Primary); 4. Diploma in Education (Secondary). Teaching subjects include: English, Mathematics, Biology, Chemistry, Physics, Agriculture, Geography, History, Religious Education, Economics, Entrepreneurship, Business Studies, ICT, Kiswahili, Luganda.",
+    "category": "academic",
+    "tags": ["education", "teaching", "teacher", "pedagogy", "school"],
+    "priority": 1,
+    "synonyms": ["teaching programs", "teacher training", "education degrees", "bachelor of education"]
+  },
+  {
+    "keyword": "ba with education",
+    "answer": "Bachelor of Arts with Education at Bugema University prepares students to teach arts subjects in secondary schools. Subjects offered: English Language and Literature, Kiswahili, Luganda, Geography, History, Religious Education, Economics, Entrepreneurship, Business Studies. Duration: 4 years. Includes teaching practice. Career opportunities: Secondary school teacher, Education officer, Curriculum developer, Educational administrator, Tutor.",
+    "category": "academic",
+    "tags": ["education", "arts", "teaching", "secondary", "teacher"],
+    "priority": 1,
+    "synonyms": ["arts education", "bachelor of arts education", "ba education", "teaching arts"]
+  },
+  {
+    "keyword": "bsc with education",
+    "answer": "Bachelor of Science with Education at Bugema University prepares students to teach science subjects in secondary schools. Subjects offered: Mathematics, Biology, Chemistry, Physics, Agriculture, Information Communication Technology (ICT). Duration: 4 years. Includes teaching practice and science practicals. Career opportunities: Science teacher, Mathematics teacher, ICT teacher, Education officer, Science curriculum developer.",
+    "category": "academic",
+    "tags": ["education", "science", "teaching", "mathematics", "biology"],
+    "priority": 1,
+    "synonyms": ["science education", "bachelor of science education", "bsc education", "teaching science"]
+  },
+  {
+    "keyword": "nursing program",
+    "answer": "Bachelor of Nursing Science at Bugema University School of Health and Allied Sciences is a comprehensive nursing program covering: Medical-surgical nursing, Maternal and child health nursing, Community health nursing, Mental health nursing, Nursing research, Nursing leadership, Pharmacology, Pathophysiology. Duration: 4 years. Clinical practice included. Professional recognition: Prepares for registration with Uganda Nurses and Midwives Council. Career opportunities: Registered nurse, Nurse educator, Public health nurse, Clinical nurse specialist, Nursing administrator.",
+    "category": "academic",
+    "tags": ["nursing", "health", "medical", "nurse", "clinical"],
+    "priority": 1,
+    "synonyms": ["nursing degree", "bachelor of nursing", "bsc nursing", "nursing science"]
+  },
+  {
+    "keyword": "software engineering program",
+    "answer": "The Bachelor of Science in Software Engineering at Bugema University is a comprehensive program that focuses on designing, developing, testing, and maintaining software systems. The program covers software development methodologies, programming languages, database management, web development, mobile app development, software testing, and project management. Graduates become skilled software engineers capable of creating reliable, efficient, and scalable software solutions for various industries.",
+    "category": "academic",
+    "tags": ["software", "engineering", "computing", "program", "bsc"],
+    "priority": 1,
+    "synonyms": ["bsc software engineering", "software engineering degree", "software development", "software engineer", "what is software engineering", "software engineering course", "software engineering program details"]
+  },
+  {
+    "keyword": "bachelor of software engineering",
+    "answer": "The Bachelor of Software Engineering at Bugema University School of Science and Technology prepares students for careers in software development. The program includes courses in: Programming (Java, Python, C++), Web Development, Mobile App Development, Database Systems, Software Design Patterns, Software Testing, Software Project Management, Cybersecurity, Artificial Intelligence, and Cloud Computing. Duration: 4 years (8 semesters). Career opportunities: Software Developer, Web Developer, Mobile App Developer, Software Tester, Systems Analyst, IT Consultant.",
+    "category": "academic",
+    "tags": ["software", "engineering", "degree", "computing"],
+    "priority": 1,
+    "synonyms": ["bsc software eng", "software engineering bachelor", "software degree", "software engineering studies"]
+  },
+  {
+    "keyword": "network systems administration",
+    "answer": "Bachelor of Science in Network Systems Administration at Bugema University focuses on: Computer networking, Network security, System administration, Server management, Cloud computing, Cybersecurity, Wireless networks, Network troubleshooting. Duration: 4 years. Career opportunities: Network administrator, System administrator, IT support specialist, Network security analyst, Cloud administrator, IT infrastructure manager.",
+    "category": "academic",
+    "tags": ["network", "systems", "administration", "it", "computing"],
+    "priority": 1,
+    "synonyms": ["network administration", "systems admin", "bsc network", "computer networking"]
+  },
+  {
+    "keyword": "business computing",
+    "answer": "Bachelor of Business Computing at Bugema University combines business and computing skills. Covers: Business applications development, E-commerce, Database management for business, Business intelligence, IT project management, Systems analysis and design, Enterprise systems, Digital marketing. Duration: 4 years. Career opportunities: Business analyst, Systems analyst, IT project manager, E-commerce manager, Business applications developer, Database administrator.",
+    "category": "academic",
+    "tags": ["business", "computing", "it", "commerce", "technology"],
+    "priority": 1,
+    "synonyms": ["business computing degree", "bachelor of business computing", "business it", "computing for business"]
+  },
+  {
+    "keyword": "library information science",
+    "answer": "Bachelor of Library and Information Science at Bugema University focuses on: Information organization, Cataloging and classification, Reference services, Digital libraries, Information retrieval, Archives management, Knowledge management, Information technology in libraries. Duration: 4 years. Career opportunities: Librarian, Information officer, Archivist, Knowledge manager, Records manager, Digital content manager, Information specialist.",
+    "category": "academic",
+    "tags": ["library", "information", "science", "librarian", "information"],
+    "priority": 1,
+    "synonyms": ["library science", "information science", "bachelor of library", "blis degree"]
+  },
+  {
+    "keyword": "information technology program",
+    "answer": "Bachelor of Information Technology at Bugema University covers: Programming fundamentals, Database systems, Web technologies, Systems analysis, IT project management, Cybersecurity, Data communications, IT ethics and law. Duration: 4 years. Career opportunities: IT officer, Web developer, Database administrator, Systems analyst, IT support specialist, IT project coordinator, Network technician.",
+    "category": "academic",
+    "tags": ["information", "technology", "it", "computing", "tech"],
+    "priority": 1,
+    "synonyms": ["it degree", "bachelor of it", "bsc information technology", "information tech"]
+  },
+  {
+    "keyword": "bsc statistics",
+    "answer": "Bachelor of Science in Statistics at Bugema University focuses on: Statistical theory, Probability, Data analysis, Statistical computing, Survey methodology, Biostatistics, Econometrics, Operations research. Duration: 4 years. Career opportunities: Statistician, Data analyst, Research officer, Quality control analyst, Actuary, Demographer, Statistical consultant.",
+    "category": "academic",
+    "tags": ["statistics", "data", "analysis", "mathematics", "stats"],
+    "priority": 1,
+    "synonyms": ["statistics degree", "bachelor of statistics", "bsc stats", "data analysis"]
+  },
+  {
+    "keyword": "bsc biochemistry",
+    "answer": "Bachelor of Science in Biochemistry at Bugema University focuses on: Molecular biology, Enzymology, Metabolism, Clinical biochemistry, Biotechnology, Pharmacology, Immunology, Biochemical techniques. Duration: 4 years. Career opportunities: Biochemist, Medical laboratory scientist, Research scientist, Quality control analyst, Pharmaceutical representative, Biotechnology researcher, Clinical biochemist.",
+    "category": "academic",
+    "tags": ["biochemistry", "biology", "chemistry", "science", "molecular"],
+    "priority": 1,
+    "synonyms": ["biochemistry degree", "bachelor of biochemistry", "bsc biochem", "molecular biology"]
+  },
+  {
+    "keyword": "development studies program",
+    "answer": "Bachelor of Arts in Development Studies at Bugema University focuses on: Development theory, Project planning and management, Community development, Gender and development, Sustainable development, Development economics, Rural development, Development policy. Duration: 4 years. Career opportunities: Development officer, Project manager, Community development worker, NGO program officer, Policy analyst, Research officer, Humanitarian worker.",
+    "category": "academic",
+    "tags": ["development", "studies", "community", "social", "ngo"],
+    "priority": 1,
+    "synonyms": ["development studies degree", "ba development", "community development", "development studies"]
+  },
+  {
+    "keyword": "community development",
+    "answer": "Bachelor of Arts in Community Development at Bugema University focuses on: Community mobilization, Participatory development, Social work practice, Community health, Livelihoods development, Conflict resolution, Advocacy, Community-based project management. Duration: 4 years. Career opportunities: Community development officer, Social worker, Community organizer, NGO field officer, Livelihoods officer, Advocacy officer, Program coordinator.",
+    "category": "academic",
+    "tags": ["community", "development", "social", "work", "ngo"],
+    "priority": 1,
+    "synonyms": ["community development degree", "ba community dev", "social development", "community work"]
+  },
+  {
+    "keyword": "humanitarian emergency management",
+    "answer": "Bachelor of Humanitarian Emergency and Disaster Management at Bugema University focuses on: Disaster risk reduction, Emergency response, Humanitarian principles, Disaster preparedness, Recovery and reconstruction, Humanitarian logistics, Refugee studies, Crisis communication. Duration: 4 years. Career opportunities: Humanitarian officer, Disaster manager, Emergency response coordinator, Refugee camp manager, Disaster risk reduction officer, Humanitarian logistics officer.",
+    "category": "academic",
+    "tags": ["humanitarian", "emergency", "disaster", "management", "relief"],
+    "priority": 1,
+    "synonyms": ["humanitarian degree", "disaster management", "emergency management", "bachelor of humanitarian"]
+  },
+  {
+    "keyword": "journalism and mass communication",
+    "answer": "Bachelor of Journalism and Mass Communication at Bugema University covers: News writing and reporting, Media ethics, Broadcast journalism, Digital media, Public relations, Advertising, Media law, Communication theory. Duration: 4 years. Career opportunities: Journalist, News reporter, Public relations officer, Media producer, Content creator, Advertising executive, Communication officer.",
+    "category": "academic",
+    "tags": ["journalism", "communication", "media", "mass", "public relations"],
+    "priority": 1,
+    "synonyms": ["journalism degree", "mass communication", "ba journalism", "media studies"]
+  },
+  {
+    "keyword": "peace and conflict management",
+    "answer": "Bachelor of Arts in Peace and Conflict Management at Bugema University focuses on: Conflict analysis, Peacebuilding, Negotiation and mediation, Human rights, International relations, Post-conflict reconstruction, Peace education, Security studies. Duration: 4 years. Career opportunities: Peacebuilding officer, Conflict mediator, Human rights officer, Security analyst, Diplomatic officer, NGO peace program officer, Community reconciliation officer.",
+    "category": "academic",
+    "tags": ["peace", "conflict", "management", "resolution", "security"],
+    "priority": 1,
+    "synonyms": ["peace studies", "conflict resolution", "peace and conflict", "ba peace studies"]
+  },
+  {
+    "keyword": "public administration",
+    "answer": "Bachelor of Public Administration and Management at Bugema University covers: Public policy, Administrative law, Public finance, Human resource management in public sector, Governance, Development administration, Local government administration, Public service ethics. Duration: 4 years. Career opportunities: Public administrator, Policy analyst, Government officer, Local government administrator, Public service manager, Program officer, Administrative officer.",
+    "category": "academic",
+    "tags": ["public", "administration", "government", "management", "policy"],
+    "priority": 1,
+    "synonyms": ["public administration degree", "bachelor of public admin", "government administration", "public management"]
+  },
+  {
+    "keyword": "social work program",
+    "answer": "Bachelor of Social Work at Bugema University focuses on: Social work practice, Counseling skills, Child protection, Family welfare, Community social work, Social policy, Research in social work, Ethics in social work. Duration: 4 years. Includes field practice. Career opportunities: Social worker, Child protection officer, Family welfare officer, Community social worker, Counseling officer, Social policy analyst, NGO social services officer.",
+    "category": "academic",
+    "tags": ["social", "work", "welfare", "counseling", "community"],
+    "priority": 1,
+    "synonyms": ["social work degree", "bachelor of social work", "ba social work", "social welfare"]
+  },
+  {
+    "keyword": "psychology and counseling",
+    "answer": "Bachelor of Science in Psychology and Counseling at Bugema University covers: General psychology, Counseling theories, Developmental psychology, Abnormal psychology, Research methods, Group counseling, Marriage and family counseling, Career counseling. Duration: 4 years. Career opportunities: Counselor, Psychological assistant, Human resource officer, Social services officer, Rehabilitation officer, Research assistant, Mental health worker.",
+    "category": "academic",
+    "tags": ["psychology", "counseling", "mental", "health", "therapy"],
+    "priority": 1,
+    "synonyms": ["psychology degree", "counseling degree", "bsc psychology", "psychological counseling"]
+  },
+  {
+    "keyword": "theology program",
+    "answer": "Bachelor of Theology at Bugema University School of Theology and Religious Studies focuses on: Biblical studies, Systematic theology, Church history, Pastoral ministry, Christian ethics, Homiletics (preaching), Religious education, Missiology. Duration: 4 years. Career opportunities: Pastor, Religious educator, Chaplain, Missionary, Church administrator, Theological teacher, Christian writer.",
+    "category": "academic",
+    "tags": ["theology", "religion", "bible", "ministry", "pastoral"],
+    "priority": 1,
+    "synonyms": ["theology degree", "bachelor of theology", "bth degree", "religious studies"]
+  },
+  {
+    "keyword": "religious studies",
+    "answer": "Bachelor of Arts in Religious Studies at Bugema University offers four options: 1. Religious Studies with Chaplaincy - Pastoral care; 2. Religious Studies with Development - Religion and development; 3. Religious Studies with Evangelism and Church Growth - Mission work; 4. Religious Studies with Urban Ministry - Urban church work. Duration: 4 years. Career opportunities: Chaplain, Development officer, Evangelist, Urban minister, Religious educator, Community worker.",
+    "category": "academic",
+    "tags": ["religious", "studies", "religion", "chaplaincy", "ministry"],
+    "priority": 1,
+    "synonyms": ["religious studies degree", "ba religious studies", "religion degree", "chaplaincy studies"]
+  },
+  {
+    "keyword": "computing and informatics programs",
+    "answer": "The Department of Computing and Informatics at Bugema University School of Science and Technology offers: 1. BSc Software Engineering - Focus on software development and engineering principles; 2. BSc Network Systems Administration - Focus on computer networks and system administration; 3. B Business Computing - Business applications of computing; 4. B Library and Information Science - Information management; 5. B Information Technology - Broad IT skills; 6. Diploma in Computer Forensics; 7. Diploma in Information Technology; 8. Certificate in Information Technology.",
+    "category": "academic",
+    "tags": ["computing", "informatics", "programs", "it", "technology"],
+    "priority": 2,
+    "synonyms": ["computing programs", "it programs", "computer science", "informatics courses", "technology programs"]
+  },
+  {
+    "keyword": "diploma programs",
+    "answer": "Bugema University offers Diploma programs in: Agriculture, Crop Production, Animal Production, Food Science, Accounting, Human Resource Management, Procurement, Management, Office Administration, Education (Primary/Secondary), Nursing, Computer Forensics, Information Technology, Science Laboratory Technology, Biomedical Engineering, Development Studies, Public Administration, Social Work, Counseling Psychology, Theology. Duration: 2 years.",
+    "category": "academic",
+    "tags": ["diploma", "programs", "certificate", "short", "courses"],
+    "priority": 1,
+    "synonyms": ["diploma courses", "certificate programs", "short courses", "diploma studies", "vocational programs"]
+  },
+  {
+    "keyword": "certificate programs",
+    "answer": "Bugema University offers Certificate programs in: Agriculture, Nursing, Public Administration, Theology, Information Technology. Duration: 1-2 years. Entry requirements: O-level certificate with 4 passes. These programs provide basic skills and can lead to diploma or degree programs through upgrading.",
+    "category": "academic",
+    "tags": ["certificate", "programs", "short", "courses", "basic"],
+    "priority": 2,
+    "synonyms": ["certificate courses", "short programs", "basic courses", "certificate studies"]
+  },
+  {
+    "keyword": "graduate programs",
+    "answer": "Bugema University Graduate School offers: Master of Business Administration (MBA), Master of Arts (MA), Master of Science (MSc), Master of Public Health (MPH), and PhD programs in various fields. Admission requires a bachelor's degree. Programs focus on advanced research and professional specialization.",
+    "category": "academic",
+    "tags": ["graduate", "masters", "phd", "postgraduate", "advanced"],
+    "priority": 1,
+    "synonyms": ["masters programs", "phd programs", "postgraduate", "graduate studies", "advanced degrees"]
+  },
+  {
+    "keyword": "student portal access",
+    "answer": "Bugema University has two student portals: 1. OLD PORTAL (for students who joined before 2025) - Access by searching 'erms bugema' in any browser, click the first link. 2. NEW PORTAL (for students who joined August-December 2024 semester onwards) - Access at eportal.bugemauniv.ac.ug.",
+    "category": "technical",
+    "tags": ["portal", "student", "erms", "eportal", "login"],
+    "priority": 1,
+    "synonyms": ["how to access portal", "student login", "portal login", "erms portal", "eportal access"]
+  },
+  {
+    "keyword": "old portal registration",
+    "answer": "For OLD PORTAL (students before 2025): 1. Search 'erms bugema' in browser; 2. Click first link; 3. Click 'Signup' if first time; 4. Provide required details (registration number, email, etc.); 5. Set password; 6. Receive verification email; 7. Click link to request admin activation; 8. Wait for admin approval; 9. Login with registration number and password after approval.",
+    "category": "technical",
+    "tags": ["portal", "registration", "signup", "old", "erms"],
+    "priority": 1,
+    "synonyms": ["erms signup", "old portal signup", "portal registration", "create portal account"]
+  },
+  {
+    "keyword": "new portal login",
+    "answer": "For NEW PORTAL (students from August-December 2024 semester): 1. Go to eportal.bugemauniv.ac.ug; 2. Enter your APP number (Application Number); 3. Enter your password; 4. Click login. If you forgot password, use the 'Forgot Password' link on the portal.",
+    "category": "technical",
+    "tags": ["portal", "login", "new", "eportal", "password"],
+    "priority": 1,
+    "synonyms": ["eportal login", "new student portal", "app number login", "portal access new students"]
+  },
+  {
+    "keyword": "university wifi",
+    "answer": "Bugema University provides free WiFi for students. WiFi Details: SSID (Network Name): 'bugema university'. Password: Obtain from IT Support Office. The WiFi covers most campus areas including library, cafeteria, hostels, and academic blocks.",
+    "category": "technical",
+    "tags": ["wifi", "internet", "network", "wireless", "connection"],
+    "priority": 1,
+    "synonyms": ["free wifi", "campus wifi", "internet access", "wireless network", "wifi password", "how to connect wifi"]
+  },
+  {
+    "keyword": "it support",
+    "answer": "IT Support Office Location: Near the New Science Complex Building. Services: WiFi password distribution, portal assistance, computer problems, network issues, email setup. For any technical inquiries, visit the IT Support Office or contact them for assistance with student portals, WiFi, or computer-related issues.",
+    "category": "services",
+    "tags": ["it", "support", "technical", "help", "assistance"],
+    "priority": 1,
+    "synonyms": ["technical support", "computer help", "it department", "tech support", "portal help"]
+  },
+  {
+    "keyword": "campus locations",
+    "answer": "Campus Layout: 1. Library - Opposite New Science Complex; 2. Cafeteria - Big building next to Bensdoff Hostel; 3. IT Department & Computer Labs - After the Cafeteria; 4. Virtual Assistance Offices - After IT Department; 5. Nursing Block (Lind Hall) - Opposite Virtual Assistance Offices; 6. Administration Block - Opposite Lind Hall, directly facing main gate; 7. Small Auditorium - Near Admin Block; 8. Main Auditorium - After Small Auditorium; 9. New Science Complex - Near IT Support.",
+    "category": "campus",
+    "tags": ["locations", "buildings", "campus", "map", "directions"],
+    "priority": 1,
+    "synonyms": ["where is", "campus buildings", "building locations", "campus map", "directions on campus"]
+  },
+  {
+    "keyword": "library location",
+    "answer": "Library Location: Opposite the New Science Complex building. The library is in the main academic block, next to the ICT center, ground floor of the administration building. It has two sections: reference section and lending section.",
+    "category": "facilities",
+    "tags": ["library", "location", "where", "books", "study"],
+    "priority": 1,
+    "synonyms": ["where is library", "find library", "library whereabouts", "library building location"]
+  },
+  {
+    "keyword": "cafeteria location",
+    "answer": "Cafeteria Location: The big building next to Bensdoff Hostel. The cafeteria offers balanced vegetarian diet meals. Residence hall students are encouraged to eat in the cafeteria (meals included in boarding fees).",
+    "category": "facilities",
+    "tags": ["cafeteria", "location", "food", "dining", "meals"],
+    "priority": 2,
+    "synonyms": ["where is cafeteria", "dining hall", "food location", "cafeteria building"]
+  },
+  {
+    "keyword": "it department location",
+    "answer": "IT Department Location: After the Cafeteria building. This building houses: IT Support Office, Computer Labs, and Virtual Assistance Offices. Students can get WiFi passwords, portal assistance, and technical support here.",
+    "category": "facilities",
+    "tags": ["it", "department", "location", "computer", "labs"],
+    "priority": 2,
+    "synonyms": ["where is it department", "computer labs location", "tech department", "it offices"]
+  },
+  {
+    "keyword": "administration block location",
+    "answer": "Administration Block Location: Opposite Lind Hall (Nursing Block), directly facing the main gate through the long path. This building houses: Registrar's Office, Finance Office, Academic Offices, and other administrative departments.",
+    "category": "campus",
+    "tags": ["administration", "block", "location", "offices", "admin"],
+    "priority": 2,
+    "synonyms": ["where is admin block", "registrar office location", "administration building", "main offices"]
+  },
+  {
+    "keyword": "exam pass download",
+    "answer": "Exam Pass Download: Students download their exam passes from their student portals. Login to your portal (old or new based on your admission year), navigate to exams section, and download/print your exam pass. You MUST bring this exam pass and student ID to all examinations.",
+    "category": "academic",
+    "tags": ["exam", "pass", "download", "portal", "examination"],
+    "priority": 1,
+    "synonyms": ["exam card", "examination pass", "download exam card", "exam clearance"]
+  },
+  {
+    "keyword": "student fees payments",
+    "answer": "Mandatory Student Fees: 1. BUSA Fee - UGX 22,000 per semester (Bugema University Student Association); 2. NCHE Fee - UGX 37,000 once per academic year (National Council for Higher Education). These fees must be paid during registration. BUSA fee supports student activities, NCHE fee is a government requirement.",
+    "category": "fees",
+    "tags": ["fees", "payments", "bus a", "nche", "student"],
+    "priority": 1,
+    "synonyms": ["bus a fee", "nche fee", "student association fee", "mandatory fees", "semester fees"]
+  },
+  {
+    "keyword": "academic calendar access",
+    "answer": "Academic Calendar Access: The academic calendar is published in the university bulletin and also shared on notice boards. You can check the Registrar's Office or your department for the current academic calendar. Important dates include: registration periods, class start dates, mid-semester breaks, examination periods, and graduation dates.",
+    "category": "academic",
+    "tags": ["calendar", "academic", "dates", "schedule", "timetable"],
+    "priority": 1,
+    "synonyms": ["school calendar", "semester dates", "academic schedule", "university calendar", "important dates"]
+  },
+  {
+    "keyword": "portal problems",
+    "answer": "Portal Problems Solutions: 1. Forgot password - Use 'Forgot Password' link on portal; 2. Cannot login - Verify you're using correct portal (old vs new); 3. Account not activated (old portal) - Wait for admin approval after verification email; 4. Technical issues - Visit IT Support Office near New Science Complex; 5. APP number issues (new portal) - Contact admissions office.",
+    "category": "technical",
+    "tags": ["portal", "problems", "issues", "login", "technical"],
+    "priority": 1,
+    "synonyms": ["portal not working", "login problems", "portal issues", "cannot access portal", "technical problems"]
+  },
+  {
+    "keyword": "new student orientation",
+    "answer": "New Student Orientation: New students receive orientation during registration week. This covers: 1. Portal access (eportal.bugemauniv.ac.ug for new students); 2. WiFi access (SSID: bugema university); 3. Campus locations (library, cafeteria, IT support, admin block); 4. Important fees (BUSA: 22,000/semester, NCHE: 37,000/year); 5. Academic calendar and exam procedures.",
+    "category": "student life",
+    "tags": ["orientation", "new", "student", "welcome", "introduction"],
+    "priority": 1,
+    "synonyms": ["freshman orientation", "welcome program", "new students guide", "orientation week"]
+  },
+  {
+    "keyword": "campus wifi setup",
+    "answer": "Campus WiFi Setup Guide: 1. On your device, go to WiFi settings; 2. Select network 'bugema university'; 3. Enter password obtained from IT Support Office; 4. Connect. WiFi coverage: Library, Cafeteria, Hostels, Academic Blocks. For connection problems, visit IT Support Office near New Science Complex.",
+    "category": "technical",
+    "tags": ["wifi", "setup", "connection", "network", "internet"],
+    "priority": 1,
+    "synonyms": ["connect to wifi", "wifi setup guide", "internet connection", "wireless setup"]
+  },
+  {
+    "keyword": "student portal features",
+    "answer": "Student Portal Features: Both old and new portals allow students to: 1. View exam results and grades; 2. Register for courses; 3. Check fees balance; 4. Download transcripts; 5. Access course materials; 6. Download exam passes; 7. Update personal information; 8. View academic progress.",
+    "category": "technical",
+    "tags": ["portal", "features", "services", "online", "student"],
+    "priority": 2,
+    "synonyms": ["portal services", "what portal can do", "online services", "portal functions"]
+  },
+  {
+    "keyword": "bus a student association",
+    "answer": "BUSA (Bugema University Student Association): Mandatory fee of UGX 22,000 per semester. BUSA provides: 1. Student leadership opportunities; 2. Communication with administration; 3. Operates canteen and copy center ('the container'); 4. Organizes student activities; 5. Provides typing, printing, photocopying services; 6. Sells snacks, drinks, airtime, school supplies. Payment during registration.",
+    "category": "student life",
+    "tags": ["bus a", "student", "association", "fee", "activities"],
+    "priority": 1,
+    "synonyms": ["student government", "bus a fee", "student organization", "student activities fee"]
+  },
+  {
+    "keyword": "nche fee",
+    "answer": "NCHE Fee: National Council for Higher Education fee of UGX 37,000 payable once per academic year. This is a government requirement for all university students in Uganda. Must be paid during registration. NCHE regulates higher education standards in Uganda.",
+    "category": "fees",
+    "tags": ["nche", "fee", "government", "academic", "year"],
+    "priority": 1,
+    "synonyms": ["national council fee", "government fee", "nche payment", "higher education fee"]
+  },
+  {
+    "keyword": "campus navigation",
+    "answer": "Campus Navigation Guide: From Main Gate: 1. Walk straight - Administration Block; 2. Right after admin - Small Auditorium; 3. Next to small auditorium - Main Auditorium; 4. Opposite main auditorium - Cafeteria (next to Bensdoff Hostel); 5. After cafeteria - IT Department & Computer Labs; 6. After IT department- Virtual Assistance Offices; 7. Opposite Virtual Offices - Nursing Block (Lind Hall); 8. Opposite Lind Hall - Admin Block; 9. Opposite library to the right - New Science Complex; 10. Opposite New Science Complex - Library; 11. Further after IT support - agric block.",
+    "category": "campus",
+    "tags": ["navigation", "campus", "directions", "map", "locations"],
+    "priority": 1,
+    "synonyms": ["how to find", "campus directions", "where to go", "campus guide", "finding buildings"]
+  }
+]
 ]

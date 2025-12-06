@@ -1,10 +1,10 @@
 // frontend/src/components/FeedbackButton.js
 import React, { useState } from "react";
 import { ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
-import axios from "axios";
+import axios from "axios"; // ADD THIS IMPORT
 import { API_BASE_URL } from "../config/api";
 
-const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
+const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit, chatId }) => {
   const [rating, setRating] = useState(null);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [comment, setComment] = useState("");
@@ -26,17 +26,33 @@ const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
         ? { headers: { Authorization: `Bearer ${token}` } }
         : {};
 
-      await axios.post(
+      // Build the request payload
+      const payload = {
+        messageId,
+        rating,
+        question: question || "User question",
+        answer: answer || "Assistant response",
+        comment: comment.trim(),
+        chatId: chatId || null,
+        // category will be auto-detected on backend
+      };
+
+      console.log("Submitting feedback:", {
+        messageId,
+        rating,
+        questionLength: question?.length,
+        answerLength: answer?.length,
+        commentLength: comment?.length,
+        chatId
+      });
+
+      const response = await axios.post(
         `${API_BASE_URL}/feedback`,
-        {
-          messageId,
-          rating,
-          question,
-          answer,
-          comment: comment.trim(),
-        },
+        payload,
         config
       );
+
+      console.log("Feedback submitted successfully:", response.data);
 
       setSubmitted(true);
       setShowCommentBox(false);
@@ -45,27 +61,33 @@ const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
         onFeedbackSubmit({ rating, comment });
       }
 
-      // Auto-hide after 2 seconds
+      // Auto-hide after 3 seconds
       setTimeout(() => {
         setShowCommentBox(false);
-      }, 2000);
+      }, 3000);
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      alert("Failed to submit feedback. Please try again.");
+      console.error("Error response:", error.response?.data);
+      alert(`Failed to submit feedback: ${error.response?.data?.message || "Please try again."}`);
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleSkip = () => {
-    setShowCommentBox(false);
-    setSubmitted(true);
+    // Submit feedback without comment
+    if (rating) {
+      submitFeedback();
+    } else {
+      setShowCommentBox(false);
+      setSubmitted(true);
+    }
   };
 
   if (submitted) {
     return (
       <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-        <span>✓ Thank you for your feedback!</span>
+        <span className="text-xs">✓ Thank you for your feedback!</span>
       </div>
     );
   }
@@ -85,6 +107,7 @@ const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
                 : "hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400"
             }`}
             title="Helpful"
+            disabled={submitting}
           >
             <ThumbsUp className="h-4 w-4" />
           </button>
@@ -96,6 +119,7 @@ const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
                 : "hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400"
             }`}
             title="Not helpful"
+            disabled={submitting}
           >
             <ThumbsDown className="h-4 w-4" />
           </button>
@@ -111,8 +135,9 @@ const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Share your thoughts..."
             className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none"
-            rows={3}
+            rows={2}
             maxLength={500}
+            disabled={submitting}
           />
           <div className="flex justify-end gap-2">
             <button
@@ -120,7 +145,7 @@ const FeedbackButton = ({ messageId, question, answer, onFeedbackSubmit }) => {
               disabled={submitting}
               className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition disabled:opacity-50"
             >
-              Skip
+              {comment ? "Skip" : "Submit without comment"}
             </button>
             <button
               onClick={submitFeedback}

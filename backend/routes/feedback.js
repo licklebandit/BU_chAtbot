@@ -14,6 +14,8 @@ const router = express.Router();
 // ---------------------------
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
+  console.log("Auth token present:", !!token);
+  
   if (!token) {
     req.user = null;
     return next();
@@ -22,6 +24,7 @@ const authenticate = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id).select("_id name email");
+    console.log("User authenticated:", req.user?._id);
   } catch (err) {
     console.error("JWT verification failed:", err.message);
     req.user = null;
@@ -57,25 +60,62 @@ const authenticateAdmin = async (req, res, next) => {
 // ---------------------------
 router.post("/", authenticate, async (req, res) => {
   try {
-    const { messageId, rating, question, answer, comment, category } = req.body;
+    const { messageId, rating, question, answer, comment, chatId, category } = req.body;
 
+    console.log("Received feedback submission:", {
+      messageId,
+      rating,
+      questionLength: question?.length,
+      answerLength: answer?.length,
+      commentLength: comment?.length,
+      chatId,
+      userId: req.user?._id
+    });
+
+    // Required fields validation
     if (!messageId || !rating || !question || !answer) {
-      return res.status(400).json({ message: "Missing required fields" });
+      console.log("Missing required fields:", { messageId, rating, question, answer });
+      return res.status(400).json({ 
+        message: "Missing required fields: messageId, rating, question, and answer are required" 
+      });
     }
 
     if (!["positive", "negative"].includes(rating)) {
-      return res.status(400).json({ message: "Invalid rating value" });
+      return res.status(400).json({ 
+        message: "Invalid rating value. Must be 'positive' or 'negative'" 
+      });
     }
 
     // Auto-classify intent if not provided
-    let finalCategory = category;
-    if (!finalCategory || finalCategory === "other") {
-      const { intent } = classifyIntent(question);
-      finalCategory = intent;
+    let finalCategory = category || "other";
+    if (!category || category === "other") {
+      // Simple keyword-based classification
+      const questionLower = question.toLowerCase();
+      if (questionLower.includes("admission") || questionLower.includes("apply") || questionLower.includes("enroll")) {
+        finalCategory = "admissions";
+      } else if (questionLower.includes("fee") || questionLower.includes("payment") || questionLower.includes("cost") || questionLower.includes("tuition")) {
+        finalCategory = "fees";
+      } else if (questionLower.includes("course") || questionLower.includes("class") || questionLower.includes("exam") || questionLower.includes("study") || questionLower.includes("program")) {
+        finalCategory = "academics";
+      } else if (questionLower.includes("campus") || questionLower.includes("hostel") || questionLower.includes("dorm") || questionLower.includes("accommodation") || questionLower.includes("library")) {
+        finalCategory = "campus_life";
+      } else if (questionLower.includes("help") || questionLower.includes("support") || questionLower.includes("problem") || questionLower.includes("technical")) {
+        finalCategory = "support";
+      } else if (questionLower.includes("scholarship") || questionLower.includes("financial aid") || questionLower.includes("bursary")) {
+        finalCategory = "scholarships";
+      } else if (questionLower.includes("faculty") || questionLower.includes("lecturer") || questionLower.includes("professor")) {
+        finalCategory = "faculty";
+      } else {
+        finalCategory = "other";
+      }
     }
 
+    console.log("Creating feedback with category:", finalCategory);
+
+    // Create feedback document
     const feedback = new Feedback({
-      userId: req.user?._id,
+      userId: req.user?._id || null,
+      chatId: chatId || null,
       messageId,
       rating,
       question,
@@ -85,26 +125,51 @@ router.post("/", authenticate, async (req, res) => {
     });
 
     await feedback.save();
+    console.log("Feedback saved with ID:", feedback._id);
 
-    // Update the message feedback in Chat collection
-    if (req.user) {
-      const chat = await Chat.findOne({ userId: req.user._id });
-      if (chat) {
-        const message = chat.messages.find(
-          (msg) => msg._id.toString() === messageId
-        );
-        if (message) {
-          message.feedback = {
-            rating,
-            comment: comment || "",
-            timestamp: new Date(),
-          };
-          await chat.save();
+    // Try to update the message feedback in Chat collection if user is logged in and chatId is provided
+    if (req.user && chatId) {
+      try {
+        const chat = await Chat.findOne({ 
+          _id: chatId, 
+          userId: req.user._id 
+        });
+        
+        if (chat) {
+          // Try to find the message by ID or by content if ID doesn't match
+          let messageIndex = -1;
+          
+          // First try by messageId
+          messageIndex = chat.messages.findIndex(
+            (msg) => msg._id && msg._id.toString() === messageId
+          );
+          
+          // If not found by ID, try to find by content (approximate match)
+          if (messageIndex === -1) {
+            messageIndex = chat.messages.findIndex(
+              (msg) => msg.text && msg.text.includes(answer.substring(0, 50))
+            );
+          }
+          
+          if (messageIndex !== -1) {
+            chat.messages[messageIndex].feedback = {
+              rating,
+              comment: comment || "",
+              timestamp: new Date(),
+            };
+            await chat.save();
+            console.log("Updated feedback in chat message");
+          } else {
+            console.log("Message not found in chat for feedback update");
+          }
         }
+      } catch (chatError) {
+        console.error("Error updating chat feedback:", chatError.message);
+        // Continue even if chat update fails
       }
     }
 
-    // Emit notification to admin via socket.io
+    // Emit notification to admin via socket.io if available
     const io = req.app.get("io");
     if (io) {
       io.to("adminRoom").emit("new_feedback", {
@@ -114,15 +179,24 @@ router.post("/", authenticate, async (req, res) => {
         question: question.substring(0, 100),
         timestamp: new Date(),
       });
+      console.log("Emitted feedback notification to admin");
     }
 
     res.status(201).json({
       message: "Feedback submitted successfully",
-      feedback,
+      feedback: {
+        id: feedback._id,
+        rating: feedback.rating,
+        category: feedback.category,
+        createdAt: feedback.createdAt
+      },
     });
   } catch (error) {
     console.error("Error submitting feedback:", error);
-    res.status(500).json({ message: "Error submitting feedback" });
+    res.status(500).json({ 
+      message: "Error submitting feedback",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
@@ -139,18 +213,30 @@ router.get("/", authenticateAdmin, async (req, res) => {
       resolved,
       startDate,
       endDate,
+      search,
     } = req.query;
+
+    console.log("Fetching feedback with params:", req.query);
 
     const query = {};
 
-    if (rating) query.rating = rating;
-    if (category) query.category = category;
+    if (rating && rating !== "all") query.rating = rating;
+    if (category && category !== "all") query.category = category;
     if (resolved !== undefined) query.resolved = resolved === "true";
 
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
       if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    // Search in question or answer
+    if (search && search.trim() !== "") {
+      query.$or = [
+        { question: { $regex: search, $options: "i" } },
+        { answer: { $regex: search, $options: "i" } },
+        { comment: { $regex: search, $options: "i" } }
+      ];
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -175,6 +261,30 @@ router.get("/", authenticateAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error fetching feedback:", error);
     res.status(500).json({ message: "Error fetching feedback" });
+  }
+});
+
+// ---------------------------
+// GET /api/feedback/simple - Get simplified feedback list (for testing)
+// ---------------------------
+router.get("/simple", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find()
+      .select("rating category question answer comment createdAt")
+      .sort({ createdAt: -1 })
+      .limit(50);
+    
+    res.json({
+      success: true,
+      count: feedbacks.length,
+      feedbacks
+    });
+  } catch (error) {
+    console.error("Error fetching simple feedback:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error fetching feedback" 
+    });
   }
 });
 
