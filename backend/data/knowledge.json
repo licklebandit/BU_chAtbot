@@ -1,1108 +1,838 @@
 [
   {
+    "keyword": "How do i get admissions of Bugema university?",
+    "answer": "To get admissions at Bugema university, Reach out our online platform or visit our offices physically.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "How do i reach bensdoff?",
+    "answer": "Walk through the main gate, its the first building immediately after the main gate.\n",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "IT SUPPORT CONTACT",
+    "answer": "+256 784845785",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "What seperates a day and a student at bugema university?",
+    "answer": "Day students dont have access to unuversity resources like hostels, cafeteria etc.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Where do i find annex female hostel?",
+    "answer": "you walk through the path opposite the main gate and reach the vice chancellor's home. ",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Who is the current vice chancellor or vc of bugema university?",
+    "answer": "Mr kafeero Masiko",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Who is the warden bensdoff at bugema university?",
+    "answer": "Mummy Getrude",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
     "keyword": "academic bulletin 2024-2029",
     "answer": "BUGEMA UNIVERSITY ACADEMIC BULLETIN 2024-2029 - This is the official academic guide for students admitted between 2024-2029. The bulletin contains academic policies, program requirements, university regulations, and graduation requirements. The last graduation under this bulletin will be November 2028, after which it will be phased out. Students should refer to this bulletin throughout their academic journey at Bugema University.",
     "category": "academic",
-    "tags": ["bulletin", "academic guide", "2024-2029", "policies", "regulations"],
+    "tags": [
+      "bulletin",
+      "academic guide",
+      "2024-2029",
+      "policies",
+      "regulations"
+    ],
     "priority": 1,
-    "synonyms": ["university bulletin", "academic manual", "student guide", "bulletin 2024", "academic regulations"]
-  },
-  {
-    "keyword": "vice chancellor message",
-    "answer": "Message from Vice-Chancellor Prof. Masiko I. Kafeero, Ph.D.: 'I welcome you to Bugema University, a university of choice. This bulletin is your guide to make your academic journey less stressful. Bugema University develops whole persons through the 3-H philosophy (Heart, Head, & Hands). We believe in developing individuals who are not only knowledgeable but also have hearts yearning for service beyond self, and hands prepared to work innovatively.'",
-    "category": "administration",
-    "tags": ["vc", "message", "welcome", "philosophy"],
-    "priority": 2,
-    "synonyms": ["welcome message", "vc welcome", "university philosophy", "3-H philosophy"]
-  },
-  {
-    "keyword": "bugema university vision mission motto",
-    "answer": "Vision: 'A Christian University of choice for Excellence in Education and Skilling'. Mission: 'To offer an excellent and distinctive holistic Christian education designed to prepare students, through training, research, and scholarship, for productive lives of useful service to God and to the Society with uncompromising integrity, honesty and loyalty.' Motto: 'Excellence in Service'.",
-    "category": "general",
-    "tags": ["vision", "mission", "motto", "philosophy"],
-    "priority": 1,
-    "synonyms": ["university vision", "university mission", "excellence in service", "core values"]
-  },
-  {
-    "keyword": "bugema university history",
-    "answer": "Bugema University History: 1927 - Adventist church entry in Uganda; 1948 - Institution moved to Bugema (640 acres); 1950 - Secondary 'O' level started; 1970 - Junior college began; 1974 - Upgraded to four-year seminary (BTh); 1985 - Business Studies added; 1990 - Education added; 1994 - Government license obtained; 1995 - AAA accreditation; 2000 - 800 students; 2004 - 1,236 students from 15 countries; 2008 - 2,000 students; 2009 - Recommended for Charter; 2010 - Charter signed by President Museveni; Current - Offers wide range of undergraduate and graduate programs.",
-    "category": "general",
-    "tags": ["history", "establishment", "timeline"],
-    "priority": 2,
-    "synonyms": ["historical background", "university establishment", "bugema history", "when founded"]
-  },
-  {
-    "keyword": "admission requirements detailed",
-    "answer": "UNDERGRADUATE DEGREE: O-level with 5 passes including English; A-level with 2 principal passes or equivalent; HEAC with GPA 2.8+; Mature Entry Exam pass (age 25+); Relevant diploma. DIPLOMA PROGRAMS: O-level with 4 passes including English; A-level with 1 principal pass; HEAC with GPA 2.5+; Relevant certificate. HIGHER EDUCATION ACCESS CERTIFICATE: UACE with 2 subsidiary passes; Vocational qualifications level 2/3; Foreign qualifications equivalent. CERTIFICATE PROGRAMS: O-level with 4 passes; HEAC with GPA 2.0+. Note: Specific programs may have additional requirements.",
-    "category": "admissions",
-    "tags": ["admissions", "requirements", "entry", "eligibility"],
-    "priority": 1,
-    "synonyms": ["entry requirements", "how to qualify", "admission criteria", "minimum requirements", "qualifications needed"]
-  },
-  {
-    "keyword": "mature entry admission",
-    "answer": "Mature Entry Examination: For individuals who don't meet minimum requirements but have adequate knowledge (formal/informal). Requirements: Must be at least 25 years old; Must take exam from NCHE authorized centers only. This is an aptitude test that allows qualified mature students to gain university admission.",
-    "category": "admissions",
-    "tags": ["mature", "adult", "special admission", "examination"],
-    "priority": 2,
-    "synonyms": ["adult entry", "mature student", "mature age entry", "special entry"]
-  },
-  {
-    "keyword": "international students admission",
-    "answer": "International students may be admitted provisionally with comparable certification from their country. Documents needed: Valid passport, academic transcripts, student visa, medical insurance. Students from non-A-level systems (e.g., Kenya) must enroll for Higher Education Access Certificate (HEAC). International students should contact the international students office for assistance with accommodation and orientation.",
-    "category": "admissions",
-    "tags": ["international", "foreign", "visa", "overseas"],
-    "priority": 1,
-    "synonyms": ["foreign students", "study abroad", "international applicants", "overseas admission"]
-  },
-  {
-    "keyword": "application procedure",
-    "answer": "1. Obtain application form from Registrar's office, liaison offices, or website (www.bugemouniv.ac.ug). 2. Fill form correctly and attach copies of academic certificates. 3. Pay application fee as stipulated. 4. Return documents to Registrar's office at least 3 weeks before academic year begins. Acceptance: You will receive acceptance letter if application is successful. Only come to university after receiving acceptance letter.",
-    "category": "admissions",
-    "tags": ["application", "how to apply", "procedure", "forms"],
-    "priority": 1,
-    "synonyms": ["apply process", "admission steps", "how to get admission", "application steps"]
-  },
-  {
-    "keyword": "registration process detailed",
-    "answer": "Registration involves 4 steps: STEP 1 - BUSINESS OFFICE: Arrange financial payment, obtain financial clearance. STEP 2 - ACADEMIC DEPARTMENT: Obtain registration form, pay club fee, select courses with advisor, upload in ERMS, get chairperson approval. STEP 3 - DEAN OF STUDENTS: Obtain residential status, register for BUSA, clear club obligations, submit BUSA receipt, collect Student Handbook. STEP 4 - REGISTRAR'S OFFICE: Complete registration details, obtain Registration Card, collect Academic Bulletin. Late registration available with daily increasing fee.",
-    "category": "academic",
-    "tags": ["registration", "enrollment", "signup", "procedures"],
-    "priority": 1,
-    "synonyms": ["how to register", "enrollment process", "course registration", "signup procedure", "registration steps"]
-  },
-  {
-    "keyword": "late registration policy",
-    "answer": "Late registration policy: Students with valid reasons can register late; A fee that increases daily is charged; Late registration officially closes at discretion of DVC Academic Affairs; Special cases (accidents, death in family) considered with consultation to ascertain if coursework was done.",
-    "category": "academic",
-    "tags": ["late", "registration", "fees", "policy"],
-    "priority": 2,
-    "synonyms": ["late enrollment", "delayed registration", "registration deadline", "late admission"]
-  },
-  {
-    "keyword": "student identity cards",
-    "answer": "Student ID cards: Issued by Registrar's Office after registration; Valid for duration of academic program; Issued free of charge initially; If lost/stolen: Report to police, obtain police report, present to Registrar's Office, pay fee for replacement card.",
-    "category": "student life",
-    "tags": ["id", "identity", "card", "student card"],
-    "priority": 2,
-    "synonyms": ["student id", "identification card", "university id", "id replacement"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
     "keyword": "academic calendar 2024-2025",
     "answer": "FIRST SEMESTER: Aug 5 - Dec 13, 2024 (Classes: Aug 19; Registration closes Aug 28; Exams: Nov 25-Dec 13). CHRISTMAS BREAK: Dec 16, 2024 - Jan 5, 2025. SECOND SEMESTER: Jan 13 - May 16, 2025 (Classes: Jan 20; Exams: Apr 28-May 14). SUMMER SCHOOL: May 19 - July 16, 2025. Graduation: Nov 8-10, 2024. Mid-semester breaks: Oct 7-11, 2024; Mar 17-21, 2025.",
     "category": "academic",
-    "tags": ["calendar", "schedule", "dates", "timetable"],
+    "tags": [
+      "calendar",
+      "schedule",
+      "dates",
+      "timetable"
+    ],
     "priority": 1,
-    "synonyms": ["academic schedule", "school calendar", "semester dates", "academic year dates", "when does semester start"]
-  },
-  {
-    "keyword": "semester system",
-    "answer": "Bugema University operates a semester system: Each semester = 18 weeks (1 week registration + 15 weeks instruction + 2 weeks exams). Academic year = 2 regular semesters: 1st semester (mid-August to mid-December); 2nd semester (early January to early May). Credit units: 1 credit unit = one 50-minute class per week for 15 weeks, OR 2 hours tutorial, OR 2-3 hours practical per week. Students expected to spend 2 hours preparation per class hour.",
-    "category": "academic",
-    "tags": ["semester", "system", "duration", "credits"],
-    "priority": 1,
-    "synonyms": ["semester duration", "academic system", "credit system", "term system"]
-  },
-  {
-    "keyword": "summer sessions",
-    "answer": "Summer session purpose: Industrial attachment/practicum. Course offerings: Some departments may offer courses during summer with Senate approval. Requirements: Minimum 5 students must enroll; Only full-time lecturers teach; Students must be in final semester with not more than 2 courses (6 credits) remaining. Duration: Usually 6 weeks. Summer/holiday programs follow different refund schedule.",
-    "category": "academic",
-    "tags": ["summer", "holiday", "session", "practicum"],
-    "priority": 2,
-    "synonyms": ["summer school", "holiday session", "industrial attachment", "practical training"]
-  },
-  {
-    "keyword": "grading system",
-    "answer": "Grading Scale: 80-100% = A (5.00 GPA) Excellent; 75-79.99% = B+ (4.50) Above Average; 70-74.99% = B (4.00) Average; 65-69.99% = C+ (3.50) Below Average; 50-64.99% = C (3.00) Pass; 0-49.99% = D (2.00) Failure. Degree Classification: First Class = 4.40-5.00 (Summa cum laude); Second Class Upper = 3.60-4.39 (Magna cum laude); Second Class Lower = 2.80-3.59 (Cum laude).",
-    "category": "academic",
-    "tags": ["grading", "grades", "gpa", "marks"],
-    "priority": 1,
-    "synonyms": ["grade scale", "marking system", "grading scale", "how grades work", "gpa calculation"]
-  },
-  {
-    "keyword": "gpa calculation",
-    "answer": "GPA Calculation Method: Multiply credits for each course by grade points, sum all, divide by total credits. Example: Course 1: A (5.00) × 3 credits = 15.00; Course 2: B (4.00) × 3 credits = 12.00; etc. Total points ÷ Total credits = GPA. Cumulative GPA determines degree classification.",
-    "category": "academic",
-    "tags": ["gpa", "calculation", "grade points", "cumulative"],
-    "priority": 2,
-    "synonyms": ["calculate gpa", "grade point average", "how to calculate gpa", "gpa formula"]
-  },
-  {
-    "keyword": "special grades",
-    "answer": "DG (Deferred Grade): For courses spanning multiple semesters; No GPA effect. I (Incomplete): For illness/emergency; Must clear within 1 year or becomes F. P (Pass): Pass/fail courses; No GPA contribution. CR (Credit Repeat): When repeating course for better grade; Former grade changed to CR; No GPA contribution. EX (Exemptions): For transferable courses; No GPA calculation.",
-    "category": "academic",
-    "tags": ["grades", "incomplete", "deferred", "special"],
-    "priority": 2,
-    "synonyms": ["incomplete grade", "deferred grade", "pass/fail", "grade exemptions"]
-  },
-  {
-    "keyword": "coursework assessment",
-    "answer": "Coursework (Continuous Assessment) = 50% of final grade. Components: Assignments, projects, presentations, quizzes, tests, mid-semester exams (combination depends on lecturer). Submission deadline: Within semester unless special arrangements. Late submission: Not accepted after semester ends. Failed coursework: Cannot be supplemented after semester closes.",
-    "category": "academic",
-    "tags": ["coursework", "assessment", "assignments", "continuous"],
-    "priority": 1,
-    "synonyms": ["assignments", "continuous assessment", "class work", "course work marks"]
-  },
-  {
-    "keyword": "examinations policy",
-    "answer": "Final Exams = 50% of grade. All students must take final exams. Failure to take exam = F grade. Special exams: Available for illness/emergency with DVC approval, fee payment, within 1 academic year. Exam periods: Last 2 weeks of semester; 2 sessions daily (9am-12pm, 2pm-5pm). Prerequisite: All fees must be paid or arrangements made. Rules: Bring exam pass & student ID; Sign attendance; No admission after 30 minutes; No borrowing; Only non-programmable calculators; No phones/electronic devices.",
-    "category": "academic",
-    "tags": ["exams", "examinations", "tests", "final"],
-    "priority": 1,
-    "synonyms": ["exam rules", "final exams", "examination policy", "test regulations", "exam schedule"]
-  },
-  {
-    "keyword": "supplementary exams",
-    "answer": "Supplementary/Retake Exams: Allowed for students who failed final exam but scored minimum 25/50 in coursework. Procedure: Obtain request form from Registrar's Office, fill, supply copies to Business Office, department, Examination Office. Fee: Required. Maximum grade: D (plain). Time limit: Failed course must be cleared within 1 academic year or must repeat course.",
-    "category": "academic",
-    "tags": ["supplementary", "retake", "repeat", "exams"],
-    "priority": 2,
-    "synonyms": ["re-sit", "repeat exam", "make-up exam", "retake examination"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
     "keyword": "academic dishonesty",
     "answer": "Bugema University prohibits all forms of academic dishonesty: PLAGIARISM (25% maximum allowed in research); CHEATING (copying, cheat sheets, impersonation); MISREPRESENTATION (fabricating sources); ACADEMIC MISCONDUCT (selling papers, changing grades, theft). Penalties apply as per Examination Policy Handbook. Research papers/thesis must comply with 25% plagiarism policy.",
     "category": "academic",
-    "tags": ["plagiarism", "cheating", "dishonesty", "ethics"],
+    "tags": [
+      "plagiarism",
+      "cheating",
+      "dishonesty",
+      "ethics"
+    ],
     "priority": 1,
-    "synonyms": ["academic integrity", "plagiarism policy", "cheating rules", "academic ethics"]
-  },
-  {
-    "keyword": "academic probation",
-    "answer": "Academic Probation Policy: Warning - GPA below 2.00 in one semester; Probation/Suspension - GPA below 2.00 for two consecutive semesters (one academic year suspension); Termination - GPA below 2.00 after probation period.",
-    "category": "academic",
-    "tags": ["probation", "suspension", "academic standing", "warning"],
-    "priority": 2,
-    "synonyms": ["academic suspension", "probation policy", "academic warning", "poor performance"]
-  },
-  {
-    "keyword": "adding dropping courses",
-    "answer": "Adding/Dropping Courses: Fill form from Registrar's Office; Get lecturer approval; Return form to Registrar's Office; Fee charged for changes. Deadlines: Adding - up to published 'Last day to enter any class'; Dropping - by deadline (no record); Dropping after deadline = F grade recorded.",
-    "category": "academic",
-    "tags": ["add", "drop", "courses", "changes"],
-    "priority": 2,
-    "synonyms": ["course changes", "add/drop deadline", "changing courses", "course withdrawal"]
-  },
-  {
-    "keyword": "auditing courses",
-    "answer": "Auditing Courses: Fill designated form from Registrar's Office; Pay 70% of fee per credit unit; May attend classes regularly; No quizzes or examinations; No credits or grades given; If credit desired later, must repeat course at another time.",
-    "category": "academic",
-    "tags": ["audit", "auditing", "courses", "non-credit"],
-    "priority": 3,
-    "synonyms": ["audit class", "non-credit course", "sit-in", "audit option"]
-  },
-  {
-    "keyword": "attendance policy",
-    "answer": "Attendance Policy: Required for all classes (lectures, tutorials, practicals). Excused absences: Illness, authorized trips, circumstances beyond control. Unexcused absences: Other reasons. Makeup work: Allowed for excused absences; Not allowed for unexcused absences. Excessive absences: Exceeding 15% of contact hours may require dropping course. Tardiness: 5-10 minutes late 3 times = 1 absence; 15+ minutes late or missing 15+ minutes = absence.",
-    "category": "academic",
-    "tags": ["attendance", "absences", "absent", "tardiness"],
-    "priority": 1,
-    "synonyms": ["class attendance", "absent policy", "missed classes", "attendance rules"]
-  },
-  {
-    "keyword": "general assembly",
-    "answer": "General Assembly: Held every Tuesday 10:00-11:00am (time may change with notification). Attendance is required for all Bugema University students as part of academic life.",
-    "category": "student life",
-    "tags": ["assembly", "meeting", "weekly", "gathering"],
-    "priority": 2,
-    "synonyms": ["tuesday assembly", "weekly meeting", "university assembly", "general meeting"]
-  },
-  {
-    "keyword": "dead semester year",
-    "answer": "Dead Semester/Year: Student unable to continue classes for semester/year should submit application to Registrar through department, supported by sponsor communication. Failure to apply may require reapplication upon return.",
-    "category": "academic",
-    "tags": ["break", "leave", "interruption", "pause"],
-    "priority": 2,
-    "synonyms": ["academic break", "study interruption", "leave of absence", "break from studies"]
-  },
-  {
-    "keyword": "withdrawal from university",
-    "answer": "Withdrawal Procedure: 1. Obtain clearance form from Registrar's Office; 2. Fill form and obtain all required signatures; 3. Submit completed withdrawal form. Documents issued: Withdrawal letter with partial transcript of covered semester(s). Withdrawal only effective upon form submission.",
-    "category": "academic",
-    "tags": ["withdrawal", "leave", "exit", "drop out"],
-    "priority": 2,
-    "synonyms": ["leave university", "drop out process", "withdraw procedure", "exit university"]
-  },
-  {
-    "keyword": "transfer credits",
-    "answer": "Transfer Credits Policy: Bugema University accepts credits from recognized universities. Procedure: Request previous institution to send transcripts directly to Bugema Registrar. Requirements: No grade below D+; Overall GPA ≥ 2.50; Minimum 15 upper division courses (45 credits) in major taken at Bugema; Minimum 5 upper division courses (15 credits) in minor taken at Bugema; Transfer credits not accepted until completion of one semester at Bugema.",
-    "category": "academic",
-    "tags": ["transfer", "credits", "transcript", "previous study"],
-    "priority": 2,
-    "synonyms": ["credit transfer", "previous credits", "transfer students", "external credits"]
-  },
-  {
-    "keyword": "change of program department",
-    "answer": "Changing Program/Department: Acceptable with department heads and Registrar guidance. Requirements: Complete 18 credit hours (one semester) first; Check with current and new departments for qualifications; Obtain Change of Major/Program Form from Registrar's Office; Apply for transfer.",
-    "category": "academic",
-    "tags": ["change", "program", "department", "transfer"],
-    "priority": 2,
-    "synonyms": ["switch major", "change course", "transfer department", "program transfer"]
-  },
-  {
-    "keyword": "change of campus centre",
-    "answer": "Change Campus/Centre: Timing - Beginning of academic year; Procedure - Fill designated form from host campus, get department clearance, receive transfer letter and assessment sheet. Restrictions: Not allowed without proper procedure; Not allowed if remaining with one semester; Only at end/beginning of academic year.",
-    "category": "academic",
-    "tags": ["campus", "centre", "transfer", "location"],
-    "priority": 2,
-    "synonyms": ["campus transfer", "change campus", "center transfer", "location change"]
-  },
-  {
-    "keyword": "erms student portal",
-    "answer": "ERMS (Educational Resource Management System): portal.bugemauniv.ac.ug. Uses: View results, register courses, check fees balance, download transcripts, access course materials. Login: Student number and password. Parents can access with student's ID and password to monitor progress. Assessment sheet: Print once free; additional copies attract fee.",
-    "category": "technical",
-    "tags": ["erms", "portal", "online", "student system"],
-    "priority": 1,
-    "synonyms": ["student portal", "online portal", "academic portal", "university portal", "digital platform"]
-  },
-  {
-    "keyword": "graduation requirements detailed",
-    "answer": "Graduation Requirements: 1. Complete all required course credits; 2. Clear all outstanding fees; 3. No disciplinary cases; 4. Apply through academic registry; 5. Minimum GPA requirements: Major - 2.25, Minor - 2.00, Cumulative - 2.00; 6. No grades below D accepted; 7. Complete major, minor, cognate (if required); 8. Complete General Education courses; 9. Submit transfer transcripts if applicable; 10. Clear all service departments.",
-    "category": "academic",
-    "tags": ["graduation", "requirements", "completion", "finishing"],
-    "priority": 1,
-    "synonyms": ["how to graduate", "graduation criteria", "completion requirements", "finishing requirements", "graduation eligibility"]
-  },
-  {
-    "keyword": "graduation in absentia",
-    "answer": "Graduation in Absentia: Candidates must be present unless permission granted. Application: Submit written request to DVC - Academics at least 3 weeks before convocation; Include reason and fee; Permission only for obvious necessity. Procedure: Apply with genuine reasons; Must fulfill all requirements including fee payment. Restriction: Not granted when student is on campus.",
-    "category": "academic",
-    "tags": ["graduation", "absent", "in absentia", "ceremony"],
-    "priority": 2,
-    "synonyms": ["absent graduation", "not attending graduation", "graduate in absence", "miss graduation"]
-  },
-  {
-    "keyword": "certificates transcripts collection",
-    "answer": "Certificate/Transcript Collection: Ready 1 month after graduation; Collect personally within 1 year; After 1 year: $2/month surcharge; Previous uncollected documents also charged; Safe custody at Registrar's Office: $1/month; Reprint/corrections handled by officers. Alternative collection: Legally registered spouse/sponsor/guardian; Or DHL delivery (preferred).",
-    "category": "academic",
-    "tags": ["certificates", "transcripts", "documents", "collection"],
-    "priority": 2,
-    "synonyms": ["collect documents", "get certificate", "transcript collection", "graduation documents"]
-  },
-  {
-    "keyword": "lost damaged documents replacement",
-    "answer": "Lost/Damaged Documents Replacement: Bugema University may issue duplicate original certificate with Senate action. Requirements: 1. Hand-written signed request letter; 2. Police report; 3. Affidavit from recognized firm/lawyer; 4. Payment for certificate reprint.",
-    "category": "academic",
-    "tags": ["lost", "damaged", "documents", "replacement"],
-    "priority": 2,
-    "synonyms": ["replace certificate", "lost transcript", "damaged documents", "document replacement"]
-  },
-  {
-    "keyword": "tuition fees payment",
-    "answer": "Tuition Payment: All fees must be paid before registration. Bank Accounts: Equity Bank (UGX: 1017200261563; KES: 1004203110057); Centenary Bank (UGX: 3100018764); UBA (UGX: 1206000016; Forex: 0113009891); Standard Chartered (Forex: 8702010609600). International Transfers: UBA (SWIFT: UNAFUGKA) or Standard Chartered (SWIFT: SCBLUGKA). Present deposit slip to cashier within deposit month.",
-    "category": "fees",
-    "tags": ["fees", "payment", "bank", "tuition"],
-    "priority": 1,
-    "synonyms": ["fee payment", "bank accounts", "how to pay fees", "tuition payment", "payment methods"]
-  },
-  {
-    "keyword": "fees refund policy",
-    "answer": "Refund Policy: Applies to course load changes, withdrawal, dropout, expulsion, non-completion. Effective date: Date student notifies university or last class attended. Institutional Charges Refund: Week 1 - 80%; Week 2 - 70%; Weeks 3-4 - 60%; Week 5 - 50%; After Week 5 - 0%. Summer/Holiday Refund: First 2 class days - 80%; Next 4 days - 10% less each day; After 5 days - 0%.",
-    "category": "fees",
-    "tags": ["refund", "fees", "money back", "withdrawal"],
-    "priority": 2,
-    "synonyms": ["fee refund", "money refund", "withdrawal refund", "tuition refund"]
-  },
-  {
-    "keyword": "late fees charges",
-    "answer": "Late Fees: Continuing students reporting after normal registration charged late fee; Amount increases daily to maximum UGX 300,000; Purpose: Encourage early arrival and registration.",
-    "category": "fees",
-    "tags": ["late", "fees", "charges", "penalty"],
-    "priority": 2,
-    "synonyms": ["late payment", "registration late fee", "late arrival fee", "delayed registration fee"]
-  },
-  {
-    "keyword": "financial matters general",
-    "answer": "General Financial Matters: University can withhold registration materials, results, transcripts, diplomas for unpaid amounts. Fees covered: Tuition, room/board, library fines, book costs, damages. Students responsible for breakage/damage costs. Personal effects should be insured; University accepts no liability for loss/damage. Postdated cheques not accepted. Bounced cheques treated per bank/government regulations.",
-    "category": "fees",
-    "tags": ["financial", "obligations", "responsibilities", "withholding"],
-    "priority": 2,
-    "synonyms": ["financial obligations", "unpaid fees", "financial responsibilities", "fee clearance"]
-  },
-  {
-    "keyword": "library hours detailed",
-    "answer": "E.W. Petersen Memorial Library Hours: Sunday - 7:30am-6:00pm, 7:30pm-10:00pm; Monday-Thursday - 7:30am-6:00pm, 7:30pm-10:00pm; Friday - 7:30am-12:00 noon; Saturday - 7:30pm-10:00pm. Services: Lending, information provision, literature search, reader advisory, photocopying, binding. Facilities: Internet, printed materials, CD-ROMs, theses, e-journals/books, online catalog, multimedia room.",
-    "category": "facilities",
-    "tags": ["library", "hours", "services", "facilities"],
-    "priority": 1,
-    "synonyms": ["library opening hours", "library schedule", "library services", "library access", "study hours"]
-  },
-  {
-    "keyword": "library location description",
-    "answer": "Library Location: Main academic block, next to ICT center, ground floor of administration building. Sections: Reference section and lending section. Named after E.W. Petersen, pioneer who helped found institution in 1948.",
-    "category": "facilities",
-    "tags": ["library", "location", "building", "where"],
-    "priority": 2,
-    "synonyms": ["where is library", "library whereabouts", "find library", "library building", "library directions"]
-  },
-  {
-    "keyword": "student accommodation housing",
-    "answer": "Accommodation: Female students (not with parents/spouses) encouraged to live in campus residence halls. Male students (not with parents/spouses) may live in approved private facilities near campus. Facilities: Beds and basic conveniences provided; Students provide own mattresses/bedding. No married student housing. Keys: Issued at entrance, returned when moving out; Replacement fee for lost keys. Room check: At semester end for cleanliness/damage; Charges for cleaning/repairs. Non-residents cannot use hall facilities. Vacation stay: Apply 1 month before closure; Room/board fee charged.",
-    "category": "accommodation",
-    "tags": ["hostel", "accommodation", "housing", "dormitory"],
-    "priority": 1,
-    "synonyms": ["student housing", "dormitory", "residential accommodation", "campus housing", "where to stay"]
-  },
-  {
-    "keyword": "food services cafeteria",
-    "answer": "Food Services: University operates bakery, kitchen, cafeteria offering balanced vegetarian diet. Residence hall students encouraged to eat in cafeteria (no cooking in rooms). Cost: Three meals/day included in boarding fees. Other options: University snack center; Privately owned restaurants near campus.",
-    "category": "student life",
-    "tags": ["food", "cafeteria", "meals", "dining"],
-    "priority": 2,
-    "synonyms": ["meals", "dining hall", "cafeteria hours", "food options", "eating facilities"]
-  },
-  {
-    "keyword": "medical services health",
-    "answer": "Medical Services: University medical clinic near administration block. Services: Basic healthcare, laboratory, maternal-child health, dental, optical, HIV counseling/testing, community health. Hours: During working hours; Emergency services 24/7.",
-    "category": "services",
-    "tags": ["medical", "health", "clinic", "healthcare"],
-    "priority": 1,
-    "synonyms": ["health services", "medical clinic", "university hospital", "healthcare facility", "campus clinic"]
-  },
-  {
-    "keyword": "student life services",
-    "answer": "Student Life Services: Student Handbook provided with guidelines/rules; Leave of absence forms from Director of Students Affairs; Marriages generally discouraged during academic year; Literature Evangelism Ministry for fee earning; Off-campus trips require proper behavior; Student Government (BUSA) with elections yearly; Student clubs with membership fees; Student vehicles must be registered, licensed, insured; Work program for part-time earnings; Recreational sports facilities; Internet at library, tele-center, computer labs.",
-    "category": "student life",
-    "tags": ["student", "life", "services", "activities"],
-    "priority": 2,
-    "synonyms": ["campus life", "student activities", "university life", "student services"]
-  },
-  {
-    "keyword": "recreational sports facilities",
-    "answer": "Recreational Sports: Facilities for volleyball, basketball, soccer, netball, handball, badminton, table tennis. Ample space for exercise, jogging, walking. Sports Day: Every Tuesday from 4:00pm. Encouragement: Regular recreation/exercise promoted for physical fitness.",
-    "category": "facilities",
-    "tags": ["sports", "recreation", "games", "facilities"],
-    "priority": 2,
-    "synonyms": ["sports facilities", "games", "athletics", "physical activities", "sports day"]
-  },
-  {
-    "keyword": "bus student association",
-    "answer": "BUSA (Bugema University Student Association): Primary association for all registered students. Purpose: Leadership opportunities, communication with faculty/administration. Elections: Yearly. Services: Operates canteen, copy center, computing facility ('the container'). Available: Typing, printing, book binding, scanning, photocopying. Shop: Soft drinks, snacks, airtime, school supplies.",
-    "category": "student life",
-    "tags": ["busa", "student", "association", "government"],
-    "priority": 2,
-    "synonyms": ["student government", "student association", "busa services", "student organization"]
-  },
-  {
-    "keyword": "student code of conduct",
-    "answer": "Code of Conduct: Based on Seventh-day Adventist Christian principles. Prohibited: Illegal drugs/tobacco/alcohol; Stealing/gambling; Vulgar language/degrading literature; Defying authority; Violence; Tampering with locks/illegal entry; Firearms/weapons; Immorality; Instigating lawlessness; Public sexual intimacy; Unauthorized meetings. Consequences: Unwillingness to cooperate may lead to withdrawal or denial of readmission.",
-    "category": "student life",
-    "tags": ["conduct", "rules", "behavior", "discipline"],
-    "priority": 1,
-    "synonyms": ["rules and regulations", "student conduct", "behavior rules", "university rules", "disciplinary code"]
-  },
-  {
-    "keyword": "spiritual life convocation",
-    "answer": "Spiritual Life: Students expected to attend weekly convocations, special spiritual weeks, worship services. Purpose: Personal enrichment, spiritual growth. Activities: Daily worship, weekend services, weekly assemblies, group prayers, off-campus witnessing, Adventist Youth Society. Sabbath observance: Sunset Friday to sunset Saturday; Day for rest, worship, praise; Expected conduct in harmony with sacredness.",
-    "category": "student life",
-    "tags": ["spiritual", "religion", "worship", "sabbath"],
-    "priority": 2,
-    "synonyms": ["religious life", "worship services", "spiritual activities", "sabbath observance", "convocation"]
-  },
-  {
-    "keyword": "work program opportunities",
-    "answer": "Work Program: University operates auxiliary/vocational services for part-time work. Purpose: Earn money for school expenses; Develop industry, dependability, initiative; Acquire vocational skills. Opportunities available for students to engage in productive labor.",
-    "category": "student life",
-    "tags": ["work", "employment", "part-time", "jobs"],
-    "priority": 2,
-    "synonyms": ["student jobs", "part-time work", "campus employment", "work opportunities", "student employment"]
-  },
-  {
-    "keyword": "literature evangelism ministry",
-    "answer": "Literature Evangelism Ministry: Students can earn substantial money toward fees by engaging during holidays (June-July). Territories: East/Central Africa Division, Scandinavian countries. Requirement: Join Ministerial Association for recommendations.",
-    "category": "student life",
-    "tags": ["literature", "evangelism", "ministry", "earn money"],
-    "priority": 3,
-    "synonyms": ["book ministry", "evangelism work", "holiday work", "fee earning", "summer ministry"]
-  },
-  {
-    "keyword": "higher education access certificate heac",
-    "answer": "HEAC (Higher Education Access Certificate): For students whose qualifications not equivalent to UACE. Categories: HEAC Humanities (Business/Arts/Theology); HEAC Physical Sciences (Computing/Technology); HEAC Biological Studies (Nursing/Agriculture/Health). Admission: UACE with 2 subsidiary passes; Vocational qualifications level 2/3; Foreign qualifications with 5 subjects minimum grade C. Program: 2 semesters, 40-44 credits. Required before degree/diploma if qualifications insufficient.",
-    "category": "academic",
-    "tags": ["heac", "access", "certificate", "bridging"],
-    "priority": 1,
-    "synonyms": ["bridging course", "access certificate", "pre-university", "foundation course", "heac program"]
-  },
-  {
-    "keyword": "general education courses gec",
-    "answer": "General Education Courses (GEC): Required for all students. Seven areas: Religion, Health, Computer Skills, Writing Skills, Science/Math, Social Awareness, Vocational Studies. Requirement: At least one course in each area. Total credits: 21. Diploma/Certificate students: Required courses: Christian Beliefs, Health Principles, Fundamentals of Computer, Introduction to Writing Skills (13 credits).",
-    "category": "academic",
-    "tags": ["gec", "general", "education", "courses"],
-    "priority": 1,
-    "synonyms": ["general courses", "required courses", "core courses", "foundation courses", "gec requirements"]
-  },
-  {
-    "keyword": "school of agricultural and applied sciences",
-    "answer": "School of Agricultural and Applied Sciences: Dean - Assoc. Prof. Paul Nampala, PhD. Philosophy: Science as study of God's handiwork to sustain mankind. Mission: Train holistic professionals in Agricultural Sciences and Rural Development. Vision: Center of excellence in Research, Training, Community Engagement, Sustainable Innovations. Departments: Agricultural & Environmental Sciences; Nutrition, Food Science & Technology. Programs: BSc Agriculture (Crop/Animal Science), BSc Agribusiness Innovation & Management, BSc Environmental Science, BSc Food Technology & Human Nutrition, Diplomas, Certificates.",
-    "category": "academic",
-    "tags": ["agriculture", "sciences", "school", "programs"],
-    "priority": 2,
-    "synonyms": ["agricultural sciences", "farm programs", "agriculture school", "agribusiness", "environmental science"]
-  },
-  {
-    "keyword": "school of business",
-    "answer": "School of Business: Departments: Accounting & Finance; Management. Programs: BBA, BSc Accounting, BSc Finance & Banking, BA HRM, BA Economics, B Entrepreneurship, B Procurement & Supply Chain, B Secretarial Studies, Diplomas in related fields.",
-    "category": "academic",
-    "tags": ["business", "school", "programs", "management"],
-    "priority": 1,
-    "synonyms": ["business school", "commerce", "management programs", "accounting", "finance"]
-  },
-  {
-    "keyword": "school of education",
-    "answer": "School of Education: Departments: Arts Education; Science Education; Institute of Professional Growth. Programs: BA with Education, BSc with Education, Diploma in Education (Primary/Secondary), various teaching subjects including Economics, Entrepreneurship, Business Studies, Geography, History, Religious Education, Languages, Sciences, Agriculture, ICT.",
-    "category": "academic",
-    "tags": ["education", "school", "teaching", "programs"],
-    "priority": 1,
-    "synonyms": ["teaching programs", "education school", "teacher training", "education courses"]
-  },
-  {
-    "keyword": "school of health and allied sciences",
-    "answer": "School of Health and Allied Sciences: Department of Nursing and Midwifery. Programs: Bachelor of Nursing Science, Diploma in Nursing, Diploma in Nursing Extension, Certificate in Nursing.",
-    "category": "academic",
-    "tags": ["health", "nursing", "sciences", "programs"],
-    "priority": 1,
-    "synonyms": ["nursing school", "health sciences", "medical programs", "nursing programs", "health courses"]
-  },
-  {
-    "keyword": "school of science and technology",
-    "answer": "School of Science and Technology: Departments: Computing & Informatics; Life & Physical Sciences. Programs: BSc Software Engineering, BSc Network Systems Administration, B Business Computing, B Library & Information Science, B Information Technology, BSc Statistics, BSc Biochemistry, Diplomas in Computer Forensics, IT, Science Lab Tech, Biomedical Engineering, Certificates.",
-    "category": "academic",
-    "tags": ["science", "technology", "computing", "programs"],
-    "priority": 1,
-    "synonyms": ["technology school", "science programs", "computing courses", "it programs", "engineering"]
-  },
-  {
-    "keyword": "school of social sciences",
-    "answer": "School of Social Sciences: Departments: Development & Humanitarian Studies; Public Administration & Management; Social Work. Programs: BA Development Studies, BA Community Development, BA Humanitarian Emergency Management, BA Journalism, BA Peace & Conflict Management, B Public Administration, B Social Work, BSc Psychology & Counseling, Diplomas, Certificates.",
-    "category": "academic",
-    "tags": ["social", "sciences", "programs", "development"],
-    "priority": 1,
-    "synonyms": ["social sciences", "development studies", "social work", "public administration", "humanitarian studies"]
-  },
-  {
-    "keyword": "school of theology and religious studies",
-    "answer": "School of Theology and Religious Studies: Departments: Theology; Religious Studies. Programs: B Theology, BA Religious Studies with Chaplaincy/Development/Evangelism/Urban Ministry options, Diploma in Theology, Certificate in Theology.",
-    "category": "academic",
-    "tags": ["theology", "religion", "programs", "ministry"],
-    "priority": 1,
-    "synonyms": ["theology school", "religious studies", "ministry programs", "theology courses", "religious education"]
-  },
-  {
-    "keyword": "program duration",
-    "answer": "Program Duration: Degree programs - 3-4 years (max 7 years); Diploma/Certificate - 2 years (max 5 years); HEAC - 1 year (2 semesters). Breaking residency: Less than 7 years - retain completed work if bulletin unchanged; 7+ years - forfeit previous work, re-admission required.",
-    "category": "academic",
-    "tags": ["duration", "length", "years", "program"],
-    "priority": 2,
-    "synonyms": ["course duration", "program length", "how many years", "study duration", "program timeframe"]
-  },
-  {
-    "keyword": "research project requirement",
-    "answer": "Research Project Requirement: All degree programs require independent research as capstone. Procedure: Present proposal, conduct research, write thesis/journal manuscript under supervisor guidance, present orally at seminar before panel. Research coordinator assigns mentor/supervisor.",
-    "category": "academic",
-    "tags": ["research", "project", "thesis", "capstone"],
-    "priority": 1,
-    "synonyms": ["final project", "research thesis", "capstone project", "dissertation", "research requirement"]
-  },
-  {
-    "keyword": "internship industrial training",
-    "answer": "Internship/Industrial Training: Required for many programs (e.g., Agriculture - 2 months in second year summer). Purpose: Practical knowledge exposure, research skills enhancement, field expertise development. Industrial Training I & II courses (3 credits each) for some programs.",
-    "category": "academic",
-    "tags": ["internship", "training", "practical", "industrial"],
-    "priority": 1,
-    "synonyms": ["practical training", "field attachment", "work placement", "industrial attachment", "practicum"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
     "keyword": "academic grievances",
     "answer": "Academic Grievances Resolution: 1. Try resolve with course instructor; 2. Head of Department; 3. Dean of School; 4. Senate if unresolved. All grievances should be resolved at lowest possible level.",
     "category": "academic",
-    "tags": ["grievances", "complaints", "issues", "resolution"],
+    "tags": [
+      "grievances",
+      "complaints",
+      "issues",
+      "resolution"
+    ],
     "priority": 2,
-    "synonyms": ["complaints", "academic issues", "problem resolution", "grievance procedure"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
-    "keyword": "challenge examinations",
-    "answer": "Challenge Examinations: For students with prior knowledge of introductory courses. Restrictions: Not for failed/repeated courses; Maximum 6-8 credits through challenge exams. Procedure: Written request to Head of Department; Department presents to Senate; Approval letter sent; Obtain form from Registrar; Pay 75% of course tuition fee; Take exam.",
+    "keyword": "academic probation",
+    "answer": "Academic Probation Policy: Warning - GPA below 2.00 in one semester; Probation/Suspension - GPA below 2.00 for two consecutive semesters (one academic year suspension); Termination - GPA below 2.00 after probation period.",
     "category": "academic",
-    "tags": ["challenge", "exam", "prior", "knowledge"],
+    "tags": [
+      "probation",
+      "suspension",
+      "academic standing",
+      "warning"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "adding dropping courses",
+    "answer": "Adding/Dropping Courses: Fill form from Registrar's Office; Get lecturer approval; Return form to Registrar's Office; Fee charged for changes. Deadlines: Adding - up to published 'Last day to enter any class'; Dropping - by deadline (no record); Dropping after deadline = F grade recorded.",
+    "category": "academic",
+    "tags": [
+      "add",
+      "drop",
+      "courses",
+      "changes"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "admission requirements detailed",
+    "answer": "UNDERGRADUATE DEGREE: O-level with 5 passes including English; A-level with 2 principal passes or equivalent; HEAC with GPA 2.8+; Mature Entry Exam pass (age 25+); Relevant diploma. DIPLOMA PROGRAMS: O-level with 4 passes including English; A-level with 1 principal pass; HEAC with GPA 2.5+; Relevant certificate. HIGHER EDUCATION ACCESS CERTIFICATE: UACE with 2 subsidiary passes; Vocational qualifications level 2/3; Foreign qualifications equivalent. CERTIFICATE PROGRAMS: O-level with 4 passes; HEAC with GPA 2.0+. Note: Specific programs may have additional requirements.",
+    "category": "admissions",
+    "tags": [
+      "admissions",
+      "requirements",
+      "entry",
+      "eligibility"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "application procedure",
+    "answer": "1. Obtain application form from Registrar's office, liaison offices, or website (www.bugemouniv.ac.ug). 2. Fill form correctly and attach copies of academic certificates. 3. Pay application fee as stipulated. 4. Return documents to Registrar's office at least 3 weeks before academic year begins. Acceptance: You will receive acceptance letter if application is successful. Only come to university after receiving acceptance letter.",
+    "category": "admissions",
+    "tags": [
+      "application",
+      "how to apply",
+      "procedure",
+      "forms"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "attendance policy",
+    "answer": "Attendance Policy: Required for all classes (lectures, tutorials, practicals). Excused absences: Illness, authorized trips, circumstances beyond control. Unexcused absences: Other reasons. Makeup work: Allowed for excused absences; Not allowed for unexcused absences. Excessive absences: Exceeding 15% of contact hours may require dropping course. Tardiness: 5-10 minutes late 3 times = 1 absence; 15+ minutes late or missing 15+ minutes = absence.",
+    "category": "academic",
+    "tags": [
+      "attendance",
+      "absences",
+      "absent",
+      "tardiness"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "auditing courses",
+    "answer": "Auditing Courses: Fill designated form from Registrar's Office; Pay 70% of fee per credit unit; May attend classes regularly; No quizzes or examinations; No credits or grades given; If credit desired later, must repeat course at another time.",
+    "category": "academic",
+    "tags": [
+      "audit",
+      "auditing",
+      "courses",
+      "non-credit"
+    ],
     "priority": 3,
-    "synonyms": ["prior learning", "exemption exam", "challenge test", "credit by exam", "advanced standing"]
-  },
-  {
-    "keyword": "exam remarking",
-    "answer": "Exam Remarking Procedure: 1. Obtain Head of Department approval; 2. Pay required remarking fee; 3. Submit application to Head of Department. Script retention: Lecturers submit scripts to departments; Keep grade backups; Scripts may be destroyed after 3 years per Senate instruction.",
-    "category": "academic",
-    "tags": ["remarking", "reevaluation", "exam", "review"],
-    "priority": 2,
-    "synonyms": ["reexamine", "regrading", "paper review", "exam reevaluation", "remark paper"]
-  },
-  {
-    "keyword": "change of bulletin",
-    "answer": "Bulletin Change Policy: Academic bulletin valid for 5 years; After expiry, additional 5 years given for last cohort to graduate; Current bulletin 2024-2029 graduates last cohort November 2033. If bulletin changes while student enrolled, evaluation by Head of Department determines course adaptations.",
-    "category": "academic",
-    "tags": ["bulletin", "change", "validity", "period"],
-    "priority": 2,
-    "synonyms": ["bulletin validity", "bulletin expiry", "curriculum change", "program change"]
-  },
-  {
-    "keyword": "ethical standards",
-    "answer": "Bugema University Ethical Standards: 1. Faith-Based Education; 2. Academic Integrity; 3. Respect for Human Dignity; 4. Commitment to Service; 5. Professionalism & Accountability; 6. Care for Environment; 7. Respect for Religious Freedom; 8. Health & Wholeness. Based on Seventh-day Adventist principles promoting moral integrity, spiritual development, service to humanity.",
-    "category": "general",
-    "tags": ["ethics", "standards", "principles", "values"],
-    "priority": 1,
-    "synonyms": ["ethical principles", "university values", "moral standards", "code of ethics", "ethical guidelines"]
-  },
-  {
-    "keyword": "contact information detailed",
-    "answer": "Bugema University Contact: Physical Address: Bugema University, 32km North of Kampala, Gayaza-Zirobwe Rd, Near Busilka Town Council, Luweero, UGANDA. Postal: P.O. Box 6529, Kampala. Telephone: (256) 312 351400. Mobile/WhatsApp: +256 773 408 090. Email: registrar@bugemouniv.ac.ug. Website: www.bugemouniv.ac.ug. Transportation: Public taxis UGX 5,000 from Old Taxi Park; Special hire ~UGX 70,000.",
-    "category": "general",
-    "tags": ["contact", "location", "phone", "email", "address"],
-    "priority": 1,
-    "synonyms": ["contact details", "how to contact", "phone number", "email address", "university address", "location details"]
-  },
-  {
-    "keyword": "nondiscrimination policy",
-    "answer": "Nondiscrimination Policy: Bugema University does not discriminate on basis of age, gender, color, religion, nationality, or ethnic origin in educational admission policies. However, studying at Bugema University is a privilege, not a right.",
-    "category": "general",
-    "tags": ["policy", "nondiscrimination", "equality", "admissions"],
-    "priority": 2,
-    "synonyms": ["equal opportunity", "non-discrimination", "admission equality", "fair treatment"]
-  },
-  {
-    "keyword": "accreditation status",
-    "answer": "Accreditation: Bugema University holds accreditation from Adventist Accrediting Association (AAA), Maryland, USA, and is chartered by Republic of Uganda through National Council of Higher Education.",
-    "category": "general",
-    "tags": ["accreditation", "accredited", "recognition", "charter"],
-    "priority": 1,
-    "synonyms": ["accredited university", "university recognition", "accreditation status", "chartered university"]
-  },
-  {
-    "keyword": "quality assurance",
-    "answer": "Quality Assurance: University has quality assurance system with self-regulating procedures to maintain academic excellence standards in delivery and performance.",
-    "category": "general",
-    "tags": ["quality", "assurance", "standards", "excellence"],
-    "priority": 2,
-    "synonyms": ["quality system", "standards maintenance", "academic quality", "quality control"]
-  },
-  {
-    "keyword": "senate functions",
-    "answer": "Senate Functions: Responsible for all academic policies, dates, programs, courses, academic matters. Acts on student appeals/requests regarding academic issues, conflict resolutions, exemptions to policies, graduation requirements.",
-    "category": "administration",
-    "tags": ["senate", "academic", "policies", "governance"],
-    "priority": 2,
-    "synonyms": ["academic senate", "university senate", "governing body", "academic council"]
-  },
-  {
-    "keyword": "programs offered comprehensive",
-    "answer": "Comprehensive Programs Offered: AGRICULTURE: BSc Agriculture (Crop/Animal), BSc Agribusiness, BSc Environmental Science, BSc Food Technology. BUSINESS: BBA, BSc Accounting, BSc Finance, BA HRM, BA Economics, B Entrepreneurship, B Procurement, B Secretarial. EDUCATION: BA/BSc with Education, Diplomas. HEALTH: B Nursing Science. SCIENCE/TECH: BSc Software Engineering, BSc Network Admin, B Business Computing, B Info Tech, BSc Statistics, BSc Biochemistry. SOCIAL SCIENCES: BA Development, BA Community Dev, BA Humanitarian, BA Journalism, B Public Admin, B Social Work, BSc Psychology. THEOLOGY: B Theology, BA Religious Studies. Plus Diplomas & Certificates in all fields.",
-    "category": "academic",
-    "tags": ["courses", "programs", "degrees", "study"],
-    "priority": 1,
-    "synonyms": ["available programs", "what programs do you offer", "study options", "degrees offered", "available courses", "academic programs"]
-  },
-  {
-  "keyword": "software engineering program",
-  "answer": "The Bachelor of Science in Software Engineering at Bugema University is a comprehensive program that focuses on designing, developing, testing, and maintaining software systems. The program covers software development methodologies, programming languages, database management, web development, mobile app development, software testing, and project management. Graduates become skilled software engineers capable of creating reliable, efficient, and scalable software solutions for various industries.",
-  "category": "academic",
-  "tags": ["software", "engineering", "computing", "program", "bsc"],
-  "priority": 1,
-  "synonyms": ["bsc software engineering", "software engineering degree", "software development", "software engineer", "what is software engineering", "software engineering course", "software engineering program details"]
-},
-{
-  "keyword": "bachelor of software engineering",
-  "answer": "The Bachelor of Software Engineering at Bugema University School of Science and Technology prepares students for careers in software development. The program includes courses in: Programming (Java, Python, C++), Web Development, Mobile App Development, Database Systems, Software Design Patterns, Software Testing, Software Project Management, Cybersecurity, Artificial Intelligence, and Cloud Computing. Duration: 4 years (8 semesters). Career opportunities: Software Developer, Web Developer, Mobile App Developer, Software Tester, Systems Analyst, IT Consultant.",
-  "category": "academic",
-  "tags": ["software", "engineering", "degree", "computing"],
-  "priority": 1,
-  "synonyms": ["bsc software eng", "software engineering bachelor", "software degree", "software engineering studies"]
-},
-{
-  "keyword": "computing and informatics programs",
-  "answer": "The Department of Computing and Informatics at Bugema University School of Science and Technology offers: 1. BSc Software Engineering - Focus on software development and engineering principles; 2. BSc Network Systems Administration - Focus on computer networks and system administration; 3. B Business Computing - Business applications of computing; 4. B Library and Information Science - Information management; 5. B Information Technology - Broad IT skills; 6. Diploma in Computer Forensics; 7. Diploma in Information Technology; 8. Certificate in Information Technology.",
-  "category": "academic",
-  "tags": ["computing", "informatics", "programs", "it", "technology"],
-  "priority": 2,
-  "synonyms": ["computing programs", "it programs", "computer science", "informatics courses", "technology programs"]
-},
-[
-  {
-    "keyword": "agriculture programs",
-    "answer": "Bugema University School of Agricultural and Applied Sciences offers: 1. Bachelor of Science in Agriculture (Crop Science Option) - Focus on crop production, plant breeding, biotechnology; 2. Bachelor of Science in Agriculture (Animal Science Option) - Focus on animal production, nutrition, breeding; 3. Bachelor of Science in Agribusiness Innovations and Management - Business aspects of agriculture; 4. Bachelor of Science in Environmental Science - Environmental conservation and management; 5. Diploma in Agriculture; 6. Diploma in Crop Production and Management; 7. Diploma in Animal Production and Management; 8. Certificate in Agriculture.",
-    "category": "academic",
-    "tags": ["agriculture", "farming", "crops", "animals", "agribusiness"],
-    "priority": 1,
-    "synonyms": ["agricultural sciences", "farming programs", "crop science", "animal science", "agriculture courses"]
-  },
-  {
-    "keyword": "bsc agriculture crop science",
-    "answer": "Bachelor of Science in Agriculture (Crop Science Option) at Bugema University focuses on: Crop production technologies, Plant breeding and genetics, Soil science and fertility, Crop protection (pests/diseases), Postharvest technologies, Agricultural biotechnology, Climate-smart agriculture, Horticulture, Weed management. Duration: 4 years. Career opportunities: Agricultural officer, Crop consultant, Plant breeder, Agronomist, Farm manager, Agricultural researcher.",
-    "category": "academic",
-    "tags": ["agriculture", "crop", "science", "plants", "farming"],
-    "priority": 1,
-    "synonyms": ["crop science degree", "plant science", "agriculture crop option", "bsc crop science"]
-  },
-  {
-    "keyword": "bsc agriculture animal science",
-    "answer": "Bachelor of Science in Agriculture (Animal Science Option) at Bugema University focuses on: Animal nutrition and feeding, Livestock breeding and genetics, Animal health and disease control, Pasture and forage management, Animal behavior and welfare, Meat and milk production, Poultry production, Animal biotechnology. Duration: 4 years. Career opportunities: Livestock officer, Animal nutritionist, Veterinary assistant, Farm manager, Livestock consultant, Animal researcher.",
-    "category": "academic",
-    "tags": ["agriculture", "animal", "science", "livestock", "veterinary"],
-    "priority": 1,
-    "synonyms": ["animal science degree", "livestock science", "agriculture animal option", "bsc animal science"]
-  },
-  {
-    "keyword": "bsc agribusiness",
-    "answer": "Bachelor of Science in Agribusiness Innovations and Management at Bugema University combines agriculture with business management. Covers: Agricultural economics, Farm business management, Agricultural marketing, Agribusiness entrepreneurship, Agricultural finance, Supply chain management, Agricultural policy, Innovation in agriculture. Duration: 4 years. Career opportunities: Agribusiness manager, Agricultural entrepreneur, Farm business consultant, Agricultural marketing officer, Agricultural loan officer.",
-    "category": "academic",
-    "tags": ["agribusiness", "agriculture", "business", "management", "entrepreneurship"],
-    "priority": 1,
-    "synonyms": ["agribusiness degree", "agricultural business", "farm management", "bsc agribusiness management"]
-  },
-  {
-    "keyword": "bsc environmental science",
-    "answer": "Bachelor of Science in Environmental Science at Bugema University focuses on: Environmental conservation, Natural resource management, Pollution control, Environmental impact assessment, Climate change studies, Biodiversity conservation, Environmental policy, Sustainable development. Duration: 4 years. Career opportunities: Environmental officer, Conservationist, Environmental consultant, Pollution control officer, Natural resource manager, Environmental educator.",
-    "category": "academic",
-    "tags": ["environmental", "science", "conservation", "ecology", "sustainability"],
-    "priority": 1,
-    "synonyms": ["environmental science degree", "environmental studies", "conservation science", "bsc environmental"]
-  },
-  {
-    "keyword": "food technology program",
-    "answer": "Bachelor of Science in Food Technology & Human Nutrition at Bugema University focuses on: Food processing and preservation, Food chemistry and analysis, Food microbiology, Food safety and quality control, Human nutrition, Food product development, Food packaging, Food regulations. Duration: 4 years. Career opportunities: Food technologist, Quality control officer, Food safety inspector, Nutritionist, Food product developer, Food processing manager.",
-    "category": "academic",
-    "tags": ["food", "technology", "nutrition", "processing", "science"],
-    "priority": 1,
-    "synonyms": ["food science", "food technology degree", "human nutrition", "bsc food technology"]
-  },
-  {
-    "keyword": "business administration program",
-    "answer": "Bachelor of Business Administration (BBA) at Bugema University School of Business covers: Management principles, Marketing, Finance, Accounting, Human resources, Operations management, Business law, Entrepreneurship, Strategic management. Duration: 4 years. Career opportunities: Business manager, Marketing executive, Financial analyst, HR manager, Entrepreneur, Business consultant.",
-    "category": "academic",
-    "tags": ["business", "administration", "bba", "management", "commerce"],
-    "priority": 1,
-    "synonyms": ["bba degree", "business management", "business studies", "bachelor of business"]
-  },
-  {
-    "keyword": "bsc accounting",
-    "answer": "Bachelor of Science in Accounting at Bugema University focuses on: Financial accounting, Management accounting, Auditing, Taxation, Corporate finance, Accounting information systems, Financial reporting, Cost accounting. Duration: 4 years. Professional qualifications: Prepares for CPA, ACCA, CIMA. Career opportunities: Accountant, Auditor, Tax consultant, Financial analyst, Cost accountant, Internal auditor.",
-    "category": "academic",
-    "tags": ["accounting", "finance", "accounts", "auditing", "taxation"],
-    "priority": 1,
-    "synonyms": ["accounting degree", "bachelor of accounting", "accountancy", "bsc accounts"]
-  },
-  {
-    "keyword": "bsc finance and banking",
-    "answer": "Bachelor of Science in Finance and Banking at Bugema University covers: Corporate finance, Investment analysis, Banking operations, Financial markets, Risk management, International finance, Financial planning, Banking regulations. Duration: 4 years. Career opportunities: Banker, Financial analyst, Investment advisor, Credit analyst, Risk manager, Financial planner, Loan officer.",
-    "category": "academic",
-    "tags": ["finance", "banking", "financial", "investment", "bank"],
-    "priority": 1,
-    "synonyms": ["finance degree", "banking degree", "financial management", "bsc finance"]
-  },
-  {
-    "keyword": "human resource management",
-    "answer": "Bachelor of Arts in Human Resource Management at Bugema University focuses on: Recruitment and selection, Training and development, Performance management, Compensation and benefits, Labor relations, Organizational behavior, HR planning, Employment law. Duration: 4 years. Career opportunities: HR manager, Recruitment officer, Training coordinator, Compensation analyst, HR consultant, Labor relations officer.",
-    "category": "academic",
-    "tags": ["human", "resource", "hr", "management", "personnel"],
-    "priority": 1,
-    "synonyms": ["hr degree", "human resources", "hr management", "ba human resource"]
-  },
-  {
-    "keyword": "economics program",
-    "answer": "Bachelor of Arts in Economics at Bugema University covers: Microeconomics, Macroeconomics, Development economics, International economics, Monetary economics, Econometrics, Public finance, Economic policy. Duration: 4 years. Career opportunities: Economist, Policy analyst, Economic researcher, Financial analyst, Development officer, Banking professional, Government economist.",
-    "category": "academic",
-    "tags": ["economics", "economy", "economic", "finance", "policy"],
-    "priority": 1,
-    "synonyms": ["economics degree", "bachelor of economics", "ba economics", "economic studies"]
-  },
-  {
-    "keyword": "entrepreneurship program",
-    "answer": "Bachelor of Entrepreneurship & Small Business Management at Bugema University focuses on: Business idea generation, Business plan development, Small business management, Venture capital, Innovation management, Family business, Social entrepreneurship, Business incubation. Duration: 4 years. Career opportunities: Entrepreneur, Business owner, Business consultant, Startup advisor, Innovation manager, Business development officer.",
-    "category": "academic",
-    "tags": ["entrepreneurship", "business", "small business", "startup", "innovation"],
-    "priority": 1,
-    "synonyms": ["entrepreneurship degree", "small business management", "business entrepreneurship", "bachelor of entrepreneurship"]
-  },
-  {
-    "keyword": "procurement and supply chain",
-    "answer": "Bachelor of Procurement & Supply Chain Management at Bugema University covers: Purchasing management, Inventory control, Logistics management, Supply chain strategy, Contract management, Supplier relationship management, Procurement law, Global supply chains. Duration: 4 years. Career opportunities: Procurement officer, Supply chain manager, Logistics coordinator, Purchasing manager, Inventory controller, Contract manager.",
-    "category": "academic",
-    "tags": ["procurement", "supply", "chain", "logistics", "purchasing"],
-    "priority": 1,
-    "synonyms": ["procurement degree", "supply chain management", "logistics degree", "bachelor of procurement"]
-  },
-  {
-    "keyword": "secretarial studies",
-    "answer": "Bachelor of Secretarial Studies and Office Administration at Bugema University focuses on: Office management, Business communication, Records management, Meeting management, Administrative procedures, Office technology, Business etiquette, Executive assistance. Duration: 4 years. Career opportunities: Secretary, Office administrator, Administrative assistant, Executive assistant, Records manager, Office manager.",
-    "category": "academic",
-    "tags": ["secretarial", "office", "administration", "secretary", "administrative"],
-    "priority": 1,
-    "synonyms": ["secretarial degree", "office administration", "administrative studies", "bachelor of secretarial"]
-  },
-  {
-    "keyword": "education programs",
-    "answer": "Bugema University School of Education offers: 1. Bachelor of Arts with Education (Arts subjects); 2. Bachelor of Science with Education (Science subjects); 3. Diploma in Education (Primary); 4. Diploma in Education (Secondary). Teaching subjects include: English, Mathematics, Biology, Chemistry, Physics, Agriculture, Geography, History, Religious Education, Economics, Entrepreneurship, Business Studies, ICT, Kiswahili, Luganda.",
-    "category": "academic",
-    "tags": ["education", "teaching", "teacher", "pedagogy", "school"],
-    "priority": 1,
-    "synonyms": ["teaching programs", "teacher training", "education degrees", "bachelor of education"]
-  },
-  {
-    "keyword": "ba with education",
-    "answer": "Bachelor of Arts with Education at Bugema University prepares students to teach arts subjects in secondary schools. Subjects offered: English Language and Literature, Kiswahili, Luganda, Geography, History, Religious Education, Economics, Entrepreneurship, Business Studies. Duration: 4 years. Includes teaching practice. Career opportunities: Secondary school teacher, Education officer, Curriculum developer, Educational administrator, Tutor.",
-    "category": "academic",
-    "tags": ["education", "arts", "teaching", "secondary", "teacher"],
-    "priority": 1,
-    "synonyms": ["arts education", "bachelor of arts education", "ba education", "teaching arts"]
-  },
-  {
-    "keyword": "bsc with education",
-    "answer": "Bachelor of Science with Education at Bugema University prepares students to teach science subjects in secondary schools. Subjects offered: Mathematics, Biology, Chemistry, Physics, Agriculture, Information Communication Technology (ICT). Duration: 4 years. Includes teaching practice and science practicals. Career opportunities: Science teacher, Mathematics teacher, ICT teacher, Education officer, Science curriculum developer.",
-    "category": "academic",
-    "tags": ["education", "science", "teaching", "mathematics", "biology"],
-    "priority": 1,
-    "synonyms": ["science education", "bachelor of science education", "bsc education", "teaching science"]
-  },
-  {
-    "keyword": "nursing program",
-    "answer": "Bachelor of Nursing Science at Bugema University School of Health and Allied Sciences is a comprehensive nursing program covering: Medical-surgical nursing, Maternal and child health nursing, Community health nursing, Mental health nursing, Nursing research, Nursing leadership, Pharmacology, Pathophysiology. Duration: 4 years. Clinical practice included. Professional recognition: Prepares for registration with Uganda Nurses and Midwives Council. Career opportunities: Registered nurse, Nurse educator, Public health nurse, Clinical nurse specialist, Nursing administrator.",
-    "category": "academic",
-    "tags": ["nursing", "health", "medical", "nurse", "clinical"],
-    "priority": 1,
-    "synonyms": ["nursing degree", "bachelor of nursing", "bsc nursing", "nursing science"]
-  },
-  {
-    "keyword": "software engineering program",
-    "answer": "The Bachelor of Science in Software Engineering at Bugema University is a comprehensive program that focuses on designing, developing, testing, and maintaining software systems. The program covers software development methodologies, programming languages, database management, web development, mobile app development, software testing, and project management. Graduates become skilled software engineers capable of creating reliable, efficient, and scalable software solutions for various industries.",
-    "category": "academic",
-    "tags": ["software", "engineering", "computing", "program", "bsc"],
-    "priority": 1,
-    "synonyms": ["bsc software engineering", "software engineering degree", "software development", "software engineer", "what is software engineering", "software engineering course", "software engineering program details"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
     "keyword": "bachelor of software engineering",
     "answer": "The Bachelor of Software Engineering at Bugema University School of Science and Technology prepares students for careers in software development. The program includes courses in: Programming (Java, Python, C++), Web Development, Mobile App Development, Database Systems, Software Design Patterns, Software Testing, Software Project Management, Cybersecurity, Artificial Intelligence, and Cloud Computing. Duration: 4 years (8 semesters). Career opportunities: Software Developer, Web Developer, Mobile App Developer, Software Tester, Systems Analyst, IT Consultant.",
     "category": "academic",
-    "tags": ["software", "engineering", "degree", "computing"],
+    "tags": [
+      "software",
+      "engineering",
+      "degree",
+      "computing"
+    ],
     "priority": 1,
-    "synonyms": ["bsc software eng", "software engineering bachelor", "software degree", "software engineering studies"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
-    "keyword": "network systems administration",
-    "answer": "Bachelor of Science in Network Systems Administration at Bugema University focuses on: Computer networking, Network security, System administration, Server management, Cloud computing, Cybersecurity, Wireless networks, Network troubleshooting. Duration: 4 years. Career opportunities: Network administrator, System administrator, IT support specialist, Network security analyst, Cloud administrator, IT infrastructure manager.",
+    "keyword": "certificates transcripts collection",
+    "answer": "Certificate/Transcript Collection: Ready 1 month after graduation; Collect personally within 1 year; After 1 year: $2/month surcharge; Previous uncollected documents also charged; Safe custody at Registrar's Office: $1/month; Reprint/corrections handled by officers. Alternative collection: Legally registered spouse/sponsor/guardian; Or DHL delivery (preferred).",
     "category": "academic",
-    "tags": ["network", "systems", "administration", "it", "computing"],
-    "priority": 1,
-    "synonyms": ["network administration", "systems admin", "bsc network", "computer networking"]
+    "tags": [
+      "certificates",
+      "transcripts",
+      "documents",
+      "collection"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
-    "keyword": "business computing",
-    "answer": "Bachelor of Business Computing at Bugema University combines business and computing skills. Covers: Business applications development, E-commerce, Database management for business, Business intelligence, IT project management, Systems analysis and design, Enterprise systems, Digital marketing. Duration: 4 years. Career opportunities: Business analyst, Systems analyst, IT project manager, E-commerce manager, Business applications developer, Database administrator.",
+    "keyword": "challenge examinations",
+    "answer": "Challenge Examinations: For students with prior knowledge of introductory courses. Restrictions: Not for failed/repeated courses; Maximum 6-8 credits through challenge exams. Procedure: Written request to Head of Department; Department presents to Senate; Approval letter sent; Obtain form from Registrar; Pay 75% of course tuition fee; Take exam.",
     "category": "academic",
-    "tags": ["business", "computing", "it", "commerce", "technology"],
-    "priority": 1,
-    "synonyms": ["business computing degree", "bachelor of business computing", "business it", "computing for business"]
+    "tags": [
+      "challenge",
+      "exam",
+      "prior",
+      "knowledge"
+    ],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
-    "keyword": "library information science",
-    "answer": "Bachelor of Library and Information Science at Bugema University focuses on: Information organization, Cataloging and classification, Reference services, Digital libraries, Information retrieval, Archives management, Knowledge management, Information technology in libraries. Duration: 4 years. Career opportunities: Librarian, Information officer, Archivist, Knowledge manager, Records manager, Digital content manager, Information specialist.",
+    "keyword": "change of bulletin",
+    "answer": "Bulletin Change Policy: Academic bulletin valid for 5 years; After expiry, additional 5 years given for last cohort to graduate; Current bulletin 2024-2029 graduates last cohort November 2033. If bulletin changes while student enrolled, evaluation by Head of Department determines course adaptations.",
     "category": "academic",
-    "tags": ["library", "information", "science", "librarian", "information"],
-    "priority": 1,
-    "synonyms": ["library science", "information science", "bachelor of library", "blis degree"]
+    "tags": [
+      "bulletin",
+      "change",
+      "validity",
+      "period"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "information technology program",
-    "answer": "Bachelor of Information Technology at Bugema University covers: Programming fundamentals, Database systems, Web technologies, Systems analysis, IT project management, Cybersecurity, Data communications, IT ethics and law. Duration: 4 years. Career opportunities: IT officer, Web developer, Database administrator, Systems analyst, IT support specialist, IT project coordinator, Network technician.",
+    "keyword": "change of campus centre",
+    "answer": "Change Campus/Centre: Timing - Beginning of academic year; Procedure - Fill designated form from host campus, get department clearance, receive transfer letter and assessment sheet. Restrictions: Not allowed without proper procedure; Not allowed if remaining with one semester; Only at end/beginning of academic year.",
     "category": "academic",
-    "tags": ["information", "technology", "it", "computing", "tech"],
-    "priority": 1,
-    "synonyms": ["it degree", "bachelor of it", "bsc information technology", "information tech"]
+    "tags": [
+      "campus",
+      "centre",
+      "transfer",
+      "location"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "bsc statistics",
-    "answer": "Bachelor of Science in Statistics at Bugema University focuses on: Statistical theory, Probability, Data analysis, Statistical computing, Survey methodology, Biostatistics, Econometrics, Operations research. Duration: 4 years. Career opportunities: Statistician, Data analyst, Research officer, Quality control analyst, Actuary, Demographer, Statistical consultant.",
+    "keyword": "change of program department",
+    "answer": "Changing Program/Department: Acceptable with department heads and Registrar guidance. Requirements: Complete 18 credit hours (one semester) first; Check with current and new departments for qualifications; Obtain Change of Major/Program Form from Registrar's Office; Apply for transfer.",
     "category": "academic",
-    "tags": ["statistics", "data", "analysis", "mathematics", "stats"],
-    "priority": 1,
-    "synonyms": ["statistics degree", "bachelor of statistics", "bsc stats", "data analysis"]
-  },
-  {
-    "keyword": "bsc biochemistry",
-    "answer": "Bachelor of Science in Biochemistry at Bugema University focuses on: Molecular biology, Enzymology, Metabolism, Clinical biochemistry, Biotechnology, Pharmacology, Immunology, Biochemical techniques. Duration: 4 years. Career opportunities: Biochemist, Medical laboratory scientist, Research scientist, Quality control analyst, Pharmaceutical representative, Biotechnology researcher, Clinical biochemist.",
-    "category": "academic",
-    "tags": ["biochemistry", "biology", "chemistry", "science", "molecular"],
-    "priority": 1,
-    "synonyms": ["biochemistry degree", "bachelor of biochemistry", "bsc biochem", "molecular biology"]
-  },
-  {
-    "keyword": "development studies program",
-    "answer": "Bachelor of Arts in Development Studies at Bugema University focuses on: Development theory, Project planning and management, Community development, Gender and development, Sustainable development, Development economics, Rural development, Development policy. Duration: 4 years. Career opportunities: Development officer, Project manager, Community development worker, NGO program officer, Policy analyst, Research officer, Humanitarian worker.",
-    "category": "academic",
-    "tags": ["development", "studies", "community", "social", "ngo"],
-    "priority": 1,
-    "synonyms": ["development studies degree", "ba development", "community development", "development studies"]
-  },
-  {
-    "keyword": "community development",
-    "answer": "Bachelor of Arts in Community Development at Bugema University focuses on: Community mobilization, Participatory development, Social work practice, Community health, Livelihoods development, Conflict resolution, Advocacy, Community-based project management. Duration: 4 years. Career opportunities: Community development officer, Social worker, Community organizer, NGO field officer, Livelihoods officer, Advocacy officer, Program coordinator.",
-    "category": "academic",
-    "tags": ["community", "development", "social", "work", "ngo"],
-    "priority": 1,
-    "synonyms": ["community development degree", "ba community dev", "social development", "community work"]
-  },
-  {
-    "keyword": "humanitarian emergency management",
-    "answer": "Bachelor of Humanitarian Emergency and Disaster Management at Bugema University focuses on: Disaster risk reduction, Emergency response, Humanitarian principles, Disaster preparedness, Recovery and reconstruction, Humanitarian logistics, Refugee studies, Crisis communication. Duration: 4 years. Career opportunities: Humanitarian officer, Disaster manager, Emergency response coordinator, Refugee camp manager, Disaster risk reduction officer, Humanitarian logistics officer.",
-    "category": "academic",
-    "tags": ["humanitarian", "emergency", "disaster", "management", "relief"],
-    "priority": 1,
-    "synonyms": ["humanitarian degree", "disaster management", "emergency management", "bachelor of humanitarian"]
-  },
-  {
-    "keyword": "journalism and mass communication",
-    "answer": "Bachelor of Journalism and Mass Communication at Bugema University covers: News writing and reporting, Media ethics, Broadcast journalism, Digital media, Public relations, Advertising, Media law, Communication theory. Duration: 4 years. Career opportunities: Journalist, News reporter, Public relations officer, Media producer, Content creator, Advertising executive, Communication officer.",
-    "category": "academic",
-    "tags": ["journalism", "communication", "media", "mass", "public relations"],
-    "priority": 1,
-    "synonyms": ["journalism degree", "mass communication", "ba journalism", "media studies"]
-  },
-  {
-    "keyword": "peace and conflict management",
-    "answer": "Bachelor of Arts in Peace and Conflict Management at Bugema University focuses on: Conflict analysis, Peacebuilding, Negotiation and mediation, Human rights, International relations, Post-conflict reconstruction, Peace education, Security studies. Duration: 4 years. Career opportunities: Peacebuilding officer, Conflict mediator, Human rights officer, Security analyst, Diplomatic officer, NGO peace program officer, Community reconciliation officer.",
-    "category": "academic",
-    "tags": ["peace", "conflict", "management", "resolution", "security"],
-    "priority": 1,
-    "synonyms": ["peace studies", "conflict resolution", "peace and conflict", "ba peace studies"]
-  },
-  {
-    "keyword": "public administration",
-    "answer": "Bachelor of Public Administration and Management at Bugema University covers: Public policy, Administrative law, Public finance, Human resource management in public sector, Governance, Development administration, Local government administration, Public service ethics. Duration: 4 years. Career opportunities: Public administrator, Policy analyst, Government officer, Local government administrator, Public service manager, Program officer, Administrative officer.",
-    "category": "academic",
-    "tags": ["public", "administration", "government", "management", "policy"],
-    "priority": 1,
-    "synonyms": ["public administration degree", "bachelor of public admin", "government administration", "public management"]
-  },
-  {
-    "keyword": "social work program",
-    "answer": "Bachelor of Social Work at Bugema University focuses on: Social work practice, Counseling skills, Child protection, Family welfare, Community social work, Social policy, Research in social work, Ethics in social work. Duration: 4 years. Includes field practice. Career opportunities: Social worker, Child protection officer, Family welfare officer, Community social worker, Counseling officer, Social policy analyst, NGO social services officer.",
-    "category": "academic",
-    "tags": ["social", "work", "welfare", "counseling", "community"],
-    "priority": 1,
-    "synonyms": ["social work degree", "bachelor of social work", "ba social work", "social welfare"]
-  },
-  {
-    "keyword": "psychology and counseling",
-    "answer": "Bachelor of Science in Psychology and Counseling at Bugema University covers: General psychology, Counseling theories, Developmental psychology, Abnormal psychology, Research methods, Group counseling, Marriage and family counseling, Career counseling. Duration: 4 years. Career opportunities: Counselor, Psychological assistant, Human resource officer, Social services officer, Rehabilitation officer, Research assistant, Mental health worker.",
-    "category": "academic",
-    "tags": ["psychology", "counseling", "mental", "health", "therapy"],
-    "priority": 1,
-    "synonyms": ["psychology degree", "counseling degree", "bsc psychology", "psychological counseling"]
-  },
-  {
-    "keyword": "theology program",
-    "answer": "Bachelor of Theology at Bugema University School of Theology and Religious Studies focuses on: Biblical studies, Systematic theology, Church history, Pastoral ministry, Christian ethics, Homiletics (preaching), Religious education, Missiology. Duration: 4 years. Career opportunities: Pastor, Religious educator, Chaplain, Missionary, Church administrator, Theological teacher, Christian writer.",
-    "category": "academic",
-    "tags": ["theology", "religion", "bible", "ministry", "pastoral"],
-    "priority": 1,
-    "synonyms": ["theology degree", "bachelor of theology", "bth degree", "religious studies"]
-  },
-  {
-    "keyword": "religious studies",
-    "answer": "Bachelor of Arts in Religious Studies at Bugema University offers four options: 1. Religious Studies with Chaplaincy - Pastoral care; 2. Religious Studies with Development - Religion and development; 3. Religious Studies with Evangelism and Church Growth - Mission work; 4. Religious Studies with Urban Ministry - Urban church work. Duration: 4 years. Career opportunities: Chaplain, Development officer, Evangelist, Urban minister, Religious educator, Community worker.",
-    "category": "academic",
-    "tags": ["religious", "studies", "religion", "chaplaincy", "ministry"],
-    "priority": 1,
-    "synonyms": ["religious studies degree", "ba religious studies", "religion degree", "chaplaincy studies"]
+    "tags": [
+      "change",
+      "program",
+      "department",
+      "transfer"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
     "keyword": "computing and informatics programs",
     "answer": "The Department of Computing and Informatics at Bugema University School of Science and Technology offers: 1. BSc Software Engineering - Focus on software development and engineering principles; 2. BSc Network Systems Administration - Focus on computer networks and system administration; 3. B Business Computing - Business applications of computing; 4. B Library and Information Science - Information management; 5. B Information Technology - Broad IT skills; 6. Diploma in Computer Forensics; 7. Diploma in Information Technology; 8. Certificate in Information Technology.",
     "category": "academic",
-    "tags": ["computing", "informatics", "programs", "it", "technology"],
+    "tags": [
+      "computing",
+      "informatics",
+      "programs",
+      "it",
+      "technology"
+    ],
     "priority": 2,
-    "synonyms": ["computing programs", "it programs", "computer science", "informatics courses", "technology programs"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "diploma programs",
-    "answer": "Bugema University offers Diploma programs in: Agriculture, Crop Production, Animal Production, Food Science, Accounting, Human Resource Management, Procurement, Management, Office Administration, Education (Primary/Secondary), Nursing, Computer Forensics, Information Technology, Science Laboratory Technology, Biomedical Engineering, Development Studies, Public Administration, Social Work, Counseling Psychology, Theology. Duration: 2 years.",
+    "keyword": "coursework assessment",
+    "answer": "Coursework (Continuous Assessment) = 50% of final grade. Components: Assignments, projects, presentations, quizzes, tests, mid-semester exams (combination depends on lecturer). Submission deadline: Within semester unless special arrangements. Late submission: Not accepted after semester ends. Failed coursework: Cannot be supplemented after semester closes.",
     "category": "academic",
-    "tags": ["diploma", "programs", "certificate", "short", "courses"],
+    "tags": [
+      "coursework",
+      "assessment",
+      "assignments",
+      "continuous"
+    ],
     "priority": 1,
-    "synonyms": ["diploma courses", "certificate programs", "short courses", "diploma studies", "vocational programs"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "certificate programs",
-    "answer": "Bugema University offers Certificate programs in: Agriculture, Nursing, Public Administration, Theology, Information Technology. Duration: 1-2 years. Entry requirements: O-level certificate with 4 passes. These programs provide basic skills and can lead to diploma or degree programs through upgrading.",
+    "keyword": "dead semester year",
+    "answer": "Dead Semester/Year: Student unable to continue classes for semester/year should submit application to Registrar through department, supported by sponsor communication. Failure to apply may require reapplication upon return.",
     "category": "academic",
-    "tags": ["certificate", "programs", "short", "courses", "basic"],
+    "tags": [
+      "break",
+      "leave",
+      "interruption",
+      "pause"
+    ],
     "priority": 2,
-    "synonyms": ["certificate courses", "short programs", "basic courses", "certificate studies"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "graduate programs",
-    "answer": "Bugema University Graduate School offers: Master of Business Administration (MBA), Master of Arts (MA), Master of Science (MSc), Master of Public Health (MPH), and PhD programs in various fields. Admission requires a bachelor's degree. Programs focus on advanced research and professional specialization.",
+    "keyword": "erms student portal",
+    "answer": "ERMS (Educational Resource Management System): portal.bugemauniv.ac.ug. Uses: View results, register courses, check fees balance, download transcripts, access course materials. Login: Student number and password. Parents can access with student's ID and password to monitor progress. Assessment sheet: Print once free; additional copies attract fee.",
+    "category": "technical",
+    "tags": [
+      "erms",
+      "portal",
+      "online",
+      "student system"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "exam remarking",
+    "answer": "Exam Remarking Procedure: 1. Obtain Head of Department approval; 2. Pay required remarking fee; 3. Submit application to Head of Department. Script retention: Lecturers submit scripts to departments; Keep grade backups; Scripts may be destroyed after 3 years per Senate instruction.",
     "category": "academic",
-    "tags": ["graduate", "masters", "phd", "postgraduate", "advanced"],
-    "priority": 1,
-    "synonyms": ["masters programs", "phd programs", "postgraduate", "graduate studies", "advanced degrees"]
-  },
-  {
-    "keyword": "student portal access",
-    "answer": "Bugema University has two student portals: 1. OLD PORTAL (for students who joined before 2025) - Access by searching 'erms bugema' in any browser, click the first link. 2. NEW PORTAL (for students who joined August-December 2024 semester onwards) - Access at eportal.bugemauniv.ac.ug.",
-    "category": "technical",
-    "tags": ["portal", "student", "erms", "eportal", "login"],
-    "priority": 1,
-    "synonyms": ["how to access portal", "student login", "portal login", "erms portal", "eportal access"]
-  },
-  {
-    "keyword": "old portal registration",
-    "answer": "For OLD PORTAL (students before 2025): 1. Search 'erms bugema' in browser; 2. Click first link; 3. Click 'Signup' if first time; 4. Provide required details (registration number, email, etc.); 5. Set password; 6. Receive verification email; 7. Click link to request admin activation; 8. Wait for admin approval; 9. Login with registration number and password after approval.",
-    "category": "technical",
-    "tags": ["portal", "registration", "signup", "old", "erms"],
-    "priority": 1,
-    "synonyms": ["erms signup", "old portal signup", "portal registration", "create portal account"]
-  },
-  {
-    "keyword": "new portal login",
-    "answer": "For NEW PORTAL (students from August-December 2024 semester): 1. Go to eportal.bugemauniv.ac.ug; 2. Enter your APP number (Application Number); 3. Enter your password; 4. Click login. If you forgot password, use the 'Forgot Password' link on the portal.",
-    "category": "technical",
-    "tags": ["portal", "login", "new", "eportal", "password"],
-    "priority": 1,
-    "synonyms": ["eportal login", "new student portal", "app number login", "portal access new students"]
-  },
-  {
-    "keyword": "university wifi",
-    "answer": "Bugema University provides free WiFi for students. WiFi Details: SSID (Network Name): 'bugema university'. Password: Obtain from IT Support Office. The WiFi covers most campus areas including library, cafeteria, hostels, and academic blocks.",
-    "category": "technical",
-    "tags": ["wifi", "internet", "network", "wireless", "connection"],
-    "priority": 1,
-    "synonyms": ["free wifi", "campus wifi", "internet access", "wireless network", "wifi password", "how to connect wifi"]
-  },
-  {
-    "keyword": "it support",
-    "answer": "IT Support Office Location: Near the New Science Complex Building. Services: WiFi password distribution, portal assistance, computer problems, network issues, email setup. For any technical inquiries, visit the IT Support Office or contact them for assistance with student portals, WiFi, or computer-related issues.",
-    "category": "services",
-    "tags": ["it", "support", "technical", "help", "assistance"],
-    "priority": 1,
-    "synonyms": ["technical support", "computer help", "it department", "tech support", "portal help"]
-  },
-  {
-    "keyword": "campus locations",
-    "answer": "Campus Layout: 1. Library - Opposite New Science Complex; 2. Cafeteria - Big building next to Bensdoff Hostel; 3. IT Department & Computer Labs - After the Cafeteria; 4. Virtual Assistance Offices - After IT Department; 5. Nursing Block (Lind Hall) - Opposite Virtual Assistance Offices; 6. Administration Block - Opposite Lind Hall, directly facing main gate; 7. Small Auditorium - Near Admin Block; 8. Main Auditorium - After Small Auditorium; 9. New Science Complex - Near IT Support.",
-    "category": "campus",
-    "tags": ["locations", "buildings", "campus", "map", "directions"],
-    "priority": 1,
-    "synonyms": ["where is", "campus buildings", "building locations", "campus map", "directions on campus"]
-  },
-  {
-    "keyword": "library location",
-    "answer": "Library Location: Opposite the New Science Complex building. The library is in the main academic block, next to the ICT center, ground floor of the administration building. It has two sections: reference section and lending section.",
-    "category": "facilities",
-    "tags": ["library", "location", "where", "books", "study"],
-    "priority": 1,
-    "synonyms": ["where is library", "find library", "library whereabouts", "library building location"]
-  },
-  {
-    "keyword": "cafeteria location",
-    "answer": "Cafeteria Location: The big building next to Bensdoff Hostel. The cafeteria offers balanced vegetarian diet meals. Residence hall students are encouraged to eat in the cafeteria (meals included in boarding fees).",
-    "category": "facilities",
-    "tags": ["cafeteria", "location", "food", "dining", "meals"],
+    "tags": [
+      "remarking",
+      "reevaluation",
+      "exam",
+      "review"
+    ],
     "priority": 2,
-    "synonyms": ["where is cafeteria", "dining hall", "food location", "cafeteria building"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "it department location",
-    "answer": "IT Department Location: After the Cafeteria building. This building houses: IT Support Office, Computer Labs, and Virtual Assistance Offices. Students can get WiFi passwords, portal assistance, and technical support here.",
-    "category": "facilities",
-    "tags": ["it", "department", "location", "computer", "labs"],
-    "priority": 2,
-    "synonyms": ["where is it department", "computer labs location", "tech department", "it offices"]
-  },
-  {
-    "keyword": "administration block location",
-    "answer": "Administration Block Location: Opposite Lind Hall (Nursing Block), directly facing the main gate through the long path. This building houses: Registrar's Office, Finance Office, Academic Offices, and other administrative departments.",
-    "category": "campus",
-    "tags": ["administration", "block", "location", "offices", "admin"],
-    "priority": 2,
-    "synonyms": ["where is admin block", "registrar office location", "administration building", "main offices"]
-  },
-  {
-    "keyword": "exam pass download",
-    "answer": "Exam Pass Download: Students download their exam passes from their student portals. Login to your portal (old or new based on your admission year), navigate to exams section, and download/print your exam pass. You MUST bring this exam pass and student ID to all examinations.",
+    "keyword": "examinations policy",
+    "answer": "Final Exams = 50% of grade. All students must take final exams. Failure to take exam = F grade. Special exams: Available for illness/emergency with DVC approval, fee payment, within 1 academic year. Exam periods: Last 2 weeks of semester; 2 sessions daily (9am-12pm, 2pm-5pm). Prerequisite: All fees must be paid or arrangements made. Rules: Bring exam pass & student ID; Sign attendance; No admission after 30 minutes; No borrowing; Only non-programmable calculators; No phones/electronic devices.",
     "category": "academic",
-    "tags": ["exam", "pass", "download", "portal", "examination"],
+    "tags": [
+      "exams",
+      "examinations",
+      "tests",
+      "final"
+    ],
     "priority": 1,
-    "synonyms": ["exam card", "examination pass", "download exam card", "exam clearance"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "student fees payments",
-    "answer": "Mandatory Student Fees: 1. BUSA Fee - UGX 22,000 per semester (Bugema University Student Association); 2. NCHE Fee - UGX 37,000 once per academic year (National Council for Higher Education). These fees must be paid during registration. BUSA fee supports student activities, NCHE fee is a government requirement.",
+    "keyword": "fees refund policy",
+    "answer": "Refund Policy: Applies to course load changes, withdrawal, dropout, expulsion, non-completion. Effective date: Date student notifies university or last class attended. Institutional Charges Refund: Week 1 - 80%; Week 2 - 70%; Weeks 3-4 - 60%; Week 5 - 50%; After Week 5 - 0%. Summer/Holiday Refund: First 2 class days - 80%; Next 4 days - 10% less each day; After 5 days - 0%.",
     "category": "fees",
-    "tags": ["fees", "payments", "bus a", "nche", "student"],
-    "priority": 1,
-    "synonyms": ["bus a fee", "nche fee", "student association fee", "mandatory fees", "semester fees"]
-  },
-  {
-    "keyword": "academic calendar access",
-    "answer": "Academic Calendar Access: The academic calendar is published in the university bulletin and also shared on notice boards. You can check the Registrar's Office or your department for the current academic calendar. Important dates include: registration periods, class start dates, mid-semester breaks, examination periods, and graduation dates.",
-    "category": "academic",
-    "tags": ["calendar", "academic", "dates", "schedule", "timetable"],
-    "priority": 1,
-    "synonyms": ["school calendar", "semester dates", "academic schedule", "university calendar", "important dates"]
-  },
-  {
-    "keyword": "portal problems",
-    "answer": "Portal Problems Solutions: 1. Forgot password - Use 'Forgot Password' link on portal; 2. Cannot login - Verify you're using correct portal (old vs new); 3. Account not activated (old portal) - Wait for admin approval after verification email; 4. Technical issues - Visit IT Support Office near New Science Complex; 5. APP number issues (new portal) - Contact admissions office.",
-    "category": "technical",
-    "tags": ["portal", "problems", "issues", "login", "technical"],
-    "priority": 1,
-    "synonyms": ["portal not working", "login problems", "portal issues", "cannot access portal", "technical problems"]
-  },
-  {
-    "keyword": "new student orientation",
-    "answer": "New Student Orientation: New students receive orientation during registration week. This covers: 1. Portal access (eportal.bugemauniv.ac.ug for new students); 2. WiFi access (SSID: bugema university); 3. Campus locations (library, cafeteria, IT support, admin block); 4. Important fees (BUSA: 22,000/semester, NCHE: 37,000/year); 5. Academic calendar and exam procedures.",
-    "category": "student life",
-    "tags": ["orientation", "new", "student", "welcome", "introduction"],
-    "priority": 1,
-    "synonyms": ["freshman orientation", "welcome program", "new students guide", "orientation week"]
-  },
-  {
-    "keyword": "campus wifi setup",
-    "answer": "Campus WiFi Setup Guide: 1. On your device, go to WiFi settings; 2. Select network 'bugema university'; 3. Enter password obtained from IT Support Office; 4. Connect. WiFi coverage: Library, Cafeteria, Hostels, Academic Blocks. For connection problems, visit IT Support Office near New Science Complex.",
-    "category": "technical",
-    "tags": ["wifi", "setup", "connection", "network", "internet"],
-    "priority": 1,
-    "synonyms": ["connect to wifi", "wifi setup guide", "internet connection", "wireless setup"]
-  },
-  {
-    "keyword": "student portal features",
-    "answer": "Student Portal Features: Both old and new portals allow students to: 1. View exam results and grades; 2. Register for courses; 3. Check fees balance; 4. Download transcripts; 5. Access course materials; 6. Download exam passes; 7. Update personal information; 8. View academic progress.",
-    "category": "technical",
-    "tags": ["portal", "features", "services", "online", "student"],
+    "tags": [
+      "refund",
+      "fees",
+      "money back",
+      "withdrawal"
+    ],
     "priority": 2,
-    "synonyms": ["portal services", "what portal can do", "online services", "portal functions"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "bus a student association",
-    "answer": "BUSA (Bugema University Student Association): Mandatory fee of UGX 22,000 per semester. BUSA provides: 1. Student leadership opportunities; 2. Communication with administration; 3. Operates canteen and copy center ('the container'); 4. Organizes student activities; 5. Provides typing, printing, photocopying services; 6. Sells snacks, drinks, airtime, school supplies. Payment during registration.",
-    "category": "student life",
-    "tags": ["bus a", "student", "association", "fee", "activities"],
-    "priority": 1,
-    "synonyms": ["student government", "bus a fee", "student organization", "student activities fee"]
-  },
-  {
-    "keyword": "nche fee",
-    "answer": "NCHE Fee: National Council for Higher Education fee of UGX 37,000 payable once per academic year. This is a government requirement for all university students in Uganda. Must be paid during registration. NCHE regulates higher education standards in Uganda.",
+    "keyword": "financial matters general",
+    "answer": "General Financial Matters: University can withhold registration materials, results, transcripts, diplomas for unpaid amounts. Fees covered: Tuition, room/board, library fines, book costs, damages. Students responsible for breakage/damage costs. Personal effects should be insured; University accepts no liability for loss/damage. Postdated cheques not accepted. Bounced cheques treated per bank/government regulations.",
     "category": "fees",
-    "tags": ["nche", "fee", "government", "academic", "year"],
-    "priority": 1,
-    "synonyms": ["national council fee", "government fee", "nche payment", "higher education fee"]
+    "tags": [
+      "financial",
+      "obligations",
+      "responsibilities",
+      "withholding"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "campus navigation",
-    "answer": "Campus Navigation Guide: From Main Gate: 1. Walk straight - Administration Block; 2. Right after admin - Small Auditorium; 3. Next to small auditorium - Main Auditorium; 4. Opposite main auditorium - Cafeteria (next to Bensdoff Hostel); 5. After cafeteria - IT Department & Computer Labs; 6. After IT department- Virtual Assistance Offices; 7. Opposite Virtual Offices - Nursing Block (Lind Hall); 8. Opposite Lind Hall - Admin Block; 9. Opposite library to the right - New Science Complex; 10. Opposite New Science Complex - Library; 11. Further after IT support - agric block.",
-    "category": "campus",
-    "tags": ["navigation", "campus", "directions", "map", "locations"],
+    "keyword": "general education courses gec",
+    "answer": "General Education Courses (GEC): Required for all students. Seven areas: Religion, Health, Computer Skills, Writing Skills, Science/Math, Social Awareness, Vocational Studies. Requirement: At least one course in each area. Total credits: 21. Diploma/Certificate students: Required courses: Christian Beliefs, Health Principles, Fundamentals of Computer, Introduction to Writing Skills (13 credits).",
+    "category": "academic",
+    "tags": [
+      "gec",
+      "general",
+      "education",
+      "courses"
+    ],
     "priority": 1,
-    "synonyms": ["how to find", "campus directions", "where to go", "campus guide", "finding buildings"]
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "gpa calculation",
+    "answer": "GPA Calculation Method: Multiply credits for each course by grade points, sum all, divide by total credits. Example: Course 1: A (5.00) × 3 credits = 15.00; Course 2: B (4.00) × 3 credits = 12.00; etc. Total points ÷ Total credits = GPA. Cumulative GPA determines degree classification.",
+    "category": "academic",
+    "tags": [
+      "gpa",
+      "calculation",
+      "grade points",
+      "cumulative"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "grading system",
+    "answer": "Grading Scale: 80-100% = A (5.00 GPA) Excellent; 75-79.99% = B+ (4.50) Above Average; 70-74.99% = B (4.00) Average; 65-69.99% = C+ (3.50) Below Average; 50-64.99% = C (3.00) Pass; 0-49.99% = D (2.00) Failure. Degree Classification: First Class = 4.40-5.00 (Summa cum laude); Second Class Upper = 3.60-4.39 (Magna cum laude); Second Class Lower = 2.80-3.59 (Cum laude).",
+    "category": "academic",
+    "tags": [
+      "grading",
+      "grades",
+      "gpa",
+      "marks"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "graduation in absentia",
+    "answer": "Graduation in Absentia: Candidates must be present unless permission granted. Application: Submit written request to DVC - Academics at least 3 weeks before convocation; Include reason and fee; Permission only for obvious necessity. Procedure: Apply with genuine reasons; Must fulfill all requirements including fee payment. Restriction: Not granted when student is on campus.",
+    "category": "academic",
+    "tags": [
+      "graduation",
+      "absent",
+      "in absentia",
+      "ceremony"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "graduation requirements detailed",
+    "answer": "Graduation Requirements: 1. Complete all required course credits; 2. Clear all outstanding fees; 3. No disciplinary cases; 4. Apply through academic registry; 5. Minimum GPA requirements: Major - 2.25, Minor - 2.00, Cumulative - 2.00; 6. No grades below D accepted; 7. Complete major, minor, cognate (if required); 8. Complete General Education courses; 9. Submit transfer transcripts if applicable; 10. Clear all service departments.",
+    "category": "academic",
+    "tags": [
+      "graduation",
+      "requirements",
+      "completion",
+      "finishing"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "higher education access certificate heac",
+    "answer": "HEAC (Higher Education Access Certificate): For students whose qualifications not equivalent to UACE. Categories: HEAC Humanities (Business/Arts/Theology); HEAC Physical Sciences (Computing/Technology); HEAC Biological Studies (Nursing/Agriculture/Health). Admission: UACE with 2 subsidiary passes; Vocational qualifications level 2/3; Foreign qualifications with 5 subjects minimum grade C. Program: 2 semesters, 40-44 credits. Required before degree/diploma if qualifications insufficient.",
+    "category": "academic",
+    "tags": [
+      "heac",
+      "access",
+      "certificate",
+      "bridging"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "international students admission",
+    "answer": "International students may be admitted provisionally with comparable certification from their country. Documents needed: Valid passport, academic transcripts, student visa, medical insurance. Students from non-A-level systems (e.g., Kenya) must enroll for Higher Education Access Certificate (HEAC). International students should contact the international students office for assistance with accommodation and orientation.",
+    "category": "admissions",
+    "tags": [
+      "international",
+      "foreign",
+      "visa",
+      "overseas"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "internship industrial training",
+    "answer": "Internship/Industrial Training: Required for many programs (e.g., Agriculture - 2 months in second year summer). Purpose: Practical knowledge exposure, research skills enhancement, field expertise development. Industrial Training I & II courses (3 credits each) for some programs.",
+    "category": "academic",
+    "tags": [
+      "internship",
+      "training",
+      "practical",
+      "industrial"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "late fees charges",
+    "answer": "Late Fees: Continuing students reporting after normal registration charged late fee; Amount increases daily to maximum UGX 300,000; Purpose: Encourage early arrival and registration.",
+    "category": "fees",
+    "tags": [
+      "late",
+      "fees",
+      "charges",
+      "penalty"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "late registration policy",
+    "answer": "Late registration policy: Students with valid reasons can register late; A fee that increases daily is charged; Late registration officially closes at discretion of DVC Academic Affairs; Special cases (accidents, death in family) considered with consultation to ascertain if coursework was done.",
+    "category": "academic",
+    "tags": [
+      "late",
+      "registration",
+      "fees",
+      "policy"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "lost damaged documents replacement",
+    "answer": "Lost/Damaged Documents Replacement: Bugema University may issue duplicate original certificate with Senate action. Requirements: 1. Hand-written signed request letter; 2. Police report; 3. Affidavit from recognized firm/lawyer; 4. Payment for certificate reprint.",
+    "category": "academic",
+    "tags": [
+      "lost",
+      "damaged",
+      "documents",
+      "replacement"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "mature entry admission",
+    "answer": "Mature Entry Examination: For individuals who don't meet minimum requirements but have adequate knowledge (formal/informal). Requirements: Must be at least 25 years old; Must take exam from NCHE authorized centers only. This is an aptitude test that allows qualified mature students to gain university admission.",
+    "category": "admissions",
+    "tags": [
+      "mature",
+      "adult",
+      "special admission",
+      "examination"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "program duration",
+    "answer": "Program Duration: Degree programs - 3-4 years (max 7 years); Diploma/Certificate - 2 years (max 5 years); HEAC - 1 year (2 semesters). Breaking residency: Less than 7 years - retain completed work if bulletin unchanged; 7+ years - forfeit previous work, re-admission required.",
+    "category": "academic",
+    "tags": [
+      "duration",
+      "length",
+      "years",
+      "program"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "programs offered comprehensive",
+    "answer": "Comprehensive Programs Offered: AGRICULTURE: BSc Agriculture (Crop/Animal), BSc Agribusiness, BSc Environmental Science, BSc Food Technology. BUSINESS: BBA, BSc Accounting, BSc Finance, BA HRM, BA Economics, B Entrepreneurship, B Procurement, B Secretarial. EDUCATION: BA/BSc with Education, Diplomas. HEALTH: B Nursing Science. SCIENCE/TECH: BSc Software Engineering, BSc Network Admin, B Business Computing, B Info Tech, BSc Statistics, BSc Biochemistry. SOCIAL SCIENCES: BA Development, BA Community Dev, BA Humanitarian, BA Journalism, B Public Admin, B Social Work, BSc Psychology. THEOLOGY: B Theology, BA Religious Studies. Plus Diplomas & Certificates in all fields.",
+    "category": "academic",
+    "tags": [
+      "courses",
+      "programs",
+      "degrees",
+      "study"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "registration process detailed",
+    "answer": "Registration involves 4 steps: STEP 1 - BUSINESS OFFICE: Arrange financial payment, obtain financial clearance. STEP 2 - ACADEMIC DEPARTMENT: Obtain registration form, pay club fee, select courses with advisor, upload in ERMS, get chairperson approval. STEP 3 - DEAN OF STUDENTS: Obtain residential status, register for BUSA, clear club obligations, submit BUSA receipt, collect Student Handbook. STEP 4 - REGISTRAR'S OFFICE: Complete registration details, obtain Registration Card, collect Academic Bulletin. Late registration available with daily increasing fee.",
+    "category": "academic",
+    "tags": [
+      "registration",
+      "enrollment",
+      "signup",
+      "procedures"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "research project requirement",
+    "answer": "Research Project Requirement: All degree programs require independent research as capstone. Procedure: Present proposal, conduct research, write thesis/journal manuscript under supervisor guidance, present orally at seminar before panel. Research coordinator assigns mentor/supervisor.",
+    "category": "academic",
+    "tags": [
+      "research",
+      "project",
+      "thesis",
+      "capstone"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of agricultural and applied sciences",
+    "answer": "School of Agricultural and Applied Sciences: Dean - Assoc. Prof. Paul Nampala, PhD. Philosophy: Science as study of God's handiwork to sustain mankind. Mission: Train holistic professionals in Agricultural Sciences and Rural Development. Vision: Center of excellence in Research, Training, Community Engagement, Sustainable Innovations. Departments: Agricultural & Environmental Sciences; Nutrition, Food Science & Technology. Programs: BSc Agriculture (Crop/Animal Science), BSc Agribusiness Innovation & Management, BSc Environmental Science, BSc Food Technology & Human Nutrition, Diplomas, Certificates.",
+    "category": "academic",
+    "tags": [
+      "agriculture",
+      "sciences",
+      "school",
+      "programs"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of business",
+    "answer": "School of Business: Departments: Accounting & Finance; Management. Programs: BBA, BSc Accounting, BSc Finance & Banking, BA HRM, BA Economics, B Entrepreneurship, B Procurement & Supply Chain, B Secretarial Studies, Diplomas in related fields.",
+    "category": "academic",
+    "tags": [
+      "business",
+      "school",
+      "programs",
+      "management"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of education",
+    "answer": "School of Education: Departments: Arts Education; Science Education; Institute of Professional Growth. Programs: BA with Education, BSc with Education, Diploma in Education (Primary/Secondary), various teaching subjects including Economics, Entrepreneurship, Business Studies, Geography, History, Religious Education, Languages, Sciences, Agriculture, ICT.",
+    "category": "academic",
+    "tags": [
+      "education",
+      "school",
+      "teaching",
+      "programs"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of health and allied sciences",
+    "answer": "School of Health and Allied Sciences: Department of Nursing and Midwifery. Programs: Bachelor of Nursing Science, Diploma in Nursing, Diploma in Nursing Extension, Certificate in Nursing.",
+    "category": "academic",
+    "tags": [
+      "health",
+      "nursing",
+      "sciences",
+      "programs"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of science and technology",
+    "answer": "School of Science and Technology: Departments: Computing & Informatics; Life & Physical Sciences. Programs: BSc Software Engineering, BSc Network Systems Administration, B Business Computing, B Library & Information Science, B Information Technology, BSc Statistics, BSc Biochemistry, Diplomas in Computer Forensics, IT, Science Lab Tech, Biomedical Engineering, Certificates.",
+    "category": "academic",
+    "tags": [
+      "science",
+      "technology",
+      "computing",
+      "programs"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of social sciences",
+    "answer": "School of Social Sciences: Departments: Development & Humanitarian Studies; Public Administration & Management; Social Work. Programs: BA Development Studies, BA Community Development, BA Humanitarian Emergency Management, BA Journalism, BA Peace & Conflict Management, B Public Administration, B Social Work, BSc Psychology & Counseling, Diplomas, Certificates.",
+    "category": "academic",
+    "tags": [
+      "social",
+      "sciences",
+      "programs",
+      "development"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "school of theology and religious studies",
+    "answer": "School of Theology and Religious Studies: Departments: Theology; Religious Studies. Programs: B Theology, BA Religious Studies with Chaplaincy/Development/Evangelism/Urban Ministry options, Diploma in Theology, Certificate in Theology.",
+    "category": "academic",
+    "tags": [
+      "theology",
+      "religion",
+      "programs",
+      "ministry"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "semester system",
+    "answer": "Bugema University operates a semester system: Each semester = 18 weeks (1 week registration + 15 weeks instruction + 2 weeks exams). Academic year = 2 regular semesters: 1st semester (mid-August to mid-December); 2nd semester (early January to early May). Credit units: 1 credit unit = one 50-minute class per week for 15 weeks, OR 2 hours tutorial, OR 2-3 hours practical per week. Students expected to spend 2 hours preparation per class hour.",
+    "category": "academic",
+    "tags": [
+      "semester",
+      "system",
+      "duration",
+      "credits"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "software engineering program",
+    "answer": "The Bachelor of Science in Software Engineering at Bugema University is a comprehensive program that focuses on designing, developing, testing, and maintaining software systems. The program covers software development methodologies, programming languages, database management, web development, mobile app development, software testing, and project management. Graduates become skilled software engineers capable of creating reliable, efficient, and scalable software solutions for various industries.",
+    "category": "academic",
+    "tags": [
+      "software",
+      "engineering",
+      "computing",
+      "program",
+      "bsc"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "special grades",
+    "answer": "DG (Deferred Grade): For courses spanning multiple semesters; No GPA effect. I (Incomplete): For illness/emergency; Must clear within 1 year or becomes F. P (Pass): Pass/fail courses; No GPA contribution. CR (Credit Repeat): When repeating course for better grade; Former grade changed to CR; No GPA contribution. EX (Exemptions): For transferable courses; No GPA calculation.",
+    "category": "academic",
+    "tags": [
+      "grades",
+      "incomplete",
+      "deferred",
+      "special"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "summer sessions",
+    "answer": "Summer session purpose: Industrial attachment/practicum. Course offerings: Some departments may offer courses during summer with Senate approval. Requirements: Minimum 5 students must enroll; Only full-time lecturers teach; Students must be in final semester with not more than 2 courses (6 credits) remaining. Duration: Usually 6 weeks. Summer/holiday programs follow different refund schedule.",
+    "category": "academic",
+    "tags": [
+      "summer",
+      "holiday",
+      "session",
+      "practicum"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "supplementary exams",
+    "answer": "Supplementary/Retake Exams: Allowed for students who failed final exam but scored minimum 25/50 in coursework. Procedure: Obtain request form from Registrar's Office, fill, supply copies to Business Office, department, Examination Office. Fee: Required. Maximum grade: D (plain). Time limit: Failed course must be cleared within 1 academic year or must repeat course.",
+    "category": "academic",
+    "tags": [
+      "supplementary",
+      "retake",
+      "repeat",
+      "exams"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "transfer credits",
+    "answer": "Transfer Credits Policy: Bugema University accepts credits from recognized universities. Procedure: Request previous institution to send transcripts directly to Bugema Registrar. Requirements: No grade below D+; Overall GPA ≥ 2.50; Minimum 15 upper division courses (45 credits) in major taken at Bugema; Minimum 5 upper division courses (15 credits) in minor taken at Bugema; Transfer credits not accepted until completion of one semester at Bugema.",
+    "category": "academic",
+    "tags": [
+      "transfer",
+      "credits",
+      "transcript",
+      "previous study"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "tuition fees payment",
+    "answer": "Tuition Payment: All fees must be paid before registration. Bank Accounts: Equity Bank (UGX: 1017200261563; KES: 1004203110057); Centenary Bank (UGX: 3100018764); UBA (UGX: 1206000016; Forex: 0113009891); Standard Chartered (Forex: 8702010609600). International Transfers: UBA (SWIFT: UNAFUGKA) or Standard Chartered (SWIFT: SCBLUGKA). Present deposit slip to cashier within deposit month.",
+    "category": "fees",
+    "tags": [
+      "fees",
+      "payment",
+      "bank",
+      "tuition"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
+  },
+  {
+    "keyword": "withdrawal from university",
+    "answer": "Withdrawal Procedure: 1. Obtain clearance form from Registrar's Office; 2. Fill form and obtain all required signatures; 3. Submit completed withdrawal form. Documents issued: Withdrawal letter with partial transcript of covered semester(s). Withdrawal only effective upon form submission.",
+    "category": "academic",
+    "tags": [
+      "withdrawal",
+      "leave",
+      "exit",
+      "drop out"
+    ],
+    "priority": 2,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.869Z"
   }
-]
 ]
