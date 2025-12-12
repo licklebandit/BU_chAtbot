@@ -16,91 +16,70 @@ const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
  * @param {string} userQuestion - The question asked by the user.
  * @param {string} context - The relevant text retrieved from the knowledge base.
  * @param {string} imageUrl - Optional URL of an image to include in the query.
+ * @param {Array} history - Optional array of previous messages {role: 'user'|'model', parts: [{text: '...'}]}
  * @returns {Promise<{text: string}>}
  */
-export async function getChatResponse(userQuestion, context = "", imageUrl = null) {
+export async function getChatResponse(userQuestion, context = "", imageUrl = null, history = []) {
   if (!process.env.GEMINI_API_KEY) {
     return { text: "Backend service error: API Key is missing." };
   }
 
+  // Sanitizing history to ensure it matches Gemini API format
+  const sanitizedHistory = history.map(h => ({
+    role: h.role === 'assistant' ? 'model' : h.role, // Ensure assistant -> model
+    parts: h.parts || [{ text: h.text || "" }] // Ensure parts structure
+  }));
+
   try {
-    // 1. Determine RAG mode and define the System Instruction (Model Persona and Rules)
-    const RAG_MODE = (process.env.RAG_MODE || "refine").toLowerCase();
-    let systemInstruction = "";
-    if (RAG_MODE === "kb-only") {
-      systemInstruction = `You are BUchatbot, Bugema University's friendly AI assistant. Answer the user's question politely, concisely, and accurately.
+    // 1. Define Smart System Instruction
+    const systemInstruction = `You are BUchatbot, an intelligent and friendly AI assistant for Bugema University.
+    
+    YOUR GOAL: Provide helpful, accurate, and conversational answers to the user's questions.
+    
+    INSTRUCTIONS FOR USING CONTEXT:
+    1. You will be provided with "Context" which may contain facts from the university database or web search results.
+    2. USE THIS CONTEXT clearly to answer the question.
+    3. Do NOT just copy-paste the context. Paraphrase it naturally.
+    4. If the context contains the answer, verify it matches the user's intent and use it.
+    5. If the context is empty or irrelevant, politely use your general knowledge to answer (or admit you don't know specific university details).
+    6. If the user asks for a reasoning (e.g., "Why...", "How do I..."), explain step-by-step using the facts available.
+    
+    TONE AND STYLE:
+    - Professional yet approachable.
+    - Concise (do not ramble).
+    - Use clear formatting (bullet points) for lists.
+    - NO Markdown symbols like **bold** or # headers that might break simple UI displays (unless the UI supports it, but safe to keep it minimal).
+    
+    CRITICAL:
+    - If data in context contradicts your general training, TRUST THE CONTEXT (it is the latest university data).
+    `;
 
-IMPORTANT GUIDELINES:
-- You MUST use the provided Context to answer university-related questions
-- If the Context is empty or doesn't contain the answer to a university question, politely state that you don't have that information in your knowledge base
-- For questions not related to Bugema University (general questions, personal advice, etc.), respond politely and helpfully but gently redirect to university-related topics
-- Always maintain a friendly, professional tone
-- DO NOT use Markdown formatting, such as asterisks (*), hashtags (#), or dashes (-). Present information using plain text, paragraphs, and numbered lists if necessary, but avoid special characters for styling.
-- If you cannot help with a non-university question, suggest they contact the appropriate support services
-
-Example responses for off-topic questions:
-- "That's an interesting question! While I'm specifically designed to help with Bugema University matters, I'd be happy to assist you with any questions about our programs, admissions, campus life, or student services. What would you like to know about Bugema University?"
-- "I appreciate your question, but I'm focused on helping with Bugema University-related inquiries. Is there anything about our academic programs, campus facilities, or student support services I can help you with instead?"`;
-    } else if (RAG_MODE === "refine") {
-      systemInstruction = `You are BUchatbot, Bugema University's friendly AI assistant. Answer the user's question politely, concisely, and accurately.
-
-IMPORTANT GUIDELINES:
-- If Context is provided about Bugema University topics, use it to produce a concise, accurate, and polished answer
-- For university-related questions without specific context, provide helpful general guidance when possible
-- For questions not related to Bugema University, respond politely but gently redirect to university topics
-- Always maintain a friendly, professional tone representing Bugema University
-- DO NOT use Markdown formatting, such as asterisks (*), hashtags (#), or dashes (-). Present information using plain text, paragraphs, and numbered lists if necessary, but avoid special characters for styling.
-- Do not fabricate university-specific facts; if you don't know something specific about Bugema, say so
-
-Example responses for off-topic questions:
-- "That's a great question! While I specialize in Bugema University information, I'd love to help you with questions about our academic programs, student life, admissions process, or campus services. What can I tell you about Bugema University?"
-- "I appreciate your interest, but my expertise is in Bugema University matters. I'm here to help with anything related to our courses, facilities, student support, or university policies. How can I assist you with Bugema University?"`;
-    } else {
-      // llm-only or any other mode: allow open-domain answers while optionally using context
-      systemInstruction = `You are BUchatbot, Bugema University's friendly AI assistant. Answer the user's question politely, concisely, and accurately.
-
-IMPORTANT GUIDELINES:
-- Prioritize Bugema University-related questions and provide comprehensive, helpful answers
-- For general questions not related to the university, provide brief, helpful responses but gently encourage university-related inquiries
-- Use provided Context when available and relevant
-- Always maintain a friendly, professional tone representing Bugema University
-- DO NOT use Markdown formatting, such as asterisks (*), hashtags (#), or dashes (-). Present information using plain text, paragraphs, and numbered lists if necessary, but avoid special characters for styling.
-- Do not fabricate facts; if you don't know something, say so honestly
-
-For off-topic questions, provide a brief helpful response followed by a gentle redirect:
-- "That's an interesting question! [Brief helpful response if appropriate]. As Bugema University's assistant, I'm particularly knowledgeable about our academic programs, campus life, and student services. Is there anything about Bugema University I can help you with?"`;
-    }
-
-    // 2. Build the new user prompt (Focus on synthesis)
+    // 2. Build the new user prompt
     let userPrompt = `
-Context:
----
-${context.trim() || "No specific context was found."}
----
+Context Information:
+---------------------
+${context.trim() || "No specific database information available."}
+---------------------
 
-Question: ${userQuestion.trim()}
+User Question: "${userQuestion.trim()}"
 
-Please generate a complete and helpful answer to the user's question. If Context is provided, incorporate it where useful; otherwise answer based on general knowledge.`;
+Answer the question using the context above. If the context provides the answer, rephrase it naturally. if you are greeting, be polite and introduce yourself.`;
 
-    if (imageUrl) {
-      userPrompt += `\n\nImage provided: ${imageUrl}`;
-    }
-
-    // 3. Respect GEMINI_MODEL env var if set, otherwise try a list of candidate models until one succeeds.
-    const envModel =
-      process.env.GEMINI_MODEL && process.env.GEMINI_MODEL.trim();
+    // 3. Model Selection - prioritizing efficient "flash" models for cost/speed
+    const envModel = process.env.GEMINI_MODEL && process.env.GEMINI_MODEL.trim();
     const defaultCandidates = [
       "gemini-2.5-flash",
+      "gemini-2.0-flash-exp",
       "gemini-1.5-flash",
-      "gemini-pro",
+      "gemini-1.5-pro",
+      "gemini-pro"
     ];
     const candidateModels = envModel
       ? [envModel, ...defaultCandidates.filter((m) => m !== envModel)]
       : defaultCandidates;
 
     console.log(
-      `🎯 GEMINI_MODEL env: ${envModel || "(not set)"}, Trying models in order:`,
-      candidateModels,
+      `🎯 GEMINI Model Selection: ${candidateModels[0]} (optimized for free tier)`,
     );
 
     let result = null;
@@ -109,19 +88,15 @@ Please generate a complete and helpful answer to the user's question. If Context
     for (const m of candidateModels) {
       try {
         console.log(`  ➡️  Attempting model: ${m}`);
-        // 🛑 CRITICAL FIX: Must provide model name inside an object: { model: m }
         const model = ai.getGenerativeModel({
           model: m,
+          systemInstruction: { parts: [{ text: systemInstruction }] } // Try passing system instruction formally
         });
 
-        // Embed system instruction in the user prompt directly
-        // (avoids issues with systemInstruction parameter in getGenerativeModel)
-        const combinedPrompt = `${systemInstruction}\n\n${userPrompt}`;
+        console.log(`     Sending generateContent request with ${sanitizedHistory.length} history items...`);
 
-        console.log(`     Sending generateContent request...`);
-
-        // Prepare parts for the content
-        const parts = [{ text: combinedPrompt }];
+        // Prepare parts for the user message
+        const userParts = [{ text: userPrompt }];
 
         // If imageUrl is provided, fetch and add the image
         if (imageUrl) {
@@ -132,7 +107,7 @@ Please generate a complete and helpful answer to the user's question. If Context
             const mimeType = imageResponse.headers['content-type'] || 'image/jpeg';
             const base64Image = imageBuffer.toString('base64');
 
-            parts.push({
+            userParts.push({
               inlineData: {
                 mimeType: mimeType,
                 data: base64Image
@@ -141,30 +116,24 @@ Please generate a complete and helpful answer to the user's question. If Context
             console.log(`     Image added to request (${mimeType})`);
           } catch (imageError) {
             console.warn(`⚠️ Failed to fetch image from ${imageUrl}:`, imageError.message);
-            // Continue without image
           }
         }
 
+        // Construct full conversation history + new message
+        const contents = [
+          ...sanitizedHistory,
+          { role: "user", parts: userParts }
+        ];
+
         const response = await model.generateContent({
-          contents: [{ role: "user", parts: parts }],
+          contents: contents,
         });
 
-        // Response received; avoid dumping large JSON to logs in normal operation
+        // Extract text
+        let responseText = response?.response?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        // Extract text from response (may be nested in response.candidates[0].content.parts[0].text)
-        let responseText = response?.text;
-        if (
-          !responseText &&
-          response?.candidates?.[0]?.content?.parts?.[0]?.text
-        ) {
-          responseText = response.candidates[0].content.parts[0].text;
-        }
-        // Also try response.response.candidates structure
-        if (
-          !responseText &&
-          response?.response?.candidates?.[0]?.content?.parts?.[0]?.text
-        ) {
-          responseText = response.response.candidates[0].content.parts[0].text;
+        if (!responseText && response?.text) {
+          responseText = typeof response.text === 'function' ? response.text() : response.text;
         }
 
         if (responseText) {
@@ -173,17 +142,11 @@ Please generate a complete and helpful answer to the user's question. If Context
           console.log(`✅ GenAI: model '${m}' succeeded.`);
           break;
         } else {
-          console.warn(
-            `⚠️ GenAI model '${m}' returned but no text found in response`,
-          );
+          console.warn(`⚠️ GenAI model '${m}' returned but no text found in response`);
         }
       } catch (callErr) {
         lastErr = callErr;
-        console.warn(
-          `❌ GenAI model '${m}' failed with exception:`,
-          callErr.message,
-        );
-        console.warn(`   Stack:`, callErr.stack);
+        console.warn(`❌ GenAI model '${m}' failed with exception:`, callErr.message);
       }
     }
 
@@ -191,37 +154,17 @@ Please generate a complete and helpful answer to the user's question. If Context
       throw lastErr;
     }
 
-    // If we captured finalText during the loop, use it. Otherwise, try to extract now.
     if (finalText) {
       return { text: finalText.trim() };
     }
 
-    // Extract text from result (handle both response.text and nested candidates structure)
-    let responseText = result?.text;
-    if (!responseText && result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      responseText = result.candidates[0].content.parts[0].text;
-    }
-    // also handle result.response.candidates path
-    if (
-      !responseText &&
-      result?.response?.candidates?.[0]?.content?.parts?.[0]?.text
-    ) {
-      responseText = result.response.candidates[0].content.parts[0].text;
-    }
-
-    responseText = responseText?.trim() || "I am not sure about that.";
-
-    return { text: responseText }; // Returns object { text: string }
+    return { text: "I am not sure about that." };
   } catch (error) {
-    // --- Error Logging and Fallback ---
     console.error("❌ Google GenAI API Call FAILED:", error.message);
-    if (error.stack) console.error(error.stack);
 
-    // If we have context from the KB, return it as-is (graceful degradation)
+    // Fallback to KB context
     if (context && typeof context === "string" && context.trim()) {
-      console.log(
-        "✅ GenAI failed but KB context is available; returning context instead.",
-      );
+      console.log("✅ GenAI failed but KB context is available; returning context instead.");
       return { text: context };
     }
 

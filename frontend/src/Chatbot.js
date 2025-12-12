@@ -55,7 +55,7 @@ const STATIC_CONTENT = {
   voiceNotSupported: 'Voice input not supported',
   readAloud: 'Read Aloud',
   conversation: 'Conversation',
-  
+
   // Quick topics list
   quickTopicsList: [
     "What are the library hours?",
@@ -65,7 +65,7 @@ const STATIC_CONTENT = {
     "How do I access my student email?",
     "Where can I find academic advising?"
   ],
-  
+
   // Resource links
   resourceLinks: [
     { label: 'Academic Calendar', prompt: 'Show me the academic calendar for this semester' },
@@ -74,7 +74,7 @@ const STATIC_CONTENT = {
     { label: 'Library Resources', prompt: 'What resources are available in the library?' },
     { label: 'Career Services', prompt: 'Tell me about career services' }
   ],
-  
+
   // Support links
   supportLinks: [
     { label: 'Technical Support', prompt: 'I need technical support' },
@@ -89,10 +89,11 @@ const generateId = () =>
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 
-const createAssistantMessage = (text) => ({
+const createAssistantMessage = (text, source = null) => ({
   id: generateId(),
   role: "assistant",
   text,
+  source,
   timestamp: new Date().toISOString(),
 });
 
@@ -110,17 +111,17 @@ const formatTimestamp = (value) => {
 };
 
 // --- MessageBubble Component ---
-const MessageBubble = ({ 
-  message, 
-  previousMessage, 
-  onSpeak, 
-  isSpeaking, 
+const MessageBubble = ({
+  message,
+  previousMessage,
+  onSpeak,
+  isSpeaking,
   speakingMessageId,
   chatId // Add this prop
 }) => {
   const { isDark } = useTheme();
   const isUser = message.role === "user";
-  
+
   const bubbleClasses = isUser
     ? isDark
       ? "bg-[#1d4ed8] text-white rounded-br-sm"
@@ -128,7 +129,7 @@ const MessageBubble = ({
     : isDark
       ? "bg-slate-800/70 text-slate-100 border border-slate-700/70 rounded-bl-sm"
       : "bg-white text-slate-800 border border-slate-200 rounded-bl-sm";
-      
+
   const timestampClass = isDark
     ? isUser
       ? "text-white/60"
@@ -158,9 +159,22 @@ const MessageBubble = ({
           </p>
           <span className={`mt-2 block text-[11px] ${timestampClass}`}>
             {formatTimestamp(message.timestamp)}
+            {/* Source Badge */}
+            {message.source && !isUser && (
+              <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${message.source.includes('knowledge_base')
+                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                : message.source.includes('web')
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                  : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                }`}>
+                {message.source.includes('knowledge_base') && <BookOpen className="w-3 h-3 mr-1" />}
+                {message.source.includes('web') && <Search className="w-3 h-3 mr-1" />}
+                {message.source.includes('knowledge_base') ? "Knowledge Base" : message.source.includes('web') ? "Web Search" : "AI"}
+              </span>
+            )}
           </span>
         </div>
-        
+
         {/* Feedback and Speech buttons for assistant messages */}
         {!isUser && (
           <div className="flex items-center gap-2 mt-2">
@@ -175,11 +189,10 @@ const MessageBubble = ({
             />
             <button
               onClick={() => onSpeak(message)}
-              className={`p-1.5 rounded-lg transition ${
-                isDark 
-                  ? "hover:bg-slate-700 text-slate-400" 
-                  : "hover:bg-gray-100 text-gray-600"
-              }`}
+              className={`p-1.5 rounded-lg transition ${isDark
+                ? "hover:bg-slate-700 text-slate-400"
+                : "hover:bg-gray-100 text-gray-600"
+                }`}
               title="Read Aloud"
             >
               {isThisMessageSpeaking ? (
@@ -240,21 +253,21 @@ const SidebarSection = ({
 };
 
 // --- VoiceInput Component ---
-const VoiceInput = ({ 
-  onTranscript, 
+const VoiceInput = ({
+  onTranscript,
   isDark
 }) => {
   const [localError, setLocalError] = useState(null);
   const [showStatus, setShowStatus] = useState(false);
   const statusTimeoutRef = useRef(null);
   const hasSentTranscriptRef = useRef(false);
-  
-  const { 
-    isListening, 
+
+  const {
+    isListening,
     error,
     isSupported,
-    startListening, 
-    stopListening 
+    startListening,
+    stopListening
   } = useSpeechRecognition((text) => {
     console.log('VoiceInput: Received FINAL transcript:', text);
     if (text && text.trim()) {
@@ -284,13 +297,13 @@ const VoiceInput = ({
   const handleVoiceToggle = async () => {
     console.log('Voice toggle clicked');
     setLocalError(null);
-    
+
     if (!isSupported) {
       const msg = 'Voice input requires Chrome or Edge browser.';
       alert(msg);
       return;
     }
-    
+
     if (isListening) {
       console.log('Stopping listening...');
       stopListening();
@@ -300,20 +313,20 @@ const VoiceInput = ({
       console.log('Starting listening...');
       setShowStatus(true);
       hasSentTranscriptRef.current = false; // Reset for new session
-      
+
       // Clear any existing timeout
       if (statusTimeoutRef.current) {
         clearTimeout(statusTimeoutRef.current);
       }
-      
+
       // Hide status after 5 seconds if still listening
       statusTimeoutRef.current = setTimeout(() => {
         setShowStatus(false);
       }, 5000);
-      
+
       try {
         await startListening('en-US');
-        
+
       } catch (err) {
         console.error('Failed to start listening:', err);
         setLocalError('Failed to start listening. Please try again.');
@@ -327,11 +340,10 @@ const VoiceInput = ({
     return (
       <button
         disabled
-        className={`flex-shrink-0 p-3 rounded-xl border transition ${
-          isDark 
-            ? "border-slate-700 bg-slate-800/20 text-slate-400" 
-            : "border-[#d6dfff] bg-gray-100 text-gray-400"
-        }`}
+        className={`flex-shrink-0 p-3 rounded-xl border transition ${isDark
+          ? "border-slate-700 bg-slate-800/20 text-slate-400"
+          : "border-[#d6dfff] bg-gray-100 text-gray-400"
+          }`}
         title="Voice input not supported"
       >
         <Mic className="h-5 w-5" />
@@ -344,16 +356,15 @@ const VoiceInput = ({
       <button
         onClick={handleVoiceToggle}
         type="button"
-        className={`flex-shrink-0 p-3 rounded-xl border transition ${
-          isListening
-            ? "border-red-500 bg-red-500 text-white animate-pulse"
-            : isDark 
-              ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
-              : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
-        }`}
+        className={`flex-shrink-0 p-3 rounded-xl border transition ${isListening
+          ? "border-red-500 bg-red-500 text-white animate-pulse"
+          : isDark
+            ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700"
+            : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
+          }`}
         title={
-          isListening 
-            ? "Click to stop voice recording (will send complete transcript)" 
+          isListening
+            ? "Click to stop voice recording (will send complete transcript)"
             : "Click to start voice recording"
         }
       >
@@ -366,12 +377,11 @@ const VoiceInput = ({
           <Mic className="h-5 w-5" />
         )}
       </button>
-      
+
       {/* Status indicator */}
       {(showStatus || isListening) && (
-        <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 text-xs rounded shadow-lg ${
-          isListening ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
-        }`}>
+        <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 text-xs rounded shadow-lg ${isListening ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+          }`}>
           <div className="flex items-center gap-1">
             {isListening ? (
               <>
@@ -384,7 +394,7 @@ const VoiceInput = ({
           </div>
         </div>
       )}
-      
+
       {/* Error indicator */}
       {localError && !isListening && (
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-2 py-1 bg-red-500 text-white text-xs rounded shadow-lg max-w-xs">
@@ -401,7 +411,7 @@ const VoiceInput = ({
 // --- Main Chatbot Component ---
 const Chatbot = () => {
   const { isDark, toggleTheme } = useTheme();
-  
+
   // State Management
   const [messages, setMessages] = useState([
     createAssistantMessage(STATIC_CONTENT.newChat),
@@ -422,14 +432,14 @@ const Chatbot = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // Scroll to bottom
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  
+
   useEffect(() => scrollToBottom(), [messages, loading]);
 
   // Token management
@@ -485,28 +495,28 @@ const Chatbot = () => {
       // Start speaking
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // Cancel any ongoing speech
-        
+
         const utterance = new SpeechSynthesisUtterance(message.text);
         utterance.lang = 'en-US';
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
-        
+
         utterance.onstart = () => {
           setIsSpeaking(true);
           setSpeakingMessageId(message.id);
         };
-        
+
         utterance.onend = () => {
           setIsSpeaking(false);
           setSpeakingMessageId(null);
         };
-        
+
         utterance.onerror = () => {
           setIsSpeaking(false);
           setSpeakingMessageId(null);
         };
-        
+
         window.speechSynthesis.speak(utterance);
       }
     }
@@ -627,7 +637,7 @@ const Chatbot = () => {
         timestamp: new Date().toISOString(),
       },
     ]);
-    
+
     setInput("");
     removeImage();
     setLoading(true);
@@ -638,8 +648,16 @@ const Chatbot = () => {
       const config = token
         ? { headers: { Authorization: `Bearer ${token}` } }
         : {};
-      
+
       const requestData = { q: messageText };
+
+      // Send recent history for context (last 6 messages, excluding the current one being sent)
+      const recentHistory = messages.slice(-6).map(m => ({
+        role: m.role,
+        text: m.text
+      }));
+      requestData.history = recentHistory;
+
       if (imageUrl) {
         requestData.imageUrl = imageUrl;
       }
@@ -649,12 +667,13 @@ const Chatbot = () => {
         requestData,
         config,
       );
-      
+
       const answerText =
         response.data?.answer?.trim() ||
         "I couldn't generate a response. Please try again.";
-      
-      setMessages((prev) => [...prev, createAssistantMessage(answerText)]);
+      const source = response.data?.source; // Extract source
+
+      setMessages((prev) => [...prev, createAssistantMessage(answerText, source)]);
 
       if (response.data?.suggestedQuestions) {
         setSuggestedQuestions(response.data.suggestedQuestions);
@@ -748,17 +767,15 @@ const Chatbot = () => {
     >
       {/* Mobile Sidebar Overlay */}
       <div
-        className={`fixed inset-0 z-30 lg:hidden transition-opacity ${
-          sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        } bg-black/40`}
+        className={`fixed inset-0 z-30 lg:hidden transition-opacity ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          } bg-black/40`}
         onClick={() => setSidebarOpen(false)}
       />
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 h-full w-72 transform lg:translate-x-0 transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } ${sidebarClasses} flex-shrink-0 flex flex-col gap-4 p-4 overflow-y-auto`}
+        className={`fixed top-0 left-0 z-40 h-full w-72 transform lg:translate-x-0 transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } ${sidebarClasses} flex-shrink-0 flex flex-col gap-4 p-4 overflow-y-auto`}
       >
         {/* Sidebar Header with Logo */}
         <div className="flex items-center justify-between mb-4">
@@ -773,11 +790,10 @@ const Chatbot = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={resetChat}
-              className={`text-xs font-medium px-3 py-1.5 rounded-lg transition ${
-                isDark 
-                  ? "bg-slate-800 hover:bg-slate-700 text-white" 
-                  : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
-              }`}
+              className={`text-xs font-medium px-3 py-1.5 rounded-lg transition ${isDark
+                ? "bg-slate-800 hover:bg-slate-700 text-white"
+                : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
+                }`}
             >
               {STATIC_CONTENT.newChatButton}
             </button>
@@ -801,11 +817,10 @@ const Chatbot = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={STATIC_CONTENT.searchPlaceholder}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm transition ${
-                  isDark 
-                    ? "bg-slate-800/50 border border-slate-700 text-slate-200 focus:ring-2 focus:ring-blue-500/50" 
-                    : "bg-white border border-gray-200 text-gray-800 focus:ring-2 focus:ring-blue-200"
-                }`}
+                className={`w-full pl-10 pr-4 py-2 rounded-lg text-sm transition ${isDark
+                  ? "bg-slate-800/50 border border-slate-700 text-slate-200 focus:ring-2 focus:ring-blue-500/50"
+                  : "bg-white border border-gray-200 text-gray-800 focus:ring-2 focus:ring-blue-200"
+                  }`}
               />
             </div>
           )}
@@ -860,11 +875,10 @@ const Chatbot = () => {
           <div className="flex justify-between items-center pt-2 text-sm">
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-full transition ${
-                isDark 
-                  ? "bg-slate-800/70 text-slate-200 hover:bg-slate-700" 
-                  : "bg-white text-[#102863] hover:bg-slate-100 border border-slate-200"
-              }`}
+              className={`p-2 rounded-full transition ${isDark
+                ? "bg-slate-800/70 text-slate-200 hover:bg-slate-700"
+                : "bg-white text-[#102863] hover:bg-slate-100 border border-slate-200"
+                }`}
               aria-label="Toggle theme"
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -873,11 +887,10 @@ const Chatbot = () => {
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl transition ${
-                  isDark 
-                    ? "bg-slate-800/70 text-red-400 hover:bg-slate-700" 
-                    : "bg-white text-red-600 hover:bg-slate-100 border border-slate-200"
-                }`}
+                className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl transition ${isDark
+                  ? "bg-slate-800/70 text-red-400 hover:bg-slate-700"
+                  : "bg-white text-red-600 hover:bg-slate-100 border border-slate-200"
+                  }`}
               >
                 <LogOut className="h-4 w-4" /> {STATIC_CONTENT.logout}
               </button>
@@ -916,11 +929,10 @@ const Chatbot = () => {
 
             {!isLoggedIn && (
               <span
-                className={`text-xs font-semibold uppercase tracking-[0.35em] rounded-full px-3 py-1 ${
-                  isDark 
-                    ? "bg-slate-800 text-yellow-400" 
-                    : "bg-yellow-100 text-yellow-800"
-                }`}
+                className={`text-xs font-semibold uppercase tracking-[0.35em] rounded-full px-3 py-1 ${isDark
+                  ? "bg-slate-800 text-yellow-400"
+                  : "bg-yellow-100 text-yellow-800"
+                  }`}
               >
                 Free Questions: {remainingQuestions}
               </span>
@@ -959,11 +971,10 @@ const Chatbot = () => {
 
         {/* Input Area */}
         <div
-          className={`px-4 sm:px-6 py-4 border-t ${
-            isDark 
-              ? "border-slate-800/70 bg-slate-900/70" 
-              : "border-[#d8e2ff] bg-white/90"
-          }`}
+          className={`px-4 sm:px-6 py-4 border-t ${isDark
+            ? "border-slate-800/70 bg-slate-900/70"
+            : "border-[#d8e2ff] bg-white/90"
+            }`}
         >
           {/* Image Preview */}
           {imagePreview && (
@@ -998,11 +1009,10 @@ const Chatbot = () => {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className={`flex-shrink-0 p-3 rounded-xl border transition ${
-                isDark 
-                  ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700" 
-                  : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
-              }`}
+              className={`flex-shrink-0 p-3 rounded-xl border transition ${isDark
+                ? "border-slate-700 bg-slate-800/50 text-slate-200 hover:bg-slate-700"
+                : "border-[#d6dfff] bg-white text-[#102863] hover:border-[#0033A0]"
+                }`}
               disabled={loading}
               title="Upload Image"
             >
