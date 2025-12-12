@@ -452,7 +452,7 @@ app.get("/health", (req, res) => {
       kbCount = kb.length;
     } catch (error) {
       // Ignore parse errors for health check
-    }
+    }g
   }
   
   // Get socket.io stats
