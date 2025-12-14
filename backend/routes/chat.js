@@ -19,41 +19,44 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import { loadKnowledgeBase, getKnowledgeBase } from "../utils/knowledgeLoader.js";
+import sessionManager from "../utils/sessionManager.js";
+import {
+    generateConfirmation,
+    generateFollowUp,
+    generateClarification,
+    isConfirmationQuery,
+    isFollowUpQuery,
+    isClarificationQuery,
+    extractContextKeywords,
+    isGreeting,
+    isFarewell,
+    generateGreeting,
+    generateFarewell
+} from "../utils/conversationalHandler.js";
+
 // ---------------------------
-// SIMPLE KNOWLEDGE BASE LOADER
+// KNOWLEDGE BASE LOADER (UNIFIED)
 // ---------------------------
-let knowledgeBase = [];
+import mongoose from "mongoose";
 
-function loadKnowledgeBase() {
-    try {
-        const kbPath = path.join(__dirname, '../data/knowledge.json');
-        if (!fs.existsSync(kbPath)) {
-            console.log("⚠️ knowledge.json not found at:", kbPath);
-            knowledgeBase = [];
-            return;
-        }
-
-        const data = fs.readFileSync(kbPath, 'utf8');
-        knowledgeBase = JSON.parse(data);
-        console.log(`✅ Loaded ${knowledgeBase.length} items from knowledge.json`);
-
-    } catch (error) {
-        console.error("❌ Error loading knowledge base:", error.message);
-        knowledgeBase = [];
-    }
-}
-
-// Load on startup
-loadKnowledgeBase();
+// We rely on knowledgeLoader.js to hold the state.
+// Access via getKnowledgeBase() inside functions.
 
 // ---------------------------
 // ENHANCED KB SEARCH FUNCTION WITH INTENT RECOGNITION
 // ---------------------------
+// ---------------------------
+// ENHANCED KB SEARCH FUNCTION WITH INTENT RECOGNITION
+// ---------------------------
 function searchInKnowledgeBase(query) {
+    const knowledgeBase = getKnowledgeBase();
+
     if (!query || !knowledgeBase.length) {
         console.log("❌ KB search: No query or empty knowledge base");
         return null;
     }
+
 
     const cleanQuery = query.toLowerCase().trim();
     console.log(`🔍 KB Search: "${cleanQuery}"`);
@@ -399,13 +402,117 @@ router.post("/", authenticate, async (req, res) => {
 
     console.log(`Question: "${q}"`);
 
+    // Get or create session for this user
+    const userId = req.user?._id || req.socket?.id || 'anonymous';
+    const session = sessionManager.getSession(userId);
+
     try {
+        // STEP 0: CHECK FOR CONVERSATIONAL QUERIES (Template-based, 0 API cost)
+        const lastResponse = sessionManager.getLastResponse(userId);
+        const knowledgeBase = getKnowledgeBase();
+
+        // Check if this is a greeting
+        if (isGreeting(q)) {
+            console.log("👋 CONVERSATIONAL: Greeting detected (0 API calls)");
+            const answer = generateGreeting();
+
+            // Save to session
+            sessionManager.addMessage(userId, 'user', q);
+            sessionManager.addMessage(userId, 'assistant', answer, { source: 'Template', kbUsed: false });
+
+            return res.json({
+                answer,
+                source: "conversational_template",
+                kbMatch: false,
+                apiCalls: sessionManager.getApiCallCount(userId)
+            });
+        }
+
+        // Check if this is a farewell
+        if (isFarewell(q)) {
+            console.log("👋 CONVERSATIONAL: Farewell detected (0 API calls)");
+            const answer = generateFarewell();
+
+            // Save to session
+            sessionManager.addMessage(userId, 'user', q);
+            sessionManager.addMessage(userId, 'assistant', answer, { source: 'Template', kbUsed: false });
+
+            return res.json({
+                answer,
+                source: "conversational_template",
+                kbMatch: false,
+                apiCalls: sessionManager.getApiCallCount(userId)
+            });
+        }
+
+        // Check if this is a confirmation question
+        if (isConfirmationQuery(q)) {
+            console.log("✨ CONVERSATIONAL: Confirmation query detected (0 API calls)");
+            const answer = generateConfirmation(lastResponse, q);
+
+            // Save to session
+            sessionManager.addMessage(userId, 'user', q);
+            sessionManager.addMessage(userId, 'assistant', answer, { source: 'Template', kbUsed: false });
+
+            return res.json({
+                answer,
+                source: "conversational_template",
+                kbMatch: false,
+                apiCalls: sessionManager.getApiCallCount(userId)
+            });
+        }
+
+        // Check if this is a follow-up question
+        if (isFollowUpQuery(q) && lastResponse) {
+            console.log("✨ CONVERSATIONAL: Follow-up query detected (0 API calls)");
+
+            // Extract keywords from context
+            const contextKeywords = extractContextKeywords(session.history);
+
+            // Search for related KB entries
+            const relatedEntries = knowledgeBase.filter(entry => {
+                const entryText = `${entry.keyword} ${entry.answer}`.toLowerCase();
+                return contextKeywords.some(kw => entryText.includes(kw));
+            }).slice(0, 3);
+
+            const answer = generateFollowUp(lastResponse, relatedEntries);
+
+            // Save to session
+            sessionManager.addMessage(userId, 'user', q);
+            sessionManager.addMessage(userId, 'assistant', answer, { source: 'Template+KB', kbUsed: true });
+
+            return res.json({
+                answer,
+                source: "conversational_template+kb",
+                kbMatch: relatedEntries.length > 0,
+                apiCalls: sessionManager.getApiCallCount(userId)
+            });
+        }
+
+        // Check if this is a clarification request
+        if (isClarificationQuery(q) && lastResponse) {
+            console.log("✨ CONVERSATIONAL: Clarification query detected (0 API calls)");
+            const answer = generateClarification(lastResponse);
+
+            // Save to session
+            sessionManager.addMessage(userId, 'user', q);
+            sessionManager.addMessage(userId, 'assistant', answer, { source: 'Template', kbUsed: false });
+
+            return res.json({
+                answer,
+                source: "conversational_template",
+                apiCalls: sessionManager.getApiCallCount(userId)
+            });
+        }
+
+
+        // Save user message to session
+        sessionManager.addMessage(userId, 'user', q);
+
+        // STEP 1: CHECK KNOWLEDGE BASE
         let context = "";
         let source = "ai";
         let kbMatch = false;
-
-        // STEP 1: CHECK KNOWLEDGE BASE
-        // We get the raw answer but DO NOT return it yet.
         const kbResult = searchInKnowledgeBase(q);
 
         if (kbResult && kbResult.answer) {
@@ -481,6 +588,9 @@ router.post("/", authenticate, async (req, res) => {
         try {
             const startTime = Date.now();
 
+            // Increment API call counter
+            sessionManager.incrementApiCalls(userId);
+
             // Pass the context and history to the synthesis function
             const { text, suggestions } = await getChatResponse(q, context, imageUrl, history);
 
@@ -514,12 +624,20 @@ router.post("/", authenticate, async (req, res) => {
             await saveToHistory(req.user._id, q, geminiAnswer, source);
         }
 
+        // Save assistant response to session
+        sessionManager.addMessage(userId, 'assistant', geminiAnswer, {
+            source,
+            kbUsed: kbMatch,
+            responseTime
+        });
+
         res.json({
             answer: geminiAnswer,
             source: source,
             kbMatch: kbMatch,
             responseTime: `${responseTime}ms`,
-            suggestedQuestions: req.smartSuggestions || []
+            suggestedQuestions: req.smartSuggestions || [],
+            apiCalls: sessionManager.getApiCallCount(userId)
         });
 
     } catch (error) {
@@ -603,10 +721,39 @@ router.post("/analyze-query", (req, res) => {
 });
 
 // ---------------------------
+// DEBUG ENDPOINT (Inspect current memory)
+// ---------------------------
+router.get("/debug-kb", async (req, res) => {
+    // Optional: Add auth check here if needed
+    // if (!req.user || req.user.role !== 'admin') return res.status(403).json({error: "Admin only"});
+
+    const knowledgeBase = getKnowledgeBase();
+    const count = knowledgeBase.length;
+    const bySource = knowledgeBase.reduce((acc, item) => {
+        acc[item.source] = (acc[item.source] || 0) + 1;
+        return acc;
+    }, {});
+
+    const hodItems = knowledgeBase.filter(item =>
+        item.keyword.toLowerCase().includes('hod') ||
+        item.answer.toLowerCase().includes('hod')
+    );
+
+    res.json({
+        totalItems: count,
+        bySource: bySource,
+        hodItemsMatchCount: hodItems.length,
+        sampleHodItems: hodItems.slice(0, 5).map(i => ({ k: i.keyword, s: i.source })),
+        loadedAt: new Date().toISOString()
+    });
+});
+
+// ---------------------------
 // KNOWLEDGE BASE STATS
 // ---------------------------
 router.get("/kb-stats", (req, res) => {
     try {
+        const knowledgeBase = getKnowledgeBase();
         // Count entries with synonyms
         const entriesWithSynonyms = knowledgeBase.filter(item => item.synonyms && item.synonyms.length > 0).length;
 
@@ -686,7 +833,7 @@ async function saveToHistory(userId, question, answer, source) {
 // ---------------------------
 // RELOAD KNOWLEDGE BASE (admin function)
 // ---------------------------
-router.post("/reload-kb", authenticate, (req, res) => {
+router.post("/reload-kb", authenticate, async (req, res) => {
     // Check if user is admin
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
@@ -699,13 +846,14 @@ router.post("/reload-kb", authenticate, (req, res) => {
             return res.status(403).json({ error: "Admin access required" });
         }
 
+        const knowledgeBase = getKnowledgeBase();
         const oldCount = knowledgeBase.length;
-        loadKnowledgeBase();
-        const newCount = knowledgeBase.length;
+        const newItems = await loadKnowledgeBase();
+        const newCount = newItems.length;
 
         res.json({
             success: true,
-            message: `Knowledge base reloaded. ${newCount} entries loaded.`,
+            message: `Knowledge base reloaded. ${newCount} entries loaded from JSON and MongoDB.`,
             stats: {
                 previous: oldCount,
                 current: newCount,

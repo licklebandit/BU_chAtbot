@@ -43,86 +43,8 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Warm up the knowledge base on startup
 function warmUpKnowledgeBase() {
-  console.log("\n🔥 Warming up knowledge base...");
-
-  // Pre-load and test common queries
-  const testQueries = [
-    "admission requirements",
-    "tuition fees",
-    "courses offered",
-    "library hours",
-    "contact information",
-    "who is the vc",
-    "where is the library",
-    "library location",
-    "how to apply",
-    "fee payment",
-    "where can i find books"
-  ];
-
-  // Simple warm-up by loading and parsing KB
-  const kbPath = path.join(__dirname, 'data', 'knowledge.json');
-  console.log(`📂 Loading KB from: ${kbPath}`);
-
-  if (fs.existsSync(kbPath)) {
-    try {
-      const stats = fs.statSync(kbPath);
-      console.log(`   🕒 File modified: ${stats.mtime.toISOString()}`);
-
-      const data = fs.readFileSync(kbPath, 'utf8');
-      const kb = JSON.parse(data);
-      console.log(`✅ Knowledge base loaded: ${kb.length} entries`);
-
-      // Test search speed
-      console.log("🧪 Testing common queries:");
-      testQueries.forEach(query => {
-        const start = Date.now();
-        // Test intent detection
-        const intent = detectIntent(query);
-        const time = Date.now() - start;
-
-        // Simple match test - FIX MATCHING LOGIC
-        const found = kb.some(item => {
-          const keyword = (item.keyword || '').toLowerCase();
-          // Check if keyword contains query OR query contains keyword
-          return keyword.includes(query.toLowerCase()) ||
-            query.toLowerCase().includes(keyword);
-        });
-
-        console.log(`   "${query}": ${found ? '✅' : '❌'} (${time}ms) - Intent: ${intent.intent}`);
-      });
-
-      console.log("✅ Knowledge base warmed up successfully!");
-
-    } catch (error) {
-      console.error("❌ Warm-up error:", error.message);
-      console.log("⚠️  Knowledge base warm-up failed, but server will continue...");
-    }
-  } else {
-    console.error(`❌ Knowledge file not found at: ${kbPath}`);
-    console.log("⚠️  Creating default knowledge.json...");
-
-    // Create default knowledge base
-    const defaultKnowledge = [
-      {
-        "keyword": "admission requirements",
-        "answer": "To be admitted to Bugema University, applicants must present their academic certificates and meet the minimum entry requirements.",
-        "category": "admissions",
-        "tags": ["admissions", "requirements"],
-        "priority": 1,
-        "synonyms": ["entry requirements", "how to apply", "admission process"]
-      }
-    ];
-
-    // Ensure directory exists
-    const dirPath = path.dirname(kbPath);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-
-    fs.writeFileSync(kbPath, JSON.stringify(defaultKnowledge, null, 2), 'utf8');
-    console.log(`✅ Created default knowledge.json at: ${kbPath}`);
-  }
+  console.log("\n🔥 Warming up knowledge base (Legacy Check)...");
+  // The actual loading happens in knowledgeLoader.js triggered by DB connect
 }
 
 // --- APP SETUP ---
@@ -360,9 +282,16 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- DATABASE ---
+// Import unified loader
+import { loadKnowledgeBase } from "./utils/knowledgeLoader.js";
+
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected successfully"))
+  .then(async () => {
+    console.log("✅ MongoDB connected successfully");
+    // Initialize Knowledge Base with DB data
+    await loadKnowledgeBase();
+  })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // --- ROUTES ---

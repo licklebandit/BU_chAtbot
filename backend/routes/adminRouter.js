@@ -11,6 +11,7 @@ import {
 } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+import { loadKnowledgeBase } from "../utils/knowledgeLoader.js";
 
 // Helper function to emit real-time updates
 const emitToAdmins = (req, event, data) => {
@@ -21,8 +22,8 @@ const emitToAdmins = (req, event, data) => {
 };
 
 /* ---------------------------
-    USER/ADMIN MANAGEMENT (UPDATED)
-    Routes are relative to /api/admin
+    USER/ADMIN MANAGEMENT (UPDATED)
+    Routes are relative to /api/admin
 --------------------------- */
 
 // GET /api/admin/users - Fetch ALL users (AdminsView will filter for role: 'admin')
@@ -125,7 +126,7 @@ router.delete("/users/:id", isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /* ---------------------------------
-    KNOWLEDGE BASE MANAGEMENT - DUAL ROUTES (UNMODIFIED)
+    KNOWLEDGE BASE MANAGEMENT - DUAL ROUTES (UNMODIFIED)
 // ... (rest of the /knowledge, /faqs, and /stats routes) ...
 --------------------------------- */
 
@@ -196,6 +197,9 @@ router.post("/knowledge", isAuthenticated, isAdmin, async (req, res) => {
       article: savedArticle,
     });
 
+    // RELOAD CHATBOT KNOWLEDGE BASE
+    loadKnowledgeBase().then(ids => console.log("🔄 KB Reloaded after update"));
+
     res.status(201).json(savedArticle);
   } catch (err) {
     console.error("Error creating article:", err);
@@ -224,6 +228,9 @@ router.put("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
       article: updatedArticle,
     });
 
+    // RELOAD CHATBOT KNOWLEDGE BASE
+    loadKnowledgeBase().then(ids => console.log("🔄 KB Reloaded after update"));
+
     res.json(updatedArticle);
   } catch (err) {
     console.error("Error updating article:", err);
@@ -245,6 +252,9 @@ router.delete("/knowledge/:id", isAuthenticated, isAdmin, async (req, res) => {
       action: "deleted",
       articleId: req.params.id,
     });
+
+    // RELOAD CHATBOT KNOWLEDGE BASE
+    loadKnowledgeBase().then(ids => console.log("🔄 KB Reloaded after delete"));
 
     res.json({ message: "Article deleted successfully" });
   } catch (err) {
@@ -297,6 +307,9 @@ router.post("/faqs", isAuthenticated, isAdmin, async (req, res) => {
       faq: savedFaq,
     });
 
+    // RELOAD CHATBOT KNOWLEDGE BASE
+    loadKnowledgeBase().then(ids => console.log("🔄 KB Reloaded after FAQ update"));
+
     res.status(201).json(savedFaq);
   } catch (err) {
     console.error(
@@ -333,6 +346,9 @@ router.put("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
       faq: updatedFaq,
     });
 
+    // RELOAD CHATBOT KNOWLEDGE BASE
+    loadKnowledgeBase().then(ids => console.log("🔄 KB Reloaded after FAQ update"));
+
     res.json(updatedFaq);
   } catch (err) {
     console.error("Error updating FAQ:", err);
@@ -355,6 +371,9 @@ router.delete("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
       faqId: req.params.id,
     });
 
+    // RELOAD CHATBOT KNOWLEDGE BASE
+    loadKnowledgeBase().then(ids => console.log("🔄 KB Reloaded after FAQ delete"));
+
     res.json({ message: "FAQ deleted successfully" });
   } catch (err) {
     console.error("Error deleting FAQ:", err);
@@ -363,7 +382,7 @@ router.delete("/faqs/:id", isAuthenticated, isAdmin, async (req, res) => {
 });
 
 /* ---------------------------
-    ANALYTICS ENDPOINTS (UPDATED)
+    ANALYTICS ENDPOINTS (UPDATED)
 --------------------------- */
 
 // GET /api/admin/stats - Fetch general statistics

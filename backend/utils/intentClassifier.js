@@ -96,6 +96,31 @@ export const universityIntents = {
     keywords: ['bugema', 'university', 'college', 'institution', 'school', 'academy'],
     weight: 4,
     categories: ['general']
+  },
+  // NEW: Conversational intents
+  'confirmation': {
+    keywords: ['sure', 'really', 'certain', 'are you sure', 'is that right', 'correct', 'true', 'yeah', 'seriously', 'for real', 'absolutely', 'definitely'],
+    weight: 15, // High weight for short questions
+    categories: ['conversational'],
+    requiresContext: true
+  },
+  'follow_up': {
+    keywords: ['tell me more', 'more', 'what else', 'continue', 'and', 'also', 'additionally', 'further', 'elaborate', 'details'],
+    weight: 12,
+    categories: ['conversational'],
+    requiresContext: true
+  },
+  'clarification': {
+    keywords: ['what do you mean', 'explain', 'clarify', 'how so', 'why', 'how come', 'what', 'huh', 'pardon', 'sorry'],
+    weight: 11,
+    categories: ['conversational'],
+    requiresContext: true
+  },
+  'context_dependent': {
+    keywords: ['it', 'that', 'there', 'this', 'those', 'these', 'them', 'they'],
+    weight: 8,
+    categories: ['conversational'],
+    requiresContext: true
   }
 };
 
