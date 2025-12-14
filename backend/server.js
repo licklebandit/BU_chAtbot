@@ -43,81 +43,86 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Warm up the knowledge base on startup
 function warmUpKnowledgeBase() {
-    console.log("\n🔥 Warming up knowledge base...");
-    
-    // Pre-load and test common queries
-    const testQueries = [
-        "admission requirements",
-        "tuition fees", 
-        "courses offered",
-        "library hours",
-        "contact information",
-        "who is the vc",
-        "where is the library",
-        "library location",
-        "how to apply",
-        "fee payment",
-        "where can i find books"
-    ];
-    
-    // Simple warm-up by loading and parsing KB
-    const kbPath = path.join(__dirname, 'data', 'knowledge.json');
-    if (fs.existsSync(kbPath)) {
-        try {
-            const data = fs.readFileSync(kbPath, 'utf8');
-            const kb = JSON.parse(data);
-            console.log(`✅ Knowledge base loaded: ${kb.length} entries`);
-            
-            // Test search speed
-            console.log("🧪 Testing common queries:");
-            testQueries.forEach(query => {
-                const start = Date.now();
-                // Test intent detection
-                const intent = detectIntent(query);
-                const time = Date.now() - start;
+  console.log("\n🔥 Warming up knowledge base...");
 
-                // Simple match test
-                const found = kb.some(item => {
-                  const keyword = item.keyword.toLowerCase();
-                  const synonyms = item.synonyms || [];
-                  return query.toLowerCase().includes(keyword) ||
-                          synonyms.some(syn => query.toLowerCase().includes(syn.toLowerCase()));
-                });
+  // Pre-load and test common queries
+  const testQueries = [
+    "admission requirements",
+    "tuition fees",
+    "courses offered",
+    "library hours",
+    "contact information",
+    "who is the vc",
+    "where is the library",
+    "library location",
+    "how to apply",
+    "fee payment",
+    "where can i find books"
+  ];
 
-                console.log(`   "${query}": ${found ? '✅' : '❌'} (${time}ms) - Intent: ${intent.intent}`);
-            });
-            
-            console.log("✅ Knowledge base warmed up successfully!");
-            
-        } catch (error) {
-            console.error("❌ Warm-up error:", error.message);
-            console.log("⚠️  Knowledge base warm-up failed, but server will continue...");
-        }
-    } else {
-        console.error(`❌ Knowledge file not found at: ${kbPath}`);
-        console.log("⚠️  Creating default knowledge.json...");
-        
-        // Create default knowledge base
-        const defaultKnowledge = [
-            {
-                "keyword": "admission requirements",
-                "answer": "To be admitted to Bugema University, applicants must present their academic certificates and meet the minimum entry requirements.",
-                "category": "admissions",
-                "tags": ["admissions", "requirements"],
-                "priority": 1,
-                "synonyms": ["entry requirements", "how to apply", "admission process"]
-            }
-        ];
-        
-        // Ensure directory exists
-        const dirPath = path.dirname(kbPath);
-        if (!fs.existsSync(dirPath)) {
-            fs.mkdirSync(dirPath, { recursive: true });
-        }
-        
-        fs.writeFileSync(kbPath, JSON.stringify(defaultKnowledge, null, 2), 'utf8');
-        console.log(`✅ Created default knowledge.json at: ${kbPath}`);
+  // Simple warm-up by loading and parsing KB
+  const kbPath = path.join(__dirname, 'data', 'knowledge.json');
+  console.log(`📂 Loading KB from: ${kbPath}`);
+
+  if (fs.existsSync(kbPath)) {
+    try {
+      const stats = fs.statSync(kbPath);
+      console.log(`   🕒 File modified: ${stats.mtime.toISOString()}`);
+
+      const data = fs.readFileSync(kbPath, 'utf8');
+      const kb = JSON.parse(data);
+      console.log(`✅ Knowledge base loaded: ${kb.length} entries`);
+
+      // Test search speed
+      console.log("🧪 Testing common queries:");
+      testQueries.forEach(query => {
+        const start = Date.now();
+        // Test intent detection
+        const intent = detectIntent(query);
+        const time = Date.now() - start;
+
+        // Simple match test - FIX MATCHING LOGIC
+        const found = kb.some(item => {
+          const keyword = (item.keyword || '').toLowerCase();
+          // Check if keyword contains query OR query contains keyword
+          return keyword.includes(query.toLowerCase()) ||
+            query.toLowerCase().includes(keyword);
+        });
+
+        console.log(`   "${query}": ${found ? '✅' : '❌'} (${time}ms) - Intent: ${intent.intent}`);
+      });
+
+      console.log("✅ Knowledge base warmed up successfully!");
+
+    } catch (error) {
+      console.error("❌ Warm-up error:", error.message);
+      console.log("⚠️  Knowledge base warm-up failed, but server will continue...");
     }
+  } else {
+    console.error(`❌ Knowledge file not found at: ${kbPath}`);
+    console.log("⚠️  Creating default knowledge.json...");
+
+    // Create default knowledge base
+    const defaultKnowledge = [
+      {
+        "keyword": "admission requirements",
+        "answer": "To be admitted to Bugema University, applicants must present their academic certificates and meet the minimum entry requirements.",
+        "category": "admissions",
+        "tags": ["admissions", "requirements"],
+        "priority": 1,
+        "synonyms": ["entry requirements", "how to apply", "admission process"]
+      }
+    ];
+
+    // Ensure directory exists
+    const dirPath = path.dirname(kbPath);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    fs.writeFileSync(kbPath, JSON.stringify(defaultKnowledge, null, 2), 'utf8');
+    console.log(`✅ Created default knowledge.json at: ${kbPath}`);
+  }
 }
 
 // --- APP SETUP ---
@@ -151,7 +156,7 @@ io.on("connection", (socket) => {
   socket.on("joinAdminRoom", () => {
     socket.join("adminRoom");
     console.log(`👨‍💼 Admin ${socket.id} joined admin room`);
-    
+
     // Send welcome notification to the admin
     socket.emit("newNotification", {
       id: Date.now(),
@@ -167,7 +172,7 @@ io.on("connection", (socket) => {
   socket.on("adminReadNotifications", (data) => {
     const adminId = data?.adminId || socket.id;
     console.log(`📭 Admin ${adminId} has read notifications`);
-    
+
     // Optional: Update database to mark notifications as read
     // Example (uncomment when you have a Notification model):
     /*
@@ -181,7 +186,7 @@ io.on("connection", (socket) => {
       console.error("❌ Error updating notifications:", error.message);
     }
     */
-    
+
     // Broadcast to all admins to clear notifications UI
     io.to("adminRoom").emit("clearNotificationsUI", {
       clearedBy: adminId,
@@ -193,7 +198,7 @@ io.on("connection", (socket) => {
   // ✅ Handle test notifications (for frontend testing)
   socket.on("testNotification", (data) => {
     console.log("🧪 Test notification received:", data);
-    
+
     const testNotification = {
       id: Date.now(),
       title: data.title || "Test Notification",
@@ -203,10 +208,10 @@ io.on("connection", (socket) => {
       read: false,
       source: "test"
     };
-    
+
     // Broadcast test notification to all admins
     io.to("adminRoom").emit("newNotification", testNotification);
-    
+
     // Send confirmation back to sender
     socket.emit("testNotificationSent", {
       success: true,
@@ -218,7 +223,7 @@ io.on("connection", (socket) => {
   // ✅ Handle user sending message (example for notifications)
   socket.on("userMessage", (data) => {
     console.log("💬 User message received:", data.userId);
-    
+
     // Create a notification for admins about new user message
     const adminNotification = {
       id: Date.now(),
@@ -230,7 +235,7 @@ io.on("connection", (socket) => {
       userId: data.userId,
       messageId: data.messageId
     };
-    
+
     // Notify all admins
     io.to("adminRoom").emit("newNotification", adminNotification);
   });
@@ -238,7 +243,7 @@ io.on("connection", (socket) => {
   // ✅ Handle feedback submission
   socket.on("newFeedback", (data) => {
     console.log("🌟 New feedback received:", data.feedbackId);
-    
+
     const feedbackNotification = {
       id: Date.now(),
       title: "New User Feedback",
@@ -249,7 +254,7 @@ io.on("connection", (socket) => {
       feedbackId: data.feedbackId,
       rating: data.rating
     };
-    
+
     // Notify all admins
     io.to("adminRoom").emit("newNotification", feedbackNotification);
   });
@@ -257,7 +262,7 @@ io.on("connection", (socket) => {
   // ✅ Handle system alerts
   socket.on("systemAlert", (data) => {
     console.log("🚨 System alert:", data.message);
-    
+
     const alertNotification = {
       id: Date.now(),
       title: data.title || "System Alert",
@@ -267,7 +272,7 @@ io.on("connection", (socket) => {
       read: false,
       priority: data.priority || "medium"
     };
-    
+
     // Broadcast to all connected clients (including admins)
     io.emit("newNotification", alertNotification);
   });
@@ -275,7 +280,7 @@ io.on("connection", (socket) => {
   // ✅ Handle notification mark as read (individual)
   socket.on("markNotificationRead", (data) => {
     console.log(`📌 Notification ${data.notificationId} marked as read by ${socket.id}`);
-    
+
     // Update database (example):
     /*
     await NotificationModel.findByIdAndUpdate(data.notificationId, {
@@ -283,7 +288,7 @@ io.on("connection", (socket) => {
       readAt: new Date()
     });
     */
-    
+
     // Acknowledge to sender
     socket.emit("notificationMarkedRead", {
       notificationId: data.notificationId,
@@ -304,7 +309,7 @@ io.on("connection", (socket) => {
   // ✅ Handle disconnect
   socket.on("disconnect", () => {
     console.log("❌ Client disconnected:", socket.id);
-    
+
     // Notify other admins about disconnection
     socket.to("adminRoom").emit("adminDisconnected", {
       adminId: socket.id,
@@ -376,7 +381,7 @@ app.use('/api/health', healthRoutes);
 // ✅ NEW: Notification endpoints for REST API
 app.post("/api/notifications/test", (req, res) => {
   const { title, message, type } = req.body;
-  
+
   const testNotification = {
     id: Date.now(),
     title: title || "Test Notification",
@@ -386,10 +391,10 @@ app.post("/api/notifications/test", (req, res) => {
     read: false,
     source: "rest-api"
   };
-  
+
   // Broadcast to all admins
   io.to("adminRoom").emit("newNotification", testNotification);
-  
+
   res.json({
     success: true,
     message: "Test notification sent to all admins",
@@ -400,7 +405,7 @@ app.post("/api/notifications/test", (req, res) => {
 app.get("/api/notifications/status", (req, res) => {
   const adminRoom = io.sockets.adapter.rooms.get("adminRoom");
   const adminCount = adminRoom ? adminRoom.size : 0;
-  
+
   res.json({
     status: "active",
     connectedAdmins: adminCount,
@@ -429,7 +434,7 @@ export function sendSystemNotification(title, message, type = "info") {
     read: false,
     source: "system"
   };
-  
+
   io.to("adminRoom").emit("newNotification", notification);
   return notification;
 }
@@ -444,7 +449,7 @@ app.get("/health", (req, res) => {
   const kbPath = path.join(__dirname, 'data', 'knowledge.json');
   const kbExists = fs.existsSync(kbPath);
   let kbCount = 0;
-  
+
   if (kbExists) {
     try {
       const data = fs.readFileSync(kbPath, 'utf8');
@@ -452,14 +457,14 @@ app.get("/health", (req, res) => {
       kbCount = kb.length;
     } catch (error) {
       // Ignore parse errors for health check
-    }g
+    } g
   }
-  
+
   // Get socket.io stats
   const adminRoom = io.sockets.adapter.rooms.get("adminRoom");
   const adminCount = adminRoom ? adminRoom.size : 0;
   const totalConnections = io.engine.clientsCount;
-  
+
   res.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
@@ -484,7 +489,7 @@ app.get("/api/socket-test", (req, res) => {
   const totalConnections = io.engine.clientsCount;
   const adminRoom = io.sockets.adapter.rooms.get("adminRoom");
   const adminCount = adminRoom ? adminRoom.size : 0;
-  
+
   res.json({
     success: true,
     message: "Socket.IO is running",
@@ -505,7 +510,7 @@ app.get("/api/socket-test", (req, res) => {
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.message);
   console.error('❌ Stack:', err.stack);
-  
+
   // Send error notification to admins
   if (io) {
     const errorNotification = {
@@ -517,13 +522,13 @@ app.use((err, req, res, next) => {
       read: false,
       source: "error-handler"
     };
-    
+
     io.to("adminRoom").emit("newNotification", errorNotification);
   }
-  
+
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
-  
+
   res.status(statusCode).json({
     success: false,
     message,
@@ -550,11 +555,11 @@ server.listen(PORT, () => {
   console.log(`🔌 Socket.IO endpoint: ws://localhost:${PORT}`);
   console.log(`🔔 Notification test: POST http://localhost:${PORT}/api/notifications/test`);
   console.log(`👨‍💼 Admin room ready for connections`);
-  
+
   // Call warm-up AFTER server starts listening
   setTimeout(() => {
     warmUpKnowledgeBase();
-    
+
     // Send startup notification to any connected admins
     setTimeout(() => {
       if (io) {
@@ -567,7 +572,7 @@ server.listen(PORT, () => {
           read: false,
           source: "system-startup"
         };
-        
+
         io.to("adminRoom").emit("newNotification", startupNotification);
         console.log("✅ Startup notification sent to admin room");
       }

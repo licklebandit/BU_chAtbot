@@ -2,24 +2,27 @@
 import fs from "fs";
 import path from "path";
 
-const knowledgePath = path.join('data', 'knowledge.json');
+import { fileURLToPath } from 'url';
 
-console.log(`🔍 Testing knowledge base at: ${knowledgePath}`);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-if (!fs.existsSync(knowledgePath)) {
-  console.error(`❌ File not found!`);
-  console.log(`Current directory: ${process.cwd()}`);
-  console.log(`Looking for: ${path.resolve(knowledgePath)}`);
+const dataPath = path.join(__dirname, 'data', 'knowledge.json');
+console.log(`🔍 Testing knowledge base at: ${dataPath} `);
+
+if (!fs.existsSync(dataPath)) {
+  console.error("❌ File not found!");
+  console.error(`Looking for: ${dataPath} `);
   process.exit(1);
 }
 
-const data = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
+const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 console.log(`✅ Found ${data.length} items in knowledge.json`);
 
 // Test specific queries
 const tests = [
   "admission requirements",
-  "tuition fees", 
+  "tuition fees",
   "courses offered",
   "hello world"
 ];
@@ -27,10 +30,10 @@ const tests = [
 console.log("\n🧪 Testing queries:");
 tests.forEach(query => {
   console.log(`\nQuery: "${query}"`);
-  
+
   const cleanQuery = query.toLowerCase();
   let found = false;
-  
+
   for (const item of data) {
     const keyword = (item.keyword || '').toLowerCase();
     if (keyword.includes(cleanQuery) || cleanQuery.includes(keyword)) {
@@ -40,7 +43,7 @@ tests.forEach(query => {
       break;
     }
   }
-  
+
   if (!found) {
     console.log(`❌ NOT FOUND in knowledge base`);
   }

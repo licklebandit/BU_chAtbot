@@ -411,7 +411,7 @@ router.post("/", authenticate, async (req, res) => {
         if (kbResult && kbResult.answer) {
             console.log("✅ Found relevant info in Knowledge Base");
             // Include BOTH the matched question and the answer in context
-            context = `KNOWLEDGE BASE INFORMATION:\nTopic/Question: "${kbResult.keyword}"\nFact/Answer: "${kbResult.answer}"`;
+            context = kbResult.answer;
             source = "knowledge_base+ai";
             kbMatch = true;
         } else {

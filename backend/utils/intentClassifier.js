@@ -33,7 +33,7 @@ export const universityIntents = {
     categories: ['accommodation']
   },
   'scholarship': {
-    keywords: ['scholarship', 'bursary', 'financial aid', 'funding', 'grant', 'sponsor', 'sponsorship', 'award' ,'available', 'there are'],
+    keywords: ['scholarship', 'bursary', 'financial aid', 'funding', 'grant', 'sponsor', 'sponsorship', 'award', 'available', 'there are'],
     weight: 8,
     categories: ['financial']
   },
@@ -82,6 +82,16 @@ export const universityIntents = {
     weight: 5,
     categories: ['student life']
   },
+  'history': {
+    keywords: ['history', 'founded', 'origin', 'background', 'past', 'beginning', 'start'],
+    weight: 6,
+    categories: ['history']
+  },
+  'identity': {
+    keywords: ['anthem', 'song', 'motto', 'vision', 'mission', 'logo', 'identity', 'symbol', 'flag', 'values', 'philosophy'],
+    weight: 7,
+    categories: ['general', 'history']
+  },
   'general_info': {
     keywords: ['bugema', 'university', 'college', 'institution', 'school', 'academy'],
     weight: 4,
@@ -104,7 +114,7 @@ export const nonKbIntents = {
     weight: 100
   },
   'story': {
-    patterns: [/story|tale|narrative/i, /tell.*story|write.*story/i],
+    patterns: [/\bstory\b|\btale\b|\bnarrative\b/i, /tell.*story|write.*story/i],
     weight: 100
   },
   'creative': {
@@ -136,7 +146,7 @@ export const nonKbIntents = {
 // Main intent detection function
 export function detectIntent(query) {
   const queryLower = query.toLowerCase().trim();
-  
+
   // First check for non-KB intents
   for (const [intentName, intentData] of Object.entries(nonKbIntents)) {
     for (const pattern of intentData.patterns) {
@@ -151,44 +161,44 @@ export function detectIntent(query) {
       }
     }
   }
-  
+
   // Check for university-related intents
   const intentScores = {};
-  
+
   for (const [intentName, intentData] of Object.entries(universityIntents)) {
     let score = 0;
-    
+
     for (const keyword of intentData.keywords) {
       const keywordRegex = new RegExp(`\\b${keyword}\\b`, 'i');
       if (keywordRegex.test(queryLower)) {
         score += intentData.weight;
-        
+
         // Bonus for exact word match
-        if (queryLower.includes(` ${keyword} `) || 
-            queryLower.startsWith(`${keyword} `) || 
-            queryLower.endsWith(` ${keyword}`)) {
+        if (queryLower.includes(` ${keyword} `) ||
+          queryLower.startsWith(`${keyword} `) ||
+          queryLower.endsWith(` ${keyword}`)) {
           score += 2;
         }
-        
+
         // Bonus for plural forms
         if (queryLower.includes(`${keyword}s`) || queryLower.includes(`${keyword}es`)) {
           score += 1;
         }
       }
     }
-    
+
     if (score > 0) {
       intentScores[intentName] = score;
     }
   }
-  
+
   // Sort by score
   const sortedIntents = Object.entries(intentScores).sort((a, b) => b[1] - a[1]);
-  
+
   if (sortedIntents.length > 0) {
     const [topIntent, score] = sortedIntents[0];
     const confidence = Math.min(score / 100, 1);
-    
+
     return {
       intent: topIntent,
       type: 'university',
@@ -198,7 +208,7 @@ export function detectIntent(query) {
       allScores: intentScores
     };
   }
-  
+
   // No intent detected
   return {
     intent: 'unknown',
@@ -212,7 +222,7 @@ export function detectIntent(query) {
 // Check if query is mixed (contains both university and non-university elements)
 export function isMixedQuery(query) {
   const queryLower = query.toLowerCase();
-  
+
   // Check for mixed patterns
   const mixedPatterns = [
     /(joke|funny|humor|laugh).*(university|admission|fee|cours|library|contact)/i,
@@ -222,7 +232,7 @@ export function isMixedQuery(query) {
     /(weather|time|date).*(university|admission|fee|cours|library|contact)/i,
     /(university|admission|fee|cours|library|contact).*(weather|time|date)/i
   ];
-  
+
   return mixedPatterns.some(pattern => pattern.test(queryLower));
 }
 
@@ -231,59 +241,59 @@ export function getRecommendedCategories(intentResult) {
   if (intentResult.type !== 'university') {
     return [];
   }
-  
+
   const intentData = universityIntents[intentResult.intent];
   return intentData?.categories || [];
 }
 
 // Simple intent classification (for feedback.js compatibility)
 export function classifyIntent(query) {
-    const intentResult = detectIntent(query);
-    return {
-        intent: intentResult.intent,
-        type: intentResult.type,
-        confidence: intentResult.confidence,
-        shouldUseGemini: intentResult.shouldUseGemini
-    };
+  const intentResult = detectIntent(query);
+  return {
+    intent: intentResult.intent,
+    type: intentResult.type,
+    confidence: intentResult.confidence,
+    shouldUseGemini: intentResult.shouldUseGemini
+  };
 }
 
 // Get intent priority
 export function getIntentPriority(intent) {
-    const priorityMap = {
-        'admission': 1,
-        'fees': 1,
-        'courses': 2,
-        'contact': 1,
-        'library': 2,
-        'accommodation': 2,
-        'scholarship': 2,
-        'registration': 2,
-        'exam': 3,
-        'graduation': 3,
-        'portal': 2,
-        'medical': 3,
-        'international': 2,
-        'administration': 2,
-        'campus': 3,
-        'student_life': 3,
-        'general_info': 4
-    };
-    
-    return priorityMap[intent] || 5;
+  const priorityMap = {
+    'admission': 1,
+    'fees': 1,
+    'courses': 2,
+    'contact': 1,
+    'library': 2,
+    'accommodation': 2,
+    'scholarship': 2,
+    'registration': 2,
+    'exam': 3,
+    'graduation': 3,
+    'portal': 2,
+    'medical': 3,
+    'international': 2,
+    'administration': 2,
+    'campus': 3,
+    'student_life': 3,
+    'general_info': 4
+  };
+
+  return priorityMap[intent] || 5;
 }
 
 // Additional helper function for chat.js compatibility
 export function shouldUseKnowledgeBase(query) {
   const intentResult = detectIntent(query);
-  
+
   if (intentResult.shouldUseGemini) {
     return false;
   }
-  
+
   if (isMixedQuery(query)) {
     return false;
   }
-  
+
   return true;
 }
 
