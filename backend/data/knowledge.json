@@ -3,15 +3,39 @@
     "keyword": "How do i get admissions of Bugema university?",
     "answer": "To get admissions at Bugema university, Reach out our online platform or visit our offices physically.",
     "category": "academic",
-    "tags": [],
+    "tags": [
+      "admissions"
+    ],
     "priority": 1,
     "source": "Database Export",
     "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
     "keyword": "How do i reach bensdoff?",
-    "answer": "Walk through the main gate, its the first building immediately after the main gate.\n",
+    "answer": "Walk through the main gate, its the first building immediately after the main gate.",
     "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Health Facilities",
+    "answer": "Health and emergency care are available to students as well as members of the community.\nThe facility includes services for both inpatients and outpatients, laboratory services, maternal – child health services, dental services, optical services, HIV counseling and testing and a range of community health services.",
+    "category": "student_life",
+    "tags": [
+      "hospital",
+      "health",
+      "clinic"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Spiritual Life at Bugema University",
+    "answer": "A fundamental objective of the university is to develop the spiritual faculties of the student.\nBugema University believes that God created human beings in His own image so that humanity should worship Him.",
+    "category": "about",
     "tags": [],
     "priority": 1,
     "source": "Database Export",
@@ -27,8 +51,149 @@
     "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
+    "keyword": "Internet",
+    "answer": "Internet services are available at the Campus. Students can also access online resources through the library and the computer laboratories.",
+    "category": "academic",
+    "tags": [
+      "internet",
+      "WI-FI"
+    ],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Work Program",
+    "answer": "The university operates a number of auxiliary and vocational services where students may work part-time to earn some money in order to defray some of their school expenses. These opportunities, to engage in productive and useful labor, help develop character traits of industry, dependability, and initiative.  In the process, students may also acquire valuable vocational skills.",
+    "category": "academic",
+    "tags": [
+      "work program"
+    ],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Student Government ",
+    "answer": "The Bugema University Student Association (BUSA) is the primary student association in which all registered students, including in-service, satellite campus, and graduate students are members.  This organization exists to give leadership opportunities to students and to provide a formal means of communication with the faculty and administration for the purpose of improving the learning environment of the university.  Elections to student government are held once a year.  BUSA operates a canteen, copy center and computing facility near the athletic field, locally known as “the container”. Services available include typing, printing, book binding, scanning and photocopying.  In the container shop, one can purchase soft drinks, snacks, airtime, minor school supplies, et",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Marriages",
+    "answer": "As a general rule, marriages are not encouraged during the academic year.  Exceptions may be granted on special request.",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Marriages",
+    "answer": "As a general rule, marriages are not encouraged during the academic year.  Exceptions may be granted on special request.",
+    "category": "student_life",
+    "tags": [
+      "marriages"
+    ],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Off Campus Trips",
+    "answer": "The university recognizes that providing opportunities for students to participate in study tours, industrial attachments, field research trips, club promotional tours, and mission service trips may significantly enhance an academic program.  The university requires that any student participating in official trips should behave in accordance with the regulations governing students as stipulated in the Student Handbook. ",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Sabbath Observance",
+    "answer": "The Seventh-day Sabbath is observed at Bugema University from sunset Friday to sunset Saturday according to the Bible.\nSeventh-day Adventists believe that this is a day to take a holiday from work and study, but take time to relax, rest, worship and praise God.\nAll students are expected to conduct themselves in harmony with the sacredness of this day.",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Aims & Objectives of Bugema University",
+    "answer": "Bugema University aims to develop the whole person; therefore, the following objectives reflect this holistic approach:\n1. To provide academic programs which will allow the students to acquaint themselves with various fields of knowledge and to acquire skills that will facilitate personal, social, academic, and professional development in order to meet individual and societal demands.\n2. To instill in the students an unswerving allegiance to the principles of Christian faith and BUGEMA UNIVERSITY;  A Chartered Seventh-Day Adventist Institution of Higher Learninga sense of personal responsibility so that they are prepared to render useful service to God and to humanity.\n3. To lay emphasis on applied research relevant to the development needs of the community, including encouraging research leading to the development of patents.\n4. To encourage all faculties to devote part of their time to research for publication in internationally recognized journals.\n5. To select its students solely on the basis of merit while taking cognizance of the need to apply special criteria to potentially able but disadvantaged students.6. To continue upgrading the quality of its teaching, research and administrative staff through vigorous staff development and staff appraisal schemes.",
+    "category": "academic",
+    "tags": [
+      "Aims & Objectives"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Leave of Absence",
+    "answer": "When a student needs to leave the campus for any reason, proper arrangements must be made with the office of the Director of Students Affairs. Forms to be used are available at the residence halls.  For detailed information about leave of absence, consult the Student Handbook.",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Student Handbook",
+    "answer": "Each student is provided with a student handbook, which contains guidelines, rules and regulations governing the student’s stay in this university.\nIt is the responsibility of the student to obtain a copy and get acquainted with the information therein.",
+    "category": "student_life",
+    "tags": [
+      "handbook",
+      "student journal"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Quality Assurance",
+    "answer": "The University has a quality assurance system which delineates self-regulating and selfmaintaining procedures to maintain standards of excellence in academic delivery and performance.",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Student Life and Services",
+    "answer": "Bugema University, being a Seventh-day Adventist institution, recognizes that true education has to do with the harmonious development of the whole person.\nTo achieve this broad aim, the University provides an environment in which students are encouraged to develop and strengthen their commitment to Jesus Christ, experience personal and social growth, develop their appreciation for beauty, and develop a pattern of healthful living, as well as achieve academic excellence.",
+    "category": "academic",
+    "tags": [],
+    "priority": 3,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
     "keyword": "What seperates a day and a student at bugema university?",
-    "answer": "Day students dont have access to unuversity resources like hostels, cafeteria etc.",
+    "answer": "Day students dont have access to university resources like hostels, cafeteria etc.",
+    "category": "academic",
+    "tags": [],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Food Services",
+    "answer": "Bugema University operates a bakery, an adequately equipped kitchen, and a cafeteria offering a balanced vegetarian diet.\nSince there are no eating facilities in the residence halls, all residence hall students are encouraged to take their meals in the cafeteria.\nNo provision is made for food preparation in the rooms.\nThe cost of three meals a day is included in the boarding fees.\nStudents living in private hostels make their own arrangements for their meals.\nThe university operates a snack center and there are privately owned restaurants near campus.",
+    "category": "student_life",
+    "tags": [
+      "cafeteria",
+      "meals"
+    ],
+    "priority": 1,
+    "source": "Database Export",
+    "exportedAt": "2025-12-08T06:29:27.868Z"
+  },
+  {
+    "keyword": "Housing and accommodation",
+    "answer": "Female students who do not live either with their parents or spouses are encouraged to live in residence halls on campus.\nIn each room, beds and other basic conveniences are provided but students are expected to provide their own mattresses and bedding.\nMale students who do not live either with their parents or spouses may live in one of a number of private residence facilities approved by the university which are located near the campus.  There are no facilities for married student housing.",
     "category": "academic",
     "tags": [],
     "priority": 1,
@@ -134,14 +299,11 @@
     "exportedAt": "2025-12-08T06:29:27.868Z"
   },
   {
-    "keyword": "adding dropping courses",
-    "answer": "Adding/Dropping Courses: Fill form from Registrar's Office; Get lecturer approval; Return form to Registrar's Office; Fee charged for changes. Deadlines: Adding - up to published 'Last day to enter any class'; Dropping - by deadline (no record); Dropping after deadline = F grade recorded.",
+    "keyword": "add and drop",
+    "answer": "Add & Drop Courses: Fill form from Registrar's Office; Get lecturer approval; Return form to Registrar's Office; Fee charged for changes. Deadlines: Adding - up to published 'Last day to enter any class'; Dropping - by deadline (no record); Dropping after deadline = F grade recorded.",
     "category": "academic",
     "tags": [
-      "add",
-      "drop",
-      "courses",
-      "changes"
+      "add and drop"
     ],
     "priority": 2,
     "source": "Database Export",
@@ -163,13 +325,13 @@
   },
   {
     "keyword": "application procedure",
-    "answer": "1. Obtain application form from Registrar's office, liaison offices, or website (www.bugemouniv.ac.ug). 2. Fill form correctly and attach copies of academic certificates. 3. Pay application fee as stipulated. 4. Return documents to Registrar's office at least 3 weeks before academic year begins. Acceptance: You will receive acceptance letter if application is successful. Only come to university after receiving acceptance letter.",
+    "answer": "1. Obtain application form from Registrar's office, or website (www.bugemouniv.ac.ug). 2. Fill form correctly and attach copies of academic certificates. 3. Pay application fee as stipulated. 4. Return documents to Registrar's office at least 3 weeks before academic year begins. Acceptance: You will receive acceptance letter if application is successful. Only come to university after receiving acceptance letter.",
     "category": "admissions",
     "tags": [
       "application",
-      "how to apply",
-      "procedure",
-      "forms"
+      "how do i apply",
+      "application procedure",
+      "application process"
     ],
     "priority": 1,
     "source": "Database Export",
@@ -263,12 +425,7 @@
     "keyword": "change of campus centre",
     "answer": "Change Campus/Centre: Timing - Beginning of academic year; Procedure - Fill designated form from host campus, get department clearance, receive transfer letter and assessment sheet. Restrictions: Not allowed without proper procedure; Not allowed if remaining with one semester; Only at end/beginning of academic year.",
     "category": "academic",
-    "tags": [
-      "campus",
-      "centre",
-      "transfer",
-      "location"
-    ],
+    "tags": [],
     "priority": 2,
     "source": "Database Export",
     "exportedAt": "2025-12-08T06:29:27.869Z"
@@ -332,13 +489,10 @@
   },
   {
     "keyword": "erms student portal",
-    "answer": "ERMS (Educational Resource Management System): portal.bugemauniv.ac.ug. Uses: View results, register courses, check fees balance, download transcripts, access course materials. Login: Student number and password. Parents can access with student's ID and password to monitor progress. Assessment sheet: Print once free; additional copies attract fee.",
+    "answer": "ERMS (Educational Resource Management System): portal.bugemauniv.ac.ug. Uses: View results, register courses, check fees balance, download transcripts, access course materials. Login: Student number and password. Parents can access with student's ID and password to monitor progress. Assessment sheet: Print for free.",
     "category": "technical",
     "tags": [
-      "erms",
-      "portal",
-      "online",
-      "student system"
+      "erms"
     ],
     "priority": 1,
     "source": "Database Export",
@@ -513,8 +667,8 @@
     "exportedAt": "2025-12-08T06:29:27.869Z"
   },
   {
-    "keyword": "late fees charges",
-    "answer": "Late Fees: Continuing students reporting after normal registration charged late fee; Amount increases daily to maximum UGX 300,000; Purpose: Encourage early arrival and registration.",
+    "keyword": "late reistration charges",
+    "answer": "Late registration: Continuing students reporting after normal registration charged late fee; Amount increases daily to maximum UGX 300,000; Purpose: Encourage early arrival and registration.",
     "category": "fees",
     "tags": [
       "late",
@@ -840,10 +994,7 @@
     "answer": "BUGEMA UNIVERSITY ANTHEM:\nOnward to progress, Bugema\nEver serving, ever shining\nCountless youths have left your portals\nReady to share the wonderful light;\nOur prayers will rise for you\nWherever we may go\nOur good work will show\nThat we’re ever true to you.\n\nOnward, Bugema!\nO’er the valleys and the hills\nShine on, Bugema!\nO’er the plains and cities too;\nLead on, press on, Bugema!\nOur praises will ring true.\n\nKeep the standards high, Bugema\nEver waving, ever rising\nFor on you depends the future\nOf many a youth both far and near;\nSo together we sing\nAnd together we serve\nTill the Lord’s coming\nBugema, you shall stand.",
     "category": "history",
     "tags": [
-      "anthem",
-      "song",
-      "lyrics",
-      "identity"
+      "anthem"
     ],
     "priority": 1,
     "source": "Bulletin 2024-2029"
@@ -853,10 +1004,7 @@
     "answer": "UGANDA NATIONAL ANTHEM:\nOh Uganda!\nMay God uphold Thee,\nWe lay our future in thy hand,\nUnited, free,\nFor liberty,\nTogether we’ll always stand.\n\nOh Uganda!\nThe land of Freedom,\nOur love and labor we give,\nAnd with neighbours’ all,\nAt our Country’s call,\nIn peace and friendship, we’ll live.\n\nOh Uganda!\nThe land that Feeds us,\nBy sun and fertile soil grown,\nFor our own dear land,\nWe’ll always stand,\nThe Pearl of Africa’s Crown.",
     "category": "general",
     "tags": [
-      "national anthem",
-      "uganda",
-      "song",
-      "lyrics"
+      "national anthem"
     ],
     "priority": 1,
     "source": "Bulletin 2024-2029"
@@ -866,24 +1014,18 @@
     "answer": "EAST AFRICAN COMMUNITY ANTHEM:\nChorus:\nJumuiya Yetu sote tuilinde\nTuwajibike tuimarike\nUmoja wetu ni nguzo yetu\nIdumu Jumuiya yetu.\n\n1. Ee Mungu twakuomba ulinde\nJumuiya Africa Mashariki\nTuwezeshe kuishi kwa amani\nTutimize na malengo yetu\n\n2. Uzalendo pia mshikamano\nViwe msingi wa Umoja wetu\nNatulinde Uhuru na Amani\nMila zetu na desturi zetu.\n\n3. Viwandani na hata mashambani\nTufanye kazi sote kwa makini\nTujitoe kwa hali na mali\nTuijenge Jumuiya bora.",
     "category": "general",
     "tags": [
-      "eac",
-      "anthem",
-      "community",
-      "lyrics",
-      "swahili"
+      "anthem"
     ],
     "priority": 1,
     "source": "Bulletin 2024-2029"
   },
   {
-    "keyword": "Contact Bugema University",
-    "answer": "Contact Information:\nAddress: 32km North of Kampala, Gayaza-Zirobwe Rd, Near Busiika Town Council, Luweero, UGANDA\nPostal: P.O. Box 6529, Kampala, UGANDA\nTel: (256) 312 351400\nMob/WhatsApp: +256 773 408 090\nEmail: registrar@bugemauniv.ac.ug\nWebsite: www.bugemauniv.ac.ug",
+    "keyword": "Bugema University Contacts",
+    "answer": "Contact Information: Postal: P.O. Box 6529, Kampala, UGANDA\nTel: (256) 312 351400\nMob/WhatsApp: +256 773 408 090\nEmail: registrar@bugemauniv.ac.ug\nWebsite: www.bugemauniv.ac.ug",
     "category": "contact",
     "tags": [
-      "address",
       "phone",
       "email",
-      "location",
       "contact"
     ],
     "priority": 1,
@@ -891,25 +1033,51 @@
   },
   {
     "keyword": "Bugema University Location",
-    "answer": "Bugema University is located 32 kilometers north of Kampala on Gayaza-Zirobwe Road. Public Taxis cost approx. Ushs 5,000 from Old Taxi Park, Kampala. Special hire cars approx. UShs 70,000.",
+    "answer": "Location Information:\nAddress: 32km North of Kampala, Gayaza-Zirobwe Rd, Near Busiika Town Council, Luweero, UGANDA\nPostal: P.O. Box 6529, Kampala, UGANDA",
     "category": "contact",
     "tags": [
-      "location",
-      "directions",
-      "transport",
-      "taxi"
+      "address",
+      "location"
+    ],
+    "priority": 1,
+    "source": "Bulletin 2024-2029"
+  },
+  {
+    "keyword": "Bugema University Directions",
+    "answer": "Bugema University is located 32 kilometers north of Kampala on Gayaza-Zirobwe Road. Public Taxis cost approx. Ushs 5,000 from Old or New Taxi Park, Kampala. Special hire cars approx. UShs 70,000.",
+    "category": "contact",
+    "tags": [
+      "directions"
+    ],
+    "priority": 1,
+    "source": "Bulletin 2024-2029"
+  },
+  {
+    "keyword": "About Bugema University",
+    "answer": "Bugema University is a chartered Seventh-day Adventist institution of higher learning located 32km north of Kampala, Uganda. Founded through the Adventist church's entry in Uganda in 1927, the university obtained its government license in 1994.\n\nVision: A Christian University of choice for Excellence in Education and Skilling.\nMotto: Excellence in Service.\n\nThe university offers programs in:\n• Agriculture & Applied Sciences\n• Business\n• Education  \n• Health & Allied Sciences\n• Science & Technology (Computing, Statistics, Biochemistry)\n• Social Sciences\n• Theology & Religious Studies\n\nBugema University operates on a semester system with residential and day student options. The institution emphasizes holistic Christian education, preparing students for productive lives of service to God and society.",
+    "synonyms": [
+      "tell me about bugema",
+      "about bugema university",
+      "about bugema",
+      "describe bugema university",
+      "bugema university overview",
+      "what is bugema university",
+      "bugema university info",
+      "information about bugema"
+    ],
+    "category": "general",
+    "tags": [
+      "about bugema"
     ],
     "priority": 1,
     "source": "Bulletin 2024-2029"
   },
   {
     "keyword": "History of Bugema University",
-    "answer": "Brief History:\n1927: First Adventist educational institution in Nchwanga.\n1948: Moved to Bugema (640 acres).\n1950: Secondary education started.\n1970: Junior college for pastors.\n1974: Upgrade to 4-year seminary (BTh).\n1994: Licensed as university.\n2009: Granted Charter by President Museveni.\n2010: Launched Graduate School.\nCurrently offers Undergraduate, Graduate, and PhD programs.",
+    "answer": "Brief History:\nWith the entry of the Adventist church in Uganda in 1927 came also the first Adventist educational institution in Nchwanga in West-Central Uganda.\nThe primary function of the institution was to train pastors and church workers.\nIn 1948 the institution moved to a newly purchased property of 640 acres in Bugema, 32 kilometers from Kampala.\nTwo years later a secondary education at ‘O’ level was started.\nBy 1970 a junior college began its operations training pastors for the church.\nFour years later, the denomination upgraded the institution into a four-year seminary, granting bachelor’s degree in Theology (BTh).\nIn 1985 Business Studies was added, and in 1990 Education.\nIn 1994, the institution obtained a government license to operate as a university.\nThe Adventist Accrediting Association (AAA) visited the University in 1995 and recommended accreditation to Bachelor of Theology, Bachelor of Business Administration (in Management and Accounting), and Bachelor of Arts in Religion. \nSubsequent visit of the AAA and International Board of Education (IBE) allowed the university to restructure their programs under two schools: School of Arts and Social Sciences and School of Business. \nThe former includes four departments: Development Studies, Education, Social Work and Social Admnistration, and Theology and Religious Studies.\nThe later includes three departments: Accounting and Finance, Management, and Information Technology.\nUnder these departments, the university offers 12 degree programs with various majors and several vocational certificates and professional licenses. In year 2000, the university had student population of 800.\nThere was a need to expand the offerings in various departments especially in the Department of Education.\nAs a result, the following teaching courses were introduced in education: Geography, Mathematics, Chemistry, Biology, Physics, English Language and Literature in English.\nThe School of Social Sciences also expanded to include Development Studies.",
     "category": "history",
     "tags": [
       "history",
-      "founded",
-      "charter",
       "origin"
     ],
     "priority": 1,
@@ -917,26 +1085,40 @@
   },
   {
     "keyword": "Bugema University Philosophy",
-    "answer": "Philosophy: True education fosters the restoration of the lost image of God in human beings through the harmonious development of the physical, mental, social, and spiritual dimensions (Head, Heart, and Hand - 3H program).",
+    "answer": "Philosophy: True education fosters the restoration of the lost image of God in human beings through the harmonious development of the physical, mental, social, and spiritual dimensions of life.",
     "category": "about",
     "tags": [
-      "philosophy",
-      "3h",
-      "mission",
-      "values"
+      "philosophy"
     ],
     "priority": 1,
     "source": "Bulletin 2024-2029"
   },
   {
-    "keyword": "Bugema University Vision Mission Motto",
-    "answer": "Vision: A Christian University of choice for Excellence in Education and Skilling.\nMotto: Excellence in Service.\nMission: To offer an excellent and distinctive holistic Christian education designed to prepare students for productive lives of useful service to God and Society with integrity, honesty, and loyalty.",
+    "keyword": "Bugema University Vision",
+    "answer": "Vision: A Christian University of choice for Excellence in Education and Skilling.",
     "category": "about",
     "tags": [
-      "vision",
-      "mission",
-      "motto",
-      "values"
+      "vision"
+    ],
+    "priority": 1,
+    "source": "Bulletin 2024-2029"
+  },
+  {
+    "keyword": "Bugema University Mission",
+    "answer": "Mission: To offer an excellent and distinctive holistic Christian education designed to prepare students through training, research and scholarship, for productive lives of useful service to God and Society with uncompromising integrity, honesty, and loyalty.",
+    "category": "about",
+    "tags": [
+      "mission"
+    ],
+    "priority": 1,
+    "source": "Bulletin 2024-2029"
+  },
+  {
+    "keyword": "Bugema University Motto",
+    "answer": "Motto: Excellence in Service.",
+    "category": "about",
+    "tags": [
+      "motto"
     ],
     "priority": 1,
     "source": "Bulletin 2024-2029"
@@ -955,32 +1137,6 @@
     "source": "Bulletin 2024-2029"
   },
   {
-    "keyword": "Student Food Services",
-    "answer": "Food Services: Cafeteria provides balanced vegetarian diet (included in boarding fees). No cooking allowed in rooms. Snack center available.",
-    "category": "student_life",
-    "tags": [
-      "food",
-      "cafeteria",
-      "diet",
-      "meals"
-    ],
-    "priority": 2,
-    "source": "Bulletin 2024-2029"
-  },
-  {
-    "keyword": "Student Housing Accommodation",
-    "answer": "Housing: Female students encouraged to live in on-campus residence halls (beds provided, bring mattress/bedding). Male students can live in approved private hostels near campus. Married housing not available. Room/board charged for vacation stay.",
-    "category": "student_life",
-    "tags": [
-      "housing",
-      "hostel",
-      "accommodation",
-      "residence"
-    ],
-    "priority": 2,
-    "source": "Bulletin 2024-2029"
-  },
-  {
     "keyword": "Student Code of Conduct",
     "answer": "Code of Conduct: Upholds Christian principles. Prohibited: Illegal drugs, alcohol, tobacco, gambling, vulgar language, violence, immorality, public sexual intimacy, theft, unauthorized meetings. Dress code applies. Violation leads to disciplinary action.",
     "category": "student_life",
@@ -995,12 +1151,11 @@
   },
   {
     "keyword": "E. W. Petersen Memorial Library",
-    "answer": "Library: Named after pioneer E. W. Petersen. Provides books, e-journals, internet access. \nOpening Hours:\nSun-Thu: 7:30am-6:00pm, 7:30pm-10:00pm\nFri: 7:30am-12:00noon\nSat: 7:30pm-10:00pm\nServices: Lending, Literature search, Photocopying, Binding.",
+    "answer": "Library: Named after pioneer E. W. Petersen. Provides books, e-journals, internet access. \nOpening Hours:\nSun-Thu: 7:30am-6:00pm, 7:30pm-10:00pm\nFri: 7:30am-12:00noon\nServices: Lending, Literature search, Photocopying, Binding.",
     "category": "academic",
     "tags": [
       "library",
       "hours",
-      "services",
       "books"
     ],
     "priority": 1,
@@ -1087,15 +1242,14 @@
   },
   {
     "keyword": "Department of Computing and Informatics Staff Vision",
-    "answer": "The Department of Computing & Informatics is headed by Mr. Muwanga Kosea Erasto. \n\n**Vision:** To offer quality Information Systems learning, Innovations and Research geared towards solving community Technological requirements.\n\n**Lecturers:** Kitumba David, Nantege Hellen, Mugerwa Joseph, Nandere Hudson, Golooba Ronald, Ssewankambo Erma, Onyango Laban, Walusimbi Albert, Balagadde Ssali Robert, Wogisha Dennis, Luwalo Enock, Lowu Francis.",
+    "answer": "The Department of Computing & Informatics is headed by Mr. Ssewankambo Emmanuel. \n\n**Vision:** To offer quality Information Systems learning, Innovations and Research geared towards solving community Technological requirements.\n\n**Lecturers:** Muwanga Kosea Erasto, Kitumba David, Nantege Hellen, Mugerwa Joseph, Nandere Hudson, Golooba Ronald, Ssewankambo Erma, Onyango Laban, Walusimbi Albert, Balagadde Ssali Robert, Wogisha Dennis, Luwalo Enock, etc.",
     "category": "academic",
     "tags": [
       "computing",
       "informatics",
       "staff",
       "lecturers",
-      "vision",
-      "muwanga kosea erasto"
+      "vision"
     ],
     "priority": 75,
     "source": "BU Bulletin 2024-29",
@@ -1306,5 +1460,268 @@
     "priority": 60,
     "source": "BU Bulletin 2024-29",
     "exportedAt": "2025-12-14T13:20:59.567Z"
+  },
+  {
+    "keyword": "Admission Requirements",
+    "answer": "Admission requirements vary slightly according to the program the applicant is seeking admission for and/or individual circumstances. The school or department in which the applicant wishes to register may prescribe certain additional course requirements if the student is deemed deficient. The general requirement for different programs are as follow:\n\nUndergraduate Degree Programs \n• O-level certificate with at least five passes in approved subjects, including a pass in English Language, or equivalent, and\n•  A-level certificate with two principal passes in relevant subjects or equivalent, or\n•  Higher Education Access Certificate (HEAC) Accredited by NCHE with a minimum GPA of 2.8, or \n•  A certificate of aptitude test pass (Mature Scheme Entry Exam) from the center officially recognized by the NCHE, or\n•  A diploma in a relevant subject from a recognized educational institution.\n•  For degree in Education, one must have a principal pass (or C+ or 55%) in each of the relevant teaching subject.\n\nDiploma Programs \n•  O-level certificate with at least four passes in approved subjects, including a pass in English Language, or equivalent, and\n•  A-level certificate with at least one principal pass at A-level in a relevant subject or its equivalent, or\n•  Higher education Access Certificate (HEAC) Accredited by NCHE with a minimum GPA of 2.5, or \n•  A certificate in a relevant subject from a recognized educational institution, or\n•  For a Diploma in Secondary Education, one must have two principal passes or (C+or 55%) in each of the relevant teaching subject, or\n•  For a Diploma in Primary Education, one must have a Grade III (or P1) Teacher’s Certificate from a recognized institution.\n\nHigher Education Access Certificate (HEAC)\n•  UACE with at least two subsidiary passes or its equivalent as determined by the National Council for Higher Education (NCHE) in consultation with the Uganda National Examination Board, where one of the subsidiary passes must be from a principal subject or one principal pass, or\n•  Vocational qualifications at level 2 or level 3 of Uganda vocational qualifications Framework, or\n•  An Ordinary 2 years certificate from an institution recognized by NCHE, or\n•  Foreign secondary school qualifications that are not considered equivalent to UACE but permit admission in Higher Education in their countries, with at least five subjects with a minimum overall grade of C (or 55%) (equivalently a Ugandan Credit 5).\n\nCertificate Programs: \n•  O-level certificate with at least four passes in relevant subjects.\n•  HEAC with a minimum GPA 2.0.\n\nMature Entry Examination\nThis is an aptitude test given to individuals who do not meet the minimum requirement for admissions to the University but have been exposed to adequate knowledge acquired formally or informally. The individual must be at least 25 years of age and the exam must be taken from the NCHE authorized centers only.\n\nNOTE: For specific additional requirements kindly, see under each School or Department in question.",
+    "category": "admissions",
+    "tags": [
+      "requirements",
+      "undergraduate",
+      "diploma",
+      "HEAC",
+      "certificate",
+      "mature entry"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Admission of International Students",
+    "answer": "International students may be admitted provisionally if they hold either comparable certification or university admission status in their own country, pending equating their academic papers with Uganda National Examination Board (UNEB) and any other relevant regulatory board for secondary school and other post-secondary school awards, respectively. If you come from a country where the system of education does not have an A-level system; for example, Kenya, a student is expected to enroll for Higher Education Certificate.",
+    "category": "admissions",
+    "tags": [
+      "international",
+      "foreign",
+      "students"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Academic Documents for Admission",
+    "answer": "At the time of the student’s first registration, the student is required to present original admission letter and academic documents.  They will be certified and returned to the student.  However, a student may be requested to present them again at the Registrar’s Office or to the Deputy Vice-Chancellor – Academics’ office should the need arise.",
+    "category": "admissions",
+    "tags": [
+      "documents",
+      "academic papers",
+      "registration"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Alteration of Name or Biodata",
+    "answer": "Bugema University is not responsible for the identity of its students. In that case, the information registered on the documents used to apply for admission at Bugema University will remain unchanged as much as possible, unless the issuing body supplies an amended original copy to the university. In the event where simple alterations such as spelling mistakes, year of birth, order of names and addition of names are communicated, supported by official documents, the student will have to submit an affidavit/poll deed authenticated by Uganda Registration Services Bureau (URSB).",
+    "category": "administrative",
+    "tags": [
+      "name change",
+      "biodata",
+      "identity"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Upgrading from one level to another",
+    "answer": "Students wishing to upgrade from certificate to diploma or from diploma to degree should submit documents to show that the previous study is completed. This can be a certificate and a transcript or a completion letter and a partial transcript for provisional admission. No student can be registered in two programs concurrently.",
+    "category": "academic",
+    "tags": [
+      "upgrade",
+      "certificate to diploma",
+      "diploma to degree"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Transferring to Another Department",
+    "answer": "This is acceptable under the guidance of the department heads and the Registrar’s Office. A student wishing to transfer to another department or course may do so only after completing 18 credit hours, which is equivalent to one semester. The student must check with both the current and the new department to know whether they qualify for the transfer. If it is acceptable, the student must obtain Change of Major or Program Form from the Registrar’s Office and apply.",
+    "category": "academic",
+    "tags": [
+      "transfer",
+      "change department",
+      "change major"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Registration Overview",
+    "answer": "Students are required to report to the university on the scheduled date so that they may register and begin classes on time. Usually, one week is set apart for registration. During registration, new students are given orientation to the university, its programs and facilities.",
+    "category": "administrative",
+    "tags": [
+      "registration",
+      "reporting",
+      "orientation"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Registration Procedures",
+    "answer": "There are five basic steps in the registration procedure as follows:\n\n1. At the Business Office, students need to Arrange for financial payment\n•  Obtain financial clearance\n\n2. At the student’s Academic Department, students need to\n•   Obtain a registration form,\n•   Pay departmental club fee,\n•   With the advisor, select courses in accordance with the recommended schedules published in this bulletin, upload them in ERMS, and\n• Obtain approval for the courses selected from the department chairperson.\n\n3. At the Dean of Student’s Office, students need to:\n• Obtain their residential status,\n• Register for the Bugema University Student Association (BUSA), and\n• Register and clear financial obligations to respective national and/or social clubs,\n• Submit BUSA subscription receipt for due approval.\n• Collect Student’s Handbook\n\n4. At the Registrar’s Office, students need to:\n• Complete registration of student’s details, \n• Obtain Registration Card printed from the database. Registration Card is necessary to gain entry when classes begin and other services, and\n• Keep the registration card safe for day to day use.\n• Collect your Academic Bulletin\n\nLate Registration Note:\nStudents who, for sound reason(s), arrive after the closing date of registration may be allowed to register.  However, a fee that increases daily is charged for late registration (consult the financial section of this bulletin and business office staff for details). Late registration officially closes at the discretion of the Deputy Vice Chancellor Academic Affairs. The university may consider registration of students with special cases, such as accidents or death in the family but with consultation with the lecturer(s) to ascertain if courseworks (assignment and tests) have been done.",
+    "category": "administrative",
+    "tags": [
+      "getting registered",
+      "steps",
+      "clearance",
+      "how do i register",
+      "how to register"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Identity Cards",
+    "answer": "The Registrar’s Office prepares the student identity cards immediately after registration. Students are issued a card that is valid for duration of their academic program free of charge. In the event that a Bugema University identity card is lost or stolen, the student should report to the police and obtain a police report, which must be presented to the Registrar’s Office staff to process a new identity card at a fee.",
+    "category": "student_life",
+    "tags": [
+      "ID card",
+      "identity",
+      "lost id"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Academic Affairs",
+    "answer": "The university offers a variety of degree, diploma and certificate courses. A student is expected to make intelligent choices from the available academic programs that will lead to a lifetime career. Students coming from non-English speaking countries will be required to write an English placement examination prior to enrolling for their first semester. If the student does not obtain 50% in this test, he/she will be required to attend remedial English classes for at least one semester.",
+    "category": "academic",
+    "tags": [
+      "english placement",
+      "courses",
+      "remedial"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Semester Sessions",
+    "answer": "The university operates under a semester system. Each semester runs for 18 weeks subdivided in this way: one week of registration, 15 weeks of instruction, and two weeks for final examination. The value of each course offered is expressed in terms of credit units. One credit unit represents one fifty-minute class period in each of 15 weeks, two hours of tutorial, or two to three hours of practical periods per week for 15 weeks of the semester. The student is expected to spend a minimum of two hours of outside preparation for each class period. Every academic year consists of two regular semesters: first semester from mid-August to mid December; second semester from early January to early May. For Diploma and Certificate in Nursing the semesters run according to the Nursing Counsil of Uganda, usually beginning in mid-January and/or mid-July.",
+    "category": "academic",
+    "tags": [
+      "semester",
+      "credit unit",
+      "calendar"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "eportal",
+    "answer": "Every new registered student with registration number starting with 25 and above is given an EPORTAL account. Students will use this account in all academic activities including monitoring their progressive reports. Students are encouraged to give their parents or sponsors their ID numbers and password to enable them monitor their progress. A print out of an assessment sheet that indicates all the courses covered, grades earned, and the cumulative grade point average of all the subjects covered may be printed once for each student upon request. Additional assessment sheet will attract a fee.",
+    "category": "technical",
+    "tags": [
+      "eportal"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Graduation",
+    "answer": "Graduation is held once a year at Bugema University main campus. Due to the flexibility of the system and the nature of the courses offered, it is possible for a student to take more than the required duration to complete all the requirements for graduation. Depending on the class load taken each semester, and on the student’s academic performance, a student may complete his/her course requirements at the end of first, second, or summer semester. Whenever a student completes all the requirements, the university will issue a letter of completion and partial transcript before graduation.",
+    "category": "academic",
+    "tags": [
+      "graduation",
+      "completion",
+      "transcript"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Delayed Graduation",
+    "answer": "A student who completes all the requirements for graduation is expected to clear and graduate in the proceeding graduation. In the event where a student fails to graduate in the specified time will have to do so within two years. Failure to that he/she will be re-evaluated using the running bulletin.",
+    "category": "academic",
+    "tags": [
+      "delayed graduation",
+      "graduation policy"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Collection of Certificates and Transcripts",
+    "answer": "Certificates are expected to be ready for collection on the date to one month after graduation. Graduates will be expected to collect their documents personally within one year from the day of graduation. Beyond one year the uncollected documents will attract a surcharge of $2.0 per month that will accumulate every year and will have to be paid before the documents are released. All previous uncollected documents shall also be charged the same rate from the time this policy comes into effect. Any person who may wish to keep his/her academic or any other documents for safe custody at the Registrar’s Office after official collection will pay $1.0 per month. In the event where the uncollected documents require reprint or corrections, this policy mandates the officers at post to endorse them.\nIn the event where a student cannot collect his/her documents personally, provision for a legally registered spouse, sponsor or guardian may be delegated. Otherwise, DHL, for both internal or international delivery is the desired option.",
+    "category": "academic",
+    "tags": [
+      "certificates",
+      "transcripts",
+      "collection",
+      "DHL"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "General Requirement for Graduation",
+    "answer": "The general requirements that apply to the various programs may be summarized as follows:\n1. A major, a minor and a cognate (for some courses), \n2. General education courses as outlined in the general education section. \n3. Grade-Point Average (GPA) requirements are as follows.    \nGrades of less than D will not be accepted in any category for graduation. A minimum GPA of 2.25 is required for a major and 2.0 for a minor. A cumulative average GPA of 2.0 or an average of D on the entire sequence, and a minimum of credit load as stipulated in each program.\nBefore a student participates in the graduation exercises and receives his/her certificate, the following must be met:\n1. Should complete all relevant requirements for the program of study.\n2. Have an original or certified transcript of any transfer credit submitted to the Registrar’s Office before or at the time of graduation clearance. 3. . Should be cleared from all service departments.",
+    "category": "academic",
+    "tags": [
+      "graduation requirements",
+      "GPA",
+      "clearance"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Fees Structure",
+    "answer": "Bugema University’s’ fees are competitive and are determined by the number of academic hours taken and other services provided by the university, such as boarding, library, medical, etc. The fees structure is subject to change. However, it cannot change within the academic year.\nThe total amount to be charged to every student is computed by using the academic fees structure approved by the University Council. The copies of fees structures of different courses are available in the Registrar’s Office and Business Office of the university and are given free of charge on request.",
+    "category": "fees",
+    "tags": [
+      "fees",
+      "tuition",
+      "charges"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Payment Accounts and Methods",
+    "answer": "All fees must be paid in any of the bank accounts of the university given below before registration. Bank charges for the other banks vary depending on their internal policies.\nThe deposit slip must be presented to the receiving cashier within the month of the deposit.\nCurrently the following are the “Bugema Uuniversity” account numbers in various banks:\n\na. Equity Bank (Kenyan shillings): 1004203110057\nb. Equity Bank (Ugandan Shillings): 1017200261563\nc. Centenary Rural Development Bank (Ugx): 3100018764\nd. United Bank of Africa (UBA) (Ugx): 1206000016\ne. Standard Chartered Bank-Uganda (Forex): 8702010609600\nf. United Bank of Africa (UBA) (Forex): 0113009891\n\nAll fees sent from outside Uganda must use the following SWIFT Adresses:\nBank Name: United Bank of Africa (UBA) \nAccount Name: Bugema University   \nAccount Number: 0113009891   \nBranch: Jinja Road   \nTown/Country: Kampala/Uganda   \nSWIFT Address: UNAFUGKA   \n\nBank Name: Standard Chartered Bank Ltd\nAccount Name: Bugema University\nAccount Number: 8702010609600\nBranch: 5 Speke Road\nTown/Country: Kampala/Uganda\nSWIFT Address: SCBLUGKA",
+    "category": "fees",
+    "tags": [
+      "payments",
+      "bank accounts",
+      "SWIFT",
+      "account numbers"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Refund Policy",
+    "answer": "The refund rules apply when a student makes changes in course load, withdraws, drops out, takes an unapproved leave of absence, fails to return from an approved leave of absence, is expelled, or otherwise fails to complete the period of enrollment for which he or she was charged.\nThe effective date for refunds of tuition or payments is made according to the date the student notifies the university and completes the withdrawal form. If the student fails to officially withdraw or appropriately notify the university, the last recorded date of class attended by the student, documented by the university, will be the effective date.\n\nInstitutional charges (tuition and fees, room and board) are refunded based on the total semester charges appropriately as follows for drop/withdrawal:\nWeek 1: 80% (any time after registration) \nWeek 2: 70%\nWeek 3 - 4: 60%\nWeek 5: 50%\nWeek 5+: 0% (No refund)\n\nThe university runs some summer/holiday programs. Tuition and fees refunded, based on total charges for the mini-summer, holiday classes and summer term, are as follows for drop/withdrawal:\nFirst 2 class days: 80% (any time after registration)\nNext 4 class days: 10% less each day\nAfter 5 class days: 0% (No refund)",
+    "category": "fees",
+    "tags": [
+      "refunds",
+      "withdrawal",
+      "drop"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
+  },
+  {
+    "keyword": "Late Fees",
+    "answer": "Continuing students who report for registration after the last day of normal registration and before closure of registration are charged a late fee.  The late fee increases for each day the student is late to a maximum limit of Uganda shillings 300,000.  Late fees are meant to encourage students to arrive early, complete registration and begin classes on time.",
+    "category": "fees",
+    "tags": [
+      "late registration",
+      "penalty"
+    ],
+    "priority": 100,
+    "source": "User Update",
+    "exportedAt": "2025-12-15T12:00:00.000Z"
   }
 ]

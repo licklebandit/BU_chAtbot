@@ -39,8 +39,8 @@ export const universityIntents = {
   },
   'registration': {
     keywords: ['register', 'registration', 'enroll', 'enrollment', 'sign up', 'signup'],
-    weight: 7,
-    categories: ['academic']
+    weight: 10,
+    categories: ['academic', 'administrative']
   },
   'exam': {
     keywords: ['exam', 'exams', 'examination', 'test', 'tests', 'assessment', 'paper'],

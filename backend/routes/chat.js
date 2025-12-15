@@ -160,12 +160,27 @@ function searchInKnowledgeBase(query) {
             scoringDetails.keywordContainsQuery = true;
         }
 
-        // Level 3: Synonym matches
+        // NEW: Bonus if keyword STARTS with the query (very strong signal for "how to..." queries)
+        if (keyword.startsWith(cleanQuery)) {
+            score += 15;
+            scoringDetails.startsWithQuery = true;
+        }
+
+        // Level 3: Synonym/Tag Analysis
         for (const synonym of allSynonyms) {
             const synLower = synonym.toLowerCase();
+
+            // Standard synonym match
             if (cleanQuery.includes(synLower)) {
                 score += 60;
                 scoringDetails.synonymMatch = synonym;
+
+                // NEW: Phrase Match Bonus (for tags like "how do i register")
+                // If the synonym is a multi-word phrase (2+ words) and it matches, give huge bonus
+                if (synLower.split(' ').length >= 2) {
+                    score += 50;
+                    scoringDetails.phraseTagMatch = true;
+                }
                 break;
             }
         }
@@ -196,7 +211,7 @@ function searchInKnowledgeBase(query) {
 
             // Check in keyword
             if (keyword.includes(qWord)) {
-                wordScore += 15;
+                wordScore += 20;
                 scoringDetails[`wordInKeyword_${qWord}`] = true;
             }
 
@@ -211,7 +226,7 @@ function searchInKnowledgeBase(query) {
 
             // Check in answer
             if (answer.includes(qWord)) {
-                wordScore += 8;
+                wordScore += 12;
                 scoringDetails[`wordInAnswer_${qWord}`] = true;
             }
         }
@@ -248,6 +263,14 @@ function searchInKnowledgeBase(query) {
             scoringDetails.lengthBonus = true;
         }
 
+        // NEW: Action Verb Alignment (e.g., "register", "apply", "pay")
+        const actionVerbs = ['apply', 'register', 'pay', 'reset', 'login', 'create', 'check'];
+        const queryAction = queryWords.find(w => actionVerbs.includes(w));
+        if (queryAction && (keyword.includes(queryAction) || allSynonyms.some(s => s.toLowerCase().includes(queryAction)))) {
+            score += 20;
+            scoringDetails.actionAlignment = queryAction;
+        }
+
         // Store best match
         if (score > bestScore) {
             bestScore = score;
@@ -264,13 +287,13 @@ function searchInKnowledgeBase(query) {
     }
 
     // Step 4: Dynamic threshold calculation
-    let minScore = 20; // Base minimum
+    let minScore = 15; // Lowered base minimum to catch more potential matches
 
     // Adjust based on query characteristics
     if (queryWords.length === 1) {
-        minScore = 25; // Single word needs stronger match
+        minScore = 20; // Single word needs slightly stronger match
     } else if (queryWords.length >= 3) {
-        minScore = 30; // Longer queries need good matches
+        minScore = 25; // Longer queries need reasonable matches
     }
 
     // Adjust based on intent
@@ -291,7 +314,7 @@ function searchInKnowledgeBase(query) {
         console.log(`   🏷️  Category: ${bestMatch.category || 'uncategorized'}`);
         console.log(`   🎯 Match type: ${Object.keys(bestMatchDetails).filter(k => k.includes('Match') || k.includes('Bonus')).join(', ')}`);
 
-        return { answer: bestMatch.answer, keyword: bestMatch.keyword };
+        return { answer: bestMatch.answer, keyword: bestMatch.keyword, score: bestScore };
     } else if (bestMatch) {
         console.log(`   ⚠️  Score too low: ${bestScore} < ${minScore}`);
 
@@ -299,7 +322,7 @@ function searchInKnowledgeBase(query) {
         const importantMatches = ['library location', 'contact information', 'admission requirements', 'vice', 'chancellor'];
         if (importantMatches.some(imp => bestMatch.keyword.toLowerCase().includes(imp.toLowerCase()))) {
             console.log(`   💡 Important topic match - overriding threshold`);
-            return { answer: bestMatch.answer, keyword: bestMatch.keyword };
+            return { answer: bestMatch.answer, keyword: bestMatch.keyword, score: bestScore };
         }
     }
 
@@ -317,7 +340,7 @@ function searchInKnowledgeBase(query) {
             const itemCat = item.category.toLowerCase();
             if (recommendedCats.some(cat => itemCat.includes(cat) || cat.includes(itemCat))) {
                 console.log(`   ✅ Contextual match: "${item.keyword}" (category: ${item.category})`);
-                return { answer: item.answer, keyword: item.keyword };
+                return { answer: item.answer, keyword: item.keyword, score: 40 };
             }
         }
     }
@@ -361,7 +384,7 @@ function searchInKnowledgeBase(query) {
                     for (const item of knowledgeBase) {
                         if (item.keyword.toLowerCase().includes(possibleKeyword.toLowerCase())) {
                             console.log(`   🔄 Fallback match: "${qWord}" → "${item.keyword}"`);
-                            return { answer: item.answer, keyword: item.keyword };
+                            return { answer: item.answer, keyword: item.keyword, score: 30 };
                         }
                     }
                 }
@@ -371,6 +394,43 @@ function searchInKnowledgeBase(query) {
 
     console.log("❌ No KB match found after all attempts");
     return null;
+}
+
+// ---------------------------
+// SMART DECISION LOGIC - When to use Gemini?
+// ---------------------------
+// ---------------------------
+// SMART DECISION LOGIC - When to use Gemini?
+// ---------------------------
+function shouldUseGemini(query, kbResult, kbScore) {
+    // ALWAYS use Gemini to ensure natural language responses
+    // We pass the KB result as context to the LLM, which will paraphrase it naturally.
+    if (kbResult) {
+        console.log(`   ✨ KB Match Found (Score: ${kbScore}), sending to Gemini for natural phrasing...`);
+    } else {
+        console.log("   🤖 No KB match, asking Gemini to use general knowledge/reasoning...");
+    }
+    return true;
+}
+
+// ---------------------------
+// KB ANSWER FORMATTER
+// ---------------------------
+function formatKbAnswer(answer, keyword) {
+    if (!answer) return answer;
+
+    let formatted = answer;
+
+    // Handle newline characters that might be escaped
+    formatted = formatted.replace(/\\n/g, '\n');
+
+    // Clean up excessive newlines
+    formatted = formatted.replace(/\n{3,}/g, '\n\n');
+
+    // Trim whitespace
+    formatted = formatted.trim();
+
+    return formatted;
 }
 
 // ---------------------------
@@ -513,19 +573,53 @@ router.post("/", authenticate, async (req, res) => {
         let context = "";
         let source = "ai";
         let kbMatch = false;
+        let kbScore = 0;
         const kbResult = searchInKnowledgeBase(q);
 
         if (kbResult && kbResult.answer) {
             console.log("✅ Found relevant info in Knowledge Base");
-            // Include BOTH the matched question and the answer in context
             context = kbResult.answer;
-            source = "knowledge_base+ai";
             kbMatch = true;
+            kbScore = kbResult.score || 0;
         } else {
             console.log("❌ No direct KB match found");
         }
 
-        // STEP 2: IF NO KB MATCH, TRY WEB SEARCH
+        // STEP 2: SMART DECISION - Should we use Gemini?
+        const useGemini = shouldUseGemini(q, kbResult, kbScore);
+
+        // FAST PATH: High-confidence KB answer - return directly (NO Gemini call)
+        if (!useGemini && kbMatch) {
+            const formattedAnswer = formatKbAnswer(kbResult.answer, kbResult.keyword);
+
+            console.log(`⚡ FAST PATH: Returning direct KB answer (0 API calls)`);
+
+            // Save to session
+            sessionManager.addMessage(userId, 'assistant', formattedAnswer, {
+                source: 'knowledge_base',
+                kbUsed: true,
+                responseTime: 0
+            });
+
+            // Save to history if logged in
+            if (req.user && req.user._id) {
+                await saveToHistory(req.user._id, q, formattedAnswer, 'knowledge_base');
+            }
+
+            return res.json({
+                answer: formattedAnswer,
+                source: "knowledge_base",
+                kbMatch: true,
+                kbScore: kbScore,
+                responseTime: "<100ms",
+                apiCalls: sessionManager.getApiCallCount(userId)
+            });
+        }
+
+        // SLOW PATH: Need Gemini for synthesis/reasoning
+        console.log("🐌 SLOW PATH: Using Gemini for synthesis/reasoning");
+
+        // STEP 3: IF NO KB MATCH, TRY WEB SEARCH
         // Simple intent check for search necessity
         const needsSearch = !kbMatch && q.length > 5 && !["hi", "hello", "hey", "thanks", "bye"].includes(q.toLowerCase().trim());
 
@@ -579,7 +673,7 @@ router.post("/", authenticate, async (req, res) => {
             })).slice(-6); // Limit to last 6 turns to check token usage
         }
 
-        // STEP 4: GENERATE SYNTHESIZED RESPONSE
+        // STEP 5: GENERATE SYNTHESIZED RESPONSE WITH GEMINI
         console.log("🤖 Generating AI response with context & history...");
 
         let geminiAnswer = "";
@@ -609,10 +703,9 @@ router.post("/", authenticate, async (req, res) => {
         } catch (error) {
             console.error("Gemini API error:", error.message);
 
-            // Fallback: If AI fails but we had a KB match, at least return that raw!
             if (kbMatch) {
-                console.log("⚠️ AI failed, falling back to raw KB answer");
-                geminiAnswer = kbResult.answer; // Fallback to raw
+                console.log("⚠️ AI failed, falling back to KB answer");
+                geminiAnswer = formatKbAnswer(kbResult.answer, kbResult.keyword);
                 source = "knowledge_base_fallback";
             } else {
                 geminiAnswer = "I'm having trouble connecting to the AI service. Please try again later.";
@@ -620,21 +713,22 @@ router.post("/", authenticate, async (req, res) => {
         }
 
         // Save to history if logged in
-        if (req.user) {
+        if (req.user && req.user._id) {
             await saveToHistory(req.user._id, q, geminiAnswer, source);
         }
 
         // Save assistant response to session
         sessionManager.addMessage(userId, 'assistant', geminiAnswer, {
-            source,
+            source: kbMatch ? "knowledge_base+ai" : source,
             kbUsed: kbMatch,
             responseTime
         });
 
         res.json({
             answer: geminiAnswer,
-            source: source,
+            source: kbMatch ? "knowledge_base+ai" : source,
             kbMatch: kbMatch,
+            kbScore: kbScore,
             responseTime: `${responseTime}ms`,
             suggestedQuestions: req.smartSuggestions || [],
             apiCalls: sessionManager.getApiCallCount(userId)

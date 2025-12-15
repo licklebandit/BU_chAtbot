@@ -110,7 +110,7 @@ class SessionManager {
     incrementApiCalls(userId) {
         const session = this.getSession(userId);
         session.apiCallCount++;
-        console.log(`🤖 Gemini API call #${session.apiCallCount} for session ${userId.substring(0, 8)}...`);
+        console.log(`🤖 Gemini API call #${session.apiCallCount} for session ${String(userId).substring(0, 8)}...`);
     }
 
     /**
@@ -129,7 +129,7 @@ class SessionManager {
      */
     clearSession(userId) {
         this.sessions.delete(userId);
-        console.log(`🗑️  Cleared session for ${userId.substring(0, 8)}...`);
+        console.log(`🗑️  Cleared session for ${String(userId).substring(0, 8)}...`);
     }
 
     /**

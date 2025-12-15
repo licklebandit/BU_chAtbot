@@ -6,7 +6,7 @@
   },
   {
     "source": "knowledge_base",
-    "chunk": "How do i reach bensdoff?: Walk through the main gate, its the first building immediately after the main gate.\n",
+    "chunk": "How do i reach bensdoff?: Walk through the main gate, its the first hostel inside the capus, right after the main gate.\n",
     "embedding": null
   },
   {
@@ -21,7 +21,7 @@
   },
   {
     "source": "knowledge_base",
-    "chunk": "Where do i find annex female hostel?: you walk through the path opposite the main gate and reach the vice chancellor's home. ",
+    "chunk": "Where do i find annex female hostel?: walk through the path opposite the main gate and reach the vice chancellor's home. The hostel is right after the vics chancellor's home.",
     "embedding": null
   },
   {

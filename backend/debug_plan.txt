@@ -1,0 +1,28 @@
+
+import { loadKnowledgeBase } from './utils/knowledgeLoader.js';
+import { detectIntent } from './utils/intentClassifier.js';
+import process from 'process';
+
+// Mock getKnowledgeBase since we can't easily import the internal state from chat.js if it's not exported
+// But wait, chat.js uses `getKnowledgeBase` from knowledgeLoader.js.
+// We need to copy the search logic from chat.js to debug it, OR verify if we can import it.
+// `searchInKnowledgeBase` is not exported from chat.js.
+// I will copy the relevant search logic here to debug it with the CURRENT knowledge.json.
+
+async function debugSearch() {
+    await loadKnowledgeBase();
+    // We need to re-implement the search logic to see what's happening, 
+    // or better, modify chat.js to export it or expose a debug endpoint.
+    // Since I can't easily change the running server's code instantly without restart, 
+    // and I want to reproduce it *now*, I'll use a script that mimics the logic.
+    
+    console.log("...Loading Knowledge Base...");
+    // Wait a bit for async load if needed, though await above should handle it if implemented right.
+    const { getKnowledgeBase } = await import './utils/knowledgeLoader.js'; // Syntax error? 
+}
+
+// Actually, easier path: Create a script that imports `chat.js`? No, chat.js is a route file, hard to import function.
+// Better: Create a standalone script `debug-search-v2.js` that copies the KEY logic from chat.js 
+// and runs it against the knowledge dictionary.
+
+// Let's read chat.js first to copy the latest logic I wrote.
