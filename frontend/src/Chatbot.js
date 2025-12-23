@@ -798,7 +798,7 @@ const Chatbot = () => {
               {STATIC_CONTENT.newChatButton}
             </button>
             <button
-              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
               onClick={() => setSidebarOpen(false)}
             >
               <X className={`h-5 w-5 ${mutedColor}`} />
